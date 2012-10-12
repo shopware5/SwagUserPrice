@@ -1,0 +1,77 @@
+html, body {
+	font:normal 12px verdana;
+	margin:0;
+	padding:0;
+	border:0 none;
+	overflow:hidden;
+	height:100%;
+}
+button.pencil {
+	background: url(../../../../backend/img/default/icons/pencil.png) no-repeat 0px 0px;
+}
+button.delete {
+	background: url(../../../../backend/img/default/icons/delete.png) no-repeat 0px 0px;
+}
+button.add {
+	background: url(../../../../backend/img/default/icons/add.png) no-repeat 0px 0px;
+}
+button.folders_plus {
+	background: url(../../../../backend/img/default/icons4/folders_plus.png) no-repeat 0px 0px;
+}
+.x-panel-body {
+	overflow:visible !important;
+}
+.x-panel-bwrap {
+	overflow:visible !important;
+}
+.x-html-editor-wrap {
+	overflow:hidden !important;
+}
+
+a.ico {
+	float:left;
+	height:20px;
+	margin:0 0 0 5px;
+	padding:0;
+	width:20px;
+}
+
+#sTranslations fieldset {
+	background:#F1F1F1 url(../../../../backend/img/default/window/bg_header.gif) repeat-x scroll 0 -1px;
+	border-color:#81BDD7 #A9A9A9 #A9A9A9;
+	border-style:solid;
+	border-width:1px;
+	font-size:10px;
+	line-height:16px;
+	margin:-39px 5px 30px;
+	min-width:250px;
+	padding:10px;
+	z-index:2;
+}
+#sTranslations fieldset legend {
+	color:#3E677D;
+	font-size:11px;
+	font-weight:bold;
+	margin:0;
+	padding:23px 5px 0;
+}
+
+		#adoption_window {
+			font-family:Arial,Verdana,Helvetica,sans-serif !important;
+			font-size:12px !important;
+			font-size-adjust:none !important;
+			line-height:148% !important;
+		}
+		#adoption_window strong {
+			font-weight:bold !important;
+		}
+		#adoption_window .x-panel-body {
+			padding:20px !important;
+		}
+		#adoption_window .x-panel {
+			margin-bottom:10px !important;
+		}
+
+		.x-grid3-col-options {
+			padding:0px 3px 0px 5px !important;
+		}
