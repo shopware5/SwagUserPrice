@@ -48,8 +48,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $this->Menu()->save();
 
         // Check if shopware version matches
-        if (!$this->assertVersionGreaterThen('4.0.3')){
-            throw new Exception("This plugin requires Shopware 4.0.3 or a later version");
+        if (!$this->assertVersionGreaterThen('4.0.4')){
+            throw new Exception("This plugin requires Shopware 4.0.4 or a later version");
         }
 
         //Adding of an post dispatch for the backend

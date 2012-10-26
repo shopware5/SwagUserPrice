@@ -374,7 +374,6 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         {
         	$search = Shopware()->Db()->quote(trim($this->Request()->search) . "%");
         	$sql_where = "WHERE d.ordernumber LIKE  $search ";
-        	$sql_where .= "OR gv.ordernumber LIKE $search ";
         	$sql_where .= "OR a.name LIKE $search";
         }
         $limit = empty($this->Request()->limit) ? 25 : (int)$this->Request()->limit;
