@@ -31,8 +31,46 @@
  */
 class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
+    /**
+     * Install method of the plugin
+     * - Checks if the correct shopware version is available
+     * - Creates the table for the customer prices
+     * - Creates the menu item of the module
+     * - Creates the hooks for the price calculation
+     * - Registers the post dispatch event
+     * - Starts the dialog for clearing the backend cache
+     *
+     * @return array
+     * @throws Exception
+     */
     public function install()
     {
+        // Check if shopware version matches
+        if (!$this->assertVersionGreaterThen('4.0.4')){
+            throw new Exception("This plugin requires Shopware 4.0.4 or a later version");
+        }
+
+        //Creates the table if not exists
+        Shopware()->Db()->query("
+            CREATE TABLE IF NOT EXISTS `s_core_customerpricegroups_prices` (
+              `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
+              `pricegroup` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+              `from` int(10) unsigned NOT NULL,
+              `to` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
+              `articleID` int(11) NOT NULL DEFAULT '0',
+              `articledetailsID` int(11) NOT NULL DEFAULT '0',
+              `price` double NOT NULL DEFAULT '0',
+              `pseudoprice` double DEFAULT NULL,
+              `baseprice` double DEFAULT NULL,
+              `percent` decimal(10,2) DEFAULT NULL,
+              PRIMARY KEY (`id`),
+              KEY `articleID` (`articleID`),
+              KEY `articledetailsID` (`articledetailsID`),
+              KEY `pricegroup_2` (`pricegroup`,`from`,`articledetailsID`),
+              KEY `pricegroup` (`pricegroup`,`to`,`articledetailsID`)
+            ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
+        ");
+
         //Creates a new menu item in the backend
         $parent = $this->Menu()->findOneBy('label', 'Kunden');
         $item = $this->createMenuItem(array(
@@ -47,10 +85,29 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $this->Menu()->addItem($item);
         $this->Menu()->save();
 
-        // Check if shopware version matches
-        if (!$this->assertVersionGreaterThen('4.0.4')){
-            throw new Exception("This plugin requires Shopware 4.0.4 or a later version");
-        }
+        /**
+         * Hooks for the price calculation
+         */
+        $this->subscribeEvent(
+            'sArticles::sGetArticleById::after',
+            'onAfterGetArticleById'
+        );
+        $this->subscribeEvent(
+            'sArticles::sGetPromotionById::after',
+            'onAfterGetPromotionById'
+        );
+        $this->subscribeEvent(
+            'sArticles::sGetArticlesByCategory::after',
+            'onAfterGetArticlesByCategory'
+        );
+        $this->subscribeEvent(
+            'sConfigurator::getArticleConfigurator::after',
+            'onAfterGetArticleConfigurator'
+        );
+        $this->subscribeEvent(
+            'sBasket::sUpdateArticle::after',
+            'onAfterUpdateArticle'
+        );
 
         //Adding of an post dispatch for the backend
         $this->subscribeEvent(
@@ -64,15 +121,21 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         return array('success' => true, 'invalidateCache' => array('backend'));
     }
 
-    public function uninstall()
-    {
-        return true;
-    }
-
+    /**
+     * Returns only the label of the plugin for the plugin manager
+     * @return string
+     */
     public function getLabel(){
         return "Kundenindividuelle Preise";
     }
 
+    /**
+     * Registers on the post dispatch event
+     * for adding the local template folder for the module
+     *
+     * @param Enlight_Event_EventArgs $args
+     * @return mixed
+     */
     public function onPostDispatchBackend(Enlight_Event_EventArgs $args){
         $request = $args->getSubject()->Request();
         $response = $args->getSubject()->Response();
@@ -88,8 +151,280 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         );
     }
 
+    /**
+     * Returns the path to the user price backend controller
+     *
+     * @param Enlight_Event_EventArgs $args
+     * @return string
+     */
     public function onGetControllerPathUserPrice(Enlight_Event_EventArgs $args)
     {
         return $this->Path() . 'Controllers/Backend/UserPrice.php';
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     * @return array
+     */
+    public function onAfterGetArticleById($args)
+    {
+        return $this->manupulateSingeArticle($args);
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     * @return array
+     */
+    public function onAfterGetPromotionById($args)
+    {
+        return $this->manupulateSingeArticle($args);
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     * @return array
+     */
+    public function onAfterGetArticleConfigurator($args)
+    {
+        return $this->manupulateSingeArticle($args);
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     * @return mixed
+     */
+    public function onAfterGetArticlesByCategory($args)
+    {
+        $articlesData = $args->getReturn();
+        if(!empty($articlesData['sArticles'])) {
+            foreach($articlesData['sArticles'] as &$article) {
+                $priceData = $this->refreshArticlePrices($article['price'], $article['sBlockPrices'], $article['ordernumber']);
+                $article['price'] = $priceData['price'];
+                $article['sBlockPrices'] = $priceData['blockPrices'];
+                if(empty($priceData['blockPrices'])) {
+                    unset($article['priceStartingFrom']);
+                }
+            }
+        }
+        return $articlesData;
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     */
+    public function onAfterUpdateArticle($args)
+    {
+        $basketData = Shopware()->Db()->fetchAll("
+            SELECT * FROM `s_order_basket` WHERE `sessionID` = ?
+        ", array( Shopware()->System()->sSESSION_ID ));
+
+        if(!empty($basketData)) {
+            foreach($basketData as $basketItem) {
+
+                $priceData = $this->refreshArticlePrices($basketItem['price'], $basketItem['sBlockPrices'], $basketItem['ordernumber'], $basketItem['quantity'], false);
+                Shopware()->Db()->query("
+                    UPDATE `s_order_basket` SET `price` = ? WHERE `id` = ?
+                ", array($priceData['price'], $basketItem['id']));
+            }
+        }
+    }
+
+    /**
+     * Fetches the current return of the method,
+     * manipulates the price and returns the result
+     *
+     * @param $args
+     * @return array
+     */
+    protected function manupulateSingeArticle($args)
+    {
+        $articleData = $args->getReturn();
+        $priceData = $this->refreshArticlePrices(
+            $articleData['price'],
+            $articleData['sBlockPrices'],
+            $articleData['ordernumber']
+        );
+
+        $articleData['price'] = $priceData['price'];
+        $articleData['sBlockPrices'] = $priceData['blockPrices'];
+        if(empty($priceData['blockPrices'])) {
+            unset($articleData['priceStartingFrom']);
+        }
+
+        return $articleData;
+    }
+
+    /**
+     * Fetches the price group id of the current user
+     *
+     * @return bool|string
+     */
+    protected function getPriceGroupId()
+    {
+        $userId = intval(Shopware()->System()->_SESSION['sUserId']);
+        if(empty($userId)) {
+            return false;
+        }
+
+        $priceGroupId = Shopware()->Db()->fetchOne("
+            SELECT pg.id FROM `s_user` as u
+            INNER JOIN `s_core_customerpricegroups` as pg
+            ON pg.id = u.pricegroupID
+            WHERE u.`id` = ?
+        ", array($userId));
+        if(empty($priceGroupId)) {
+            return false;
+        }
+
+        return $priceGroupId;
+    }
+
+    /**
+     * Checks if there is a different price for the current user.
+     * In this case the actually price will be replaced
+     *
+     * @param $oldPrice the old price
+     * @param $oldBlockPrices
+     * @param $orderNumber
+     * @param int $quantity
+     * @param bool $formatPrice
+     * @internal param $articleDetailsID
+     * @return array|bool
+     */
+    protected function refreshArticlePrices($oldPrice, $oldBlockPrices, $orderNumber, $quantity = 1, $formatPrice = true)
+    {
+        $priceGroupId = $this->getPriceGroupId();
+        if(empty($priceGroupId)) {
+            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+        }
+
+        $articleDetailsID = Shopware()->Db()->fetchOne("
+            SELECT id FROM `s_articles_details` WHERE `ordernumber` = ?
+        ", array($orderNumber));
+        if(empty($articleDetailsID)) {
+            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+        }
+
+        $taxData = Shopware()->Db()->fetchRow("
+            SELECT a.taxID, t.tax
+            FROM `s_articles_details` as ad
+
+            INNER JOIN `s_articles` as a
+            ON a.id = ad.articleID
+
+            INNER JOIN `s_core_tax` as t
+            ON a.taxID = t.id
+
+            WHERE ad.`id` = ?
+        ", array( $articleDetailsID ));
+        if(empty($taxData)) {
+            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+        }
+
+        $priceData = $this->getPriceGroupPrice(
+            $priceGroupId,
+            $articleDetailsID,
+            $taxData['tax'],
+            $taxData['taxID'],
+            $quantity,
+            $formatPrice
+        );
+        if($priceData === false) {
+            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+        }
+
+        return array( 'price' => $priceData['price'], 'blockPrices' => $priceData['blockPrices'] );
+    }
+
+    /**
+     * Loads the price for the given article
+     * by using the given price group
+     *
+     * @param $priceGroupId
+     * @param $articleDetailsID
+     * @param $tax
+     * @param $taxId
+     * @param int $quantity
+     * @param bool $formatPrice
+     * @return array|bool
+     */
+    protected function getPriceGroupPrice($priceGroupId, $articleDetailsID, $tax, $taxId, $quantity = 1, $formatPrice = true)
+    {
+        $price = Shopware()->Db()->fetchOne("
+            SELECT price FROM `s_core_customerpricegroups_prices`
+            WHERE `articledetailsID` = ?
+            AND `pricegroup` = ?
+            AND (
+                (
+                    `from` <= ?
+                    AND `to` >= ?
+                )
+                OR `to` = 'beliebig'
+            )
+            ORDER BY `from` ASC
+            LIMIT 1
+        ", array(
+            $articleDetailsID,
+            'PG' . $priceGroupId,
+            $quantity,
+            $quantity
+        ));
+        if(empty($price)) {
+            return false;
+        }
+
+        if($formatPrice === true) {
+            $price = Shopware()->Modules()->Articles()->sCalculatingPrice($price, $tax, $taxId);
+        } else {
+            $price = Shopware()->Modules()->Articles()->sCalculatingPriceNum($price, $tax, false, false, $taxId, false);
+        }
+
+        //Block prices
+        $blockPrices = null;
+        $priceCount = Shopware()->Db()->fetchOne("
+            SELECT COUNT(*) FROM `s_core_customerpricegroups_prices`
+            WHERE `pricegroup` = ?
+            AND `articledetailsID` = ?
+        ", array(
+            'PG' . $priceGroupId,
+            $articleDetailsID
+        ));
+
+        if($priceCount > 1) {
+            $blockPrices = Shopware()->Db()->fetchAll("
+                SELECT * FROM `s_core_customerpricegroups_prices`
+                WHERE `pricegroup` = ?
+                AND `articledetailsID` = ?
+                ORDER BY `from` ASC
+            ", array(
+                'PG' . $priceGroupId,
+                $articleDetailsID
+            ));
+
+            foreach($blockPrices as &$blockPrice) {
+                if($formatPrice === true) {
+                    $blockPrice['price'] = Shopware()->Modules()->Articles()->sCalculatingPrice($blockPrice['price'], $tax, $taxId);
+                } else {
+                    $blockPrice['price'] = Shopware()->Modules()->Articles()->sCalculatingPriceNum($blockPrice['price'], $tax, false, false, $taxId, false);
+                }
+            }
+        }
+
+        return array( 'price' => $price, 'blockPrices' => $blockPrices );
     }
 }

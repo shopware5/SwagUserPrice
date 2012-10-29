@@ -52,7 +52,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         	switch ($this->Request()->name)
         	{
         		case "customerpricegroups":
-        			Shopware()->Db()->query("DELETE FROM s_articles_prices WHERE pricegroup=?", array('PG' . $delete));
+        			Shopware()->Db()->query("DELETE FROM s_core_customerpricegroups_prices WHERE pricegroup=?", array('PG' . $delete));
 //                    Shopware()->Db()->query("DELETE FROM s_articles_groups_prices WHERE groupkey=?", array('PG' . $delete));
                     Shopware()->Db()->query("UPDATE s_user SET pricegroupID=NULL WHERE pricegroupID=?", array($delete));
                     Shopware()->Db()->query("DELETE FROM s_core_customerpricegroups WHERE id=?", array($delete));
@@ -365,7 +365,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
 //        	", array($delete, $sql_pricegroup));
 
             Shopware()->Db()->query("
-        		DELETE p FROM s_articles_details d, s_articles_prices p
+        		DELETE p FROM s_articles_details d, s_core_customerpricegroups_prices p
         		WHERE d.ordernumber=?	AND p.pricegroup=? AND p.articledetailsID=d.id
         	", array($delete, $sql_pricegroup));
         }
@@ -397,7 +397,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         		INNER JOIN s_core_tax t
         		ON t.id=a.taxID
 
-        		LEFT JOIN s_articles_prices p
+        		LEFT JOIN s_core_customerpricegroups_prices p
         		ON p.articledetailsID = d.id
         		AND p.`to` = 'beliebig'
         		AND p.pricegroup = ?
@@ -463,7 +463,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
 
         $result = Shopware()->Db()->fetchAll("
             SELECT `from`, `price`, `pseudoprice`, `baseprice`, `percent`
-            FROM s_articles_details d, s_articles_prices p
+            FROM s_articles_details d, s_core_customerpricegroups_prices p
             WHERE d.ordernumber=?
             AND p.articledetailsID=d.id
             AND p.pricegroup=?
@@ -473,7 +473,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         {
             $result = Shopware()->Db()->fetchAll("
                 SELECT `from`, `price`, `pseudoprice`, `baseprice`, `percent`
-                FROM s_articles_details d, s_articles_prices p
+                FROM s_articles_details d, s_core_customerpricegroups_prices p
                 WHERE d.ordernumber=?
                 AND p.articledetailsID=d.id
                 AND p.pricegroup='EK'
@@ -580,13 +580,13 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
             $articledetailsID = $result['articledetailsID'];
 
         	Shopware()->Db()->query("
-        		DELETE FROM s_articles_prices WHERE pricegroup=? AND articledetailsID=? AND `from`>=?
+        		DELETE FROM s_core_customerpricegroups_prices WHERE pricegroup=? AND articledetailsID=? AND `from`>=?
         	", array($pricegroup, $articledetailsID, $from));
 
         	if($from!=1)
         	{
                 Shopware()->Db()->query("
-        			UPDATE `s_articles_prices`
+        			UPDATE `s_core_customerpricegroups_prices`
         			SET `to` = ?
         			WHERE pricegroup = ?
         			AND articledetailsID = ?
@@ -598,7 +598,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         	{
                 Shopware()->Db()->query("
 
-        			INSERT INTO `s_articles_prices`
+        			INSERT INTO `s_core_customerpricegroups_prices`
         				(`pricegroup`, `from`, `to`, `articleID`, `articledetailsID`, `price`, `pseudoprice`, `baseprice`, `percent`)
         			VALUES
         				(?, ?, 'beliebig', ?, ?, ?, ?, ?, ?);
