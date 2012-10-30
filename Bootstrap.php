@@ -286,6 +286,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             INNER JOIN `s_core_customerpricegroups` as pg
             ON pg.id = u.pricegroupID
             WHERE u.`id` = ?
+            AND pg.`active` = 1
         ", array($userId));
         if(empty($priceGroupId)) {
             return false;
