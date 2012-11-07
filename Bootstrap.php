@@ -129,6 +129,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         return "Kundenspezifische Preise";
     }
 
+    public function getVersion()
+    {
+        return '1.0.0';
+    }
+
     /**
      * Registers on the post dispatch event
      * for adding the local template folder for the module
