@@ -126,7 +126,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * @return string
      */
     public function getLabel(){
-        return "Kundenindividuelle Preise";
+        return "Kundenspezifische Preise";
     }
 
     /**
