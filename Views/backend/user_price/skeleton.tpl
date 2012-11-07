@@ -1,6 +1,6 @@
 {
 	"init": {
-		"title": "{s name='WindowTitle' force}Kundenindividuelle Preise{/s}",
+		"title": "{s name='WindowTitle' force}Kundenspezifische Preise{/s}",
 		"width": 1224,
 		"height": 750,
 		"id": "coupon",
