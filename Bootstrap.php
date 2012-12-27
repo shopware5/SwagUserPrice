@@ -144,7 +144,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
 
     public function getVersion()
     {
-        return '1.0.0';
+        return '1.0.1';
     }
 
     /**
