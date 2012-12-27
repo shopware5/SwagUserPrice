@@ -122,6 +122,19 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
+     * The update method is needed for the update via plugin manager
+     *
+     * @return bool
+     */
+    public function update()
+    {
+        //1.0.0 to 1.0.1
+        //There a no changes between this versions
+
+        return true;
+    }
+
+    /**
      * Returns only the label of the plugin for the plugin manager
      * @return string
      */
@@ -213,16 +226,26 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     public function onAfterGetArticlesByCategory($args)
     {
         $articlesData = $args->getReturn();
+
         if(!empty($articlesData['sArticles'])) {
             foreach($articlesData['sArticles'] as &$article) {
                 $priceData = $this->refreshArticlePrices($article['price'], $article['sBlockPrices'], $article['ordernumber']);
-                $article['price'] = $priceData['price'];
-                $article['sBlockPrices'] = $priceData['blockPrices'];
-                if(empty($priceData['blockPrices'])) {
-                    unset($article['priceStartingFrom']);
+                if($priceData !== false) {
+                    $article['price'] = $priceData['price'];
+                    $article['sBlockPrices'] = $priceData['blockPrices'];
+                    if(empty($priceData['blockPrices'])) {
+                        unset($article['priceStartingFrom']);
+                    }                    
+                    
+                    if(!empty($priceData['cheapestPrice'])) {
+                        $article['price'] = $priceData['cheapestPrice'];
+                        $article['priceStartingFrom'] = $priceData['cheapestPrice'];
+                    }
                 }
             }
         }
+
+
         return $articlesData;
     }
 
@@ -242,9 +265,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             foreach($basketData as $basketItem) {
 
                 $priceData = $this->refreshArticlePrices($basketItem['price'], $basketItem['sBlockPrices'], $basketItem['ordernumber'], $basketItem['quantity'], false);
-                Shopware()->Db()->query("
-                    UPDATE `s_order_basket` SET `price` = ? WHERE `id` = ?
-                ", array($priceData['price'], $basketItem['id']));
+                if($priceData !== false) {
+                    Shopware()->Db()->query("
+                        UPDATE `s_order_basket` SET `price` = ?, `netprice` = ? WHERE `id` = ?
+                    ", array($priceData['price'], $priceData['netPrice'], $basketItem['id']));
+                }
             }
         }
     }
@@ -265,11 +290,14 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             $articleData['ordernumber']
         );
 
-        $articleData['price'] = $priceData['price'];
-        $articleData['sBlockPrices'] = $priceData['blockPrices'];
-        if(empty($priceData['blockPrices'])) {
-            unset($articleData['priceStartingFrom']);
+        if($priceData !== false) {
+            $articleData['price'] = $priceData['price'];
+            $articleData['sBlockPrices'] = $priceData['blockPrices'];
+            if(empty($priceData['blockPrices'])) {
+                unset($articleData['priceStartingFrom']);
+            }
         }
+
 
         return $articleData;
     }
@@ -316,14 +344,14 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     {
         $priceGroupId = $this->getPriceGroupId();
         if(empty($priceGroupId)) {
-            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+            return false;
         }
 
         $articleDetailsID = Shopware()->Db()->fetchOne("
             SELECT id FROM `s_articles_details` WHERE `ordernumber` = ?
         ", array($orderNumber));
         if(empty($articleDetailsID)) {
-            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+            return false;
         }
 
         $taxData = Shopware()->Db()->fetchRow("
@@ -339,7 +367,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             WHERE ad.`id` = ?
         ", array( $articleDetailsID ));
         if(empty($taxData)) {
-            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+            return false;
         }
 
         $priceData = $this->getPriceGroupPrice(
@@ -351,10 +379,45 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             $formatPrice
         );
         if($priceData === false) {
-            return array( 'price' => $oldPrice, 'blockPrices' => $oldBlockPrices );
+            return false;
         }
 
-        return array( 'price' => $priceData['price'], 'blockPrices' => $priceData['blockPrices'] );
+        //Checks if there are more than one variants for this
+        //article. Fetches the cheapest price
+        $articleId = Shopware()->Db()->fetchOne("
+            SELECT articleID FROM `s_articles_details` WHERE `id` = ?
+        ", array($articleDetailsID));
+
+        $variantsCount = Shopware()->Db()->fetchOne("
+            SELECT COUNT(*) FROM `s_core_customerpricegroups_prices`
+            WHERE `articleID` = ?
+            AND `pricegroup` = ?
+        ", array($articleId, 'PG' . $priceGroupId));
+
+        $cheapestPrice = 0;
+        if(!empty($articleId) && intval($variantsCount) > 1) {
+            $cheapestPrice = Shopware()->Db()->fetchOne("
+                SELECT price FROM `s_core_customerpricegroups_prices`
+                WHERE `articleID` = ?
+                AND `pricegroup` = ?
+                AND `to` = 'beliebig'
+                ORDER BY `price` ASC
+                LIMIT 1
+            ", array(
+                $articleId,
+                'PG' . $priceGroupId
+            ));
+
+            if(!empty($cheapestPrice)) {
+                if($formatPrice === true) {
+                    $cheapestPrice = Shopware()->Modules()->Articles()->sCalculatingPrice($cheapestPrice, $taxData['tax'], $taxData['taxID']);
+                } else {
+                    $cheapestPrice = Shopware()->Modules()->Articles()->sCalculatingPriceNum($cheapestPrice, $taxData['tax'], false, false, $taxData['taxID'], false);
+                }
+            }
+        }
+
+        return array( 'price' => $priceData['price'], 'netPrice' => $priceData['netPrice'], 'blockPrices' => $priceData['blockPrices'], 'cheapestPrice' => $cheapestPrice );
     }
 
     /**
@@ -394,6 +457,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             return false;
         }
 
+        $netPrice = $price;
         if($formatPrice === true) {
             $price = Shopware()->Modules()->Articles()->sCalculatingPrice($price, $tax, $taxId);
         } else {
@@ -431,6 +495,6 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             }
         }
 
-        return array( 'price' => $price, 'blockPrices' => $blockPrices );
+        return array( 'price' => $price, 'netPrice' => $netPrice, 'blockPrices' => $blockPrices );
     }
 }
