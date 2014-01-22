@@ -441,7 +441,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             AND (
                 (
                     `from` <= ?
-                    AND `to` >= ?
+                    AND `to` >= ".Shopware()->Db()->quote($quantity, Zend_Db::INT_TYPE)."
                 )
                 OR `to` = 'beliebig'
             )
@@ -450,7 +450,6 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         ", array(
             $articleDetailsID,
             'PG' . $priceGroupId,
-            $quantity,
             $quantity
         ));
         if(empty($price)) {
