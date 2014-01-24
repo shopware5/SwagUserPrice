@@ -6,18 +6,7 @@ html, body {
 	overflow:hidden;
 	height:100%;
 }
-button.pencil {
-	background: url(../../../../backend/img/default/icons/pencil.png) no-repeat 0px 0px;
-}
-button.delete {
-	background: url(../../../../backend/img/default/icons/delete.png) no-repeat 0px 0px;
-}
-button.add {
-	background: url(../../../../backend/img/default/icons/add.png) no-repeat 0px 0px;
-}
-button.folders_plus {
-	background: url(../../../../backend/img/default/icons4/folders_plus.png) no-repeat 0px 0px;
-}
+
 .x-panel-body {
 	overflow:visible !important;
 }

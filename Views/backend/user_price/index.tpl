@@ -84,8 +84,7 @@
                 	Ext.getCmp('groupgrid').stopEditing();
                 	Ext.getCmp('groupgrid').store.insert(0, c);
                 	Ext.getCmp('groupgrid').startEditing(0, 0);
-    			},
-    			iconCls:'add'
+    			}
     		},'-',{
                 text:'Preisgruppe editieren',
                 handler: function (){
@@ -108,8 +107,7 @@
                 	Ext.getCmp('users').enable();
     				Ext.getCmp('prices').enable();
     				Ext.getCmp('tabs').activate(1);
-                },
-                iconCls:'pencil'
+                }
             },'-',{
     			text:'Preisgruppen löschen',
     			handler: function (a, b, c){
@@ -127,8 +125,7 @@
     						}
     					}
     				});
-    			},
-    			iconCls:'delete'
+    			}
     		}],
     		buttonAlign:'right',
     		buttons: [{
@@ -138,6 +135,8 @@
     				Ext.getCmp('prices').disable();
     				Ext.getCmp('groupgrid').store.each(function(record){
     					new Request({ method: 'post', url: '{url action="savePricegroups"}', async: false, data: record.data}).send();
+						Ext.MessageBox.alert('Status', 'Einstellungen gespeichert.');
+
     				});
     				Ext.getCmp('groupgrid').store.commitChanges();
     				Ext.getCmp('groupgrid').store.load();
