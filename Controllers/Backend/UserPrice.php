@@ -1,7 +1,7 @@
 <?php
 /**
  * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Copyright (c) 2012 shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -69,7 +69,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         {
         	case "customergroup":
         		$sql = "
-        			SELECT 0 as id, 'allgemein gültig' as name
+        			SELECT 0 as id, 'allgemein gÃ¼ltig' as name
         			UNION (
         				SELECT id, description as name
         				FROM s_core_customergroups
@@ -79,7 +79,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         		break;
         	case "multishop":
         		$sql = "
-        			SELECT 0 as id, 'allgemein gültig' as name
+        			SELECT 0 as id, 'allgemein gÃ¼ltig' as name
         			UNION (
         				SELECT id, name
         				FROM s_core_multilanguage
@@ -99,7 +99,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         		break;
         	case "tax":
         		$sql = "
-        			SELECT 0 as id, 'höchster Steuersatz aus dem Warenkorb nehmen' as name
+        			SELECT 0 as id, 'hÃ¶chster Steuersatz aus dem Warenkorb nehmen' as name
         			UNION
         			SELECT id, description as name
         			FROM `s_core_tax`
