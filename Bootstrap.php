@@ -72,7 +72,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         ");
 
         //Creates a new menu item in the backend
-        $parent = $this->Menu()->findOneBy('label', 'Kunden');
+        $parent = $this->Menu()->findOneBy(array('label' => 'Kunden'));
         $item = $this->createMenuItem(array(
             'label' => $this->getLabel(),
             'onclick' => 'openAction(\'user_price\');',
@@ -144,7 +144,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
 
     public function getVersion()
     {
-        return '1.0.2';
+        return '1.0.3';
     }
 
     /**
