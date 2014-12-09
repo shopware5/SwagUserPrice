@@ -1,12 +1,26 @@
 {
+    "label": {
+        "de": "Kundenspezifische Preise",
+        "en": "Customer specific Prices"
+    },
+    "copyright": "(c) by Shopware AG",
+    "license": "proprietary",
+    "link": "http://store.shopware.com",
+    "author": "Shopware AG",
+
     "currentVersion": "1.0.3",
 
-    "changelogs": {
-        "1.0.3": "Fixed wrong encoding"
+    "changelog": {
+        "de": {
+            "1.0.3": "Korrigiert falsche Kodierung; Korrigiert Nutzung von SSL im Backend;"
+        },
+        "en": {
+            "1.0.3": "Fixed wrong encoding; Fixed ssl usage in the backend;"
+        }
     },
 
     "compatibility": {
-        "minimumVersion": "4.0.4",
+        "minimumVersion": "4.0.0",
         "maximumVersion": null,
         "blacklist": [
         ]
