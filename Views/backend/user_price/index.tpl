@@ -2,7 +2,7 @@
 <head>
   <title></title>
     {*<link href="../../../backend/css/icons.css" rel="stylesheet" type="text/css" />*}
-    <link rel="stylesheet" type="text/css" href="http://cdn.shopware.de/assets/library/resources/css/all.css" />
+    <link rel="stylesheet" type="text/css" href="//cdn.shopware.de/assets/library/resources/css/all.css" />
     <link href="{link file='backend/user_price/_resources/css/multiselect.css'}" rel="stylesheet" type="text/css" />
     <link href="{link file='backend/user_price/_resources/css/premium_shipping.css'}" rel="stylesheet" type="text/css" />
     {*<link href="../../../backend/css/icons.css" rel="stylesheet" type="text/css" />*}
