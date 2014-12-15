@@ -7,13 +7,13 @@
     <link href="{link file='backend/user_price/_resources/css/premium_shipping.css'}" rel="stylesheet" type="text/css" />
     {*<link href="../../../backend/css/icons.css" rel="stylesheet" type="text/css" />*}
     {*<link href="../../../backend/css/icons4.css" rel="stylesheet" type="text/css" />*}
-    <script type="text/javascript" src="http://cdn.shopware.de/assets/library/base.js"></script>
-    <script type="text/javascript" src="http://cdn.shopware.de/assets/library/all.js"></script>
+    <script type="text/javascript" src="//cdn.shopware.de/assets/library/base.js"></script>
+    <script type="text/javascript" src="//cdn.shopware.de/assets/library/all.js"></script>
     <script type="text/javascript" src="{link file='backend/user_price/_resources/js/TabCloseMenu.js'}"></script>
     <script type="text/javascript" src="{link file='backend/user_price/_resources/js/DDView.js'}"></script>
     <script type="text/javascript" src="{link file='backend/user_price/_resources/js/MultiSelect.js'}"></script>
     <script type="text/javascript" src="{link file='backend/user_price/_resources/js/ItemSelector.js'}"></script>
-    <script type="text/javascript" src="http://cdn.shopware.de/assets/library/locale/de.js" charset="utf-8"></script>
+    <script type="text/javascript" src="//cdn.shopware.de/assets/library/locale/de.js" charset="utf-8"></script>
     <script type="text/javascript" src="{link file='backend/user_price/_resources/js/mootools.js'}"></script>
 
 <script type="text/javascript">
