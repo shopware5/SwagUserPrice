@@ -135,7 +135,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         		";
         		break;
         	case "category";
-        		$node = (empty($_REQUEST["node"])||!is_numeric($_REQUEST["node"])) ? 1 : (int) $_REQUEST["node"];
+        		$node = (empty($this->Request()->node)||!is_numeric($this->Request()->node)) ? 1 : (int) $this->Request()->node;
         		$sql = "
         			SELECT c.id, c.description as text, c.parent as parentId, IF(COUNT(c2.id)>0,0,1) as leaf FROM s_categories c LEFT JOIN s_categories c2 ON c2.parent=c.id  WHERE c.parent=$node GROUP BY c.id ORDER BY c.position, c.description
         		";
@@ -258,7 +258,7 @@ class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
         			$sql_where = 'AND u.pricegroupID IS NULL';
         		$dir = (empty($this->Request()->dir)|| $this->Request()->dir=='ASC') ? 'ASC' : 'DESC';
         		$sort = (empty($this->Request()->sort)||is_array($this->Request()->sort)) ? 'customernumber' : preg_replace('#[^\w]#','',$this->Request()->sort);
-        		if(!empty($_REQUEST["search"]))
+        		if(!empty($this->Request()->search))
         		{
         			$search = Shopware()->Db()->quote(trim($this->Request()->search) . '%');
         			$search2 = Shopware()->Db()->quote('%' . trim($this->Request()->search) . '%');
