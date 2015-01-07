@@ -115,6 +115,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             'onPostDispatchBackend'
         );
 
+        $this->subscribeEvent(
+            'sAdmin::sLogin::after',
+            'onFrontendLogin'
+        );
+
         //Adds the old emotion controller
         $this->subscribeEvent('Enlight_Controller_Dispatcher_ControllerPath_Backend_UserPrice','onGetControllerPathUserPrice');
 
@@ -501,5 +506,32 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         }
 
         return array( 'price' => $price, 'netPrice' => $netPrice, 'blockPrices' => $blockPrices );
+    }
+
+    /**
+     * On user login when httpcache plugin is active
+     * set no cache tag for product prices
+     */
+    public function onFrontendLogin()
+    {
+        if ($this->cachePluginActive()) {
+            $cache = Shopware()->Plugins()->Core()->HttpCache();
+            $cache->setNoCacheTag('price');
+        }
+    }
+
+    /**
+     * Check if HttpCache plugin is installed and activate
+     *
+     * @return boolean
+     */
+    private function cachePluginActive()
+    {
+        $cachePlugin = Shopware()->Models()->getRepository('\Shopware\Models\Plugin\Plugin')->findOneBy(array('name' => 'HttpCache'));
+        if ($cachePlugin->getActive()) {
+            return true;
+        }
+
+        return false;
     }
 }

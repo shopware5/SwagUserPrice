@@ -12,10 +12,10 @@
 
     "changelog": {
         "de": {
-            "1.0.3": "Korrigiert falsche Kodierung; Korrigiert Nutzung von SSL im Backend; Replaced REQUEST superglobal variable;"
+            "1.0.3": "Korrigiert falsche Kodierung; Korrigiert Nutzung von SSL im Backend; Replaced REQUEST superglobal variable; PT-2614 Korrektur: Cache-Kompatiblität"
         },
         "en": {
-            "1.0.3": "Fixed wrong encoding; Fixed ssl usage in the backend; Replaced REQUEST superglobal variable;"
+            "1.0.3": "Fixed wrong encoding; Fixed ssl usage in the backend; Replaced REQUEST superglobal variable; PT-2614 fix for article price with httpcache active"
         }
     },
 
