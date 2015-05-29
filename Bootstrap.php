@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright © 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -20,136 +20,114 @@
  * The licensing of the program under the AGPLv3 does not imply a
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
+ */
+
+use Shopware\SwagUserPrice\Bundle\SearchBundleDBAL\PriceHelper;
+use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
+use Shopware\SwagUserPrice\Subscriber;
+
+/**
+ * Plugin bootstrap class.
  *
- * @category   Shopware
- * @package    Shopware_Plugins_Backend_SwagUserPrice
- * @subpackage Result
- * @copyright  Copyright (c) 2012, shopware AG (http://www.shopware.de)
- * @version    $Id$
- * @author     Stefan Hamann
- * @author     $Author$
+ * The Shopware_Plugins_Backend_SwagUserPrice_Bootstrap class is the bootstrap class
+ * of the user price plugin.
+ * This class contains all information about the user price plugin.
+ * Additionally it registers the needed events.
+ *
+ * @category Shopware
+ * @package Shopware\Plugin\SwagUserPrice
+ * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
     /**
-     * Install method of the plugin
-     * - Checks if the correct shopware version is available
-     * - Creates the table for the customer prices
-     * - Creates the menu item of the module
-     * - Creates the hooks for the price calculation
-     * - Registers the post dispatch event
-     * - Starts the dialog for clearing the backend cache
+     * @var $setupService \Shopware\SwagUserPrice\Bootstrap\Setup
+     */
+    private $setupService;
+
+    /**
+     * After init method is called everytime after initializing this plugin
+     */
+    public function afterInit()
+    {
+        $this->get('loader')->registerNamespace('Shopware\SwagUserPrice', $this->Path());
+        $this->registerCustomModels();
+    }
+
+    /**
+     * Returns an instance of the install / update helper service
      *
-     * @return array
+     * @return \Shopware\SwagUserPrice\Bootstrap\Setup
+     */
+    public function getSetupService()
+    {
+        if (!$this->setupService) {
+            $this->setupService = new \Shopware\SwagUserPrice\Bootstrap\Setup($this);
+        }
+
+        return $this->setupService;
+    }
+
+    /**
+     * Install method of the plugin.
+     * Triggers the install-method from the setup-class.
+     *
+     * Additionally adds the events, which would not be triggered in every case otherwise.
+     * The Enlight_Controller_Front_StartDispatch-event is not triggered when accessing shopware via command-line.
+     * Therefore we need to include those "AfterInitResource"-events in the bootstrap itself, since they need to be called when a command-line is used.
+     *
+     * @return bool
      * @throws Exception
      */
     public function install()
     {
-        // Check if shopware version matches
-        if (!$this->assertVersionGreaterThen('4.0.4')){
-            throw new Exception("This plugin requires Shopware 4.0.4 or a later version");
+        if (!$this->assertVersionGreaterThen('5.0.0')) {
+            throw new Exception("This plugin requires Shopware 5.0.0x or a later version");
         }
 
-        //Creates the table if not exists
-        Shopware()->Db()->query("
-            CREATE TABLE IF NOT EXISTS `s_core_customerpricegroups_prices` (
-              `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-              `pricegroup` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-              `from` int(10) unsigned NOT NULL,
-              `to` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-              `articleID` int(11) NOT NULL DEFAULT '0',
-              `articledetailsID` int(11) NOT NULL DEFAULT '0',
-              `price` double NOT NULL DEFAULT '0',
-              `pseudoprice` double DEFAULT NULL,
-              `baseprice` double DEFAULT NULL,
-              `percent` decimal(10,2) DEFAULT NULL,
-              PRIMARY KEY (`id`),
-              KEY `articleID` (`articleID`),
-              KEY `articledetailsID` (`articledetailsID`),
-              KEY `pricegroup_2` (`pricegroup`,`from`,`articledetailsID`),
-              KEY `pricegroup` (`pricegroup`,`to`,`articledetailsID`)
-            ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-        ");
-
-        //Creates a new menu item in the backend
-        $parent = $this->Menu()->findOneBy(array('label' => 'Kunden'));
-        $item = $this->createMenuItem(array(
-            'label' => $this->getLabel(),
-            'onclick' => 'openAction(\'user_price\');',
-            'class' => 'sprite-ui-scroll-pane-detail',
-            'active' => 1,
-            'parent' => $parent,
-            'position' => -1,
-            'style' => 'background-position: 5px 5px;'
-        ));
-        $this->Menu()->addItem($item);
-        $this->Menu()->save();
-
-        /**
-         * Hooks for the price calculation
-         */
-        $this->subscribeEvent(
-            'sArticles::sGetArticleById::after',
-            'onAfterGetArticleById'
-        );
-        $this->subscribeEvent(
-            'sArticles::sGetPromotionById::after',
-            'onAfterGetPromotionById'
-        );
-        $this->subscribeEvent(
-            'sArticles::sGetArticlesByCategory::after',
-            'onAfterGetArticlesByCategory'
-        );
-        $this->subscribeEvent(
-            'sConfigurator::getArticleConfigurator::after',
-            'onAfterGetArticleConfigurator'
-        );
-        $this->subscribeEvent(
-            'sBasket::sUpdateArticle::after',
-            'onAfterUpdateArticle'
-        );
-
-        //Adding of an post dispatch for the backend
-        $this->subscribeEvent(
-            'Enlight_Controller_Action_PostDispatch',
-            'onPostDispatchBackend'
-        );
-
-        $this->subscribeEvent(
-            'sAdmin::sLogin::after',
-            'onFrontendLogin'
-        );
-
-        //Adds the old emotion controller
-        $this->subscribeEvent('Enlight_Controller_Dispatcher_ControllerPath_Backend_UserPrice','onGetControllerPathUserPrice');
-
-        return array('success' => true, 'invalidateCache' => array('backend'));
-    }
-
-    /**
-     * The update method is needed for the update via plugin manager
-     *
-     * @return bool
-     */
-    public function update()
-    {
-        //1.0.0 to 1.0.1
-        //There a no changes between this versions
-
+        $this->getSetupService()->install();
         return true;
     }
 
     /**
-     * Returns only the label of the plugin for the plugin manager
-     * @return string
+     * Returns the meta information about the plugin.
+     * Keep in mind that the plugin description is located
+     * in the info.txt.
+     *
+     * @return array
      */
-    public function getLabel(){
-        return "Kundenspezifische Preise";
+    public function getInfo()
+    {
+        return array(
+            'version' => $this->getVersion(),
+            'label' => $this->getLabel(),
+            'link' => 'http://www.shopware.de/',
+            'description' => file_get_contents($this->Path() . 'info_de.txt') . file_get_contents(
+                    $this->Path() . 'info_en.txt'
+                )
+        );
     }
 
+    /**
+     * The update method is needed for the update via plugin manager.
+     *
+     * @param $oldVersion
+     * @return bool
+     */
+    public function update($oldVersion)
+    {
+        return $this->getSetupService()->update($oldVersion);
+    }
+
+    /**
+     * Returns the current version of the plugin.
+     *
+     * @return string|void
+     * @throws Exception
+     */
     public function getVersion()
     {
-        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR .'plugin.json'), true);
+        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
 
         if ($info) {
             return $info['currentVersion'];
@@ -159,18 +137,28 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
-     * Registers on the post dispatch event
-     * for adding the local template folder for the module
+     * Get (nice) name for plugin manager list
+     *
+     * @return string
+     */
+    public function getLabel()
+    {
+        return 'User Prices';
+    }
+
+    /**
+     * Registers on the post dispatch event for adding the local template folder for the backend-module.
      *
      * @param Enlight_Event_EventArgs $args
      * @return mixed
      */
-    public function onPostDispatchBackend(Enlight_Event_EventArgs $args){
+    public function onPostDispatchBackend(Enlight_Event_EventArgs $args)
+    {
         $request = $args->getSubject()->Request();
         $response = $args->getSubject()->Response();
 
         // Load this code only in the backend
-        if(!$request->isDispatched() || $response->isException() || $request->getModuleName() != 'backend') {
+        if (!$request->isDispatched() || $response->isException() || $request->getModuleName() != 'backend') {
             return;
         }
 
@@ -181,357 +169,70 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
-     * Returns the path to the user price backend controller
+     * Registers the extension for the default price-helper component.
+     *
+     * @see Shopware\Bundle\SearchBundleDBAL\PriceHelper
+     */
+    public function registerPriceHelper()
+    {
+        $helper = new PriceHelper(
+            $this->get('shopware_searchdbal.search_price_helper_dbal'),
+            $this->get('config'),
+            $this->get('dbal_connection'),
+            $this->get('session')
+        );
+        Shopware()->Container()->set('shopware_searchdbal.search_price_helper_dbal', $helper);
+    }
+
+    /**
+     * Registers the extension for the default CheapestPriceService component.
+     *
+     * @see CheapestPriceService
+     */
+    public function onGetCheapestPriceService(\Enlight_Event_EventArgs $arguments)
+    {
+        $coreService = $this->bootstrap->get('shopware_storefront.cheapest_price_service');
+        $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
+        $helper = $this->bootstrap->get('swaguserprice.servicehelper');
+
+        $test = function() {
+
+        };
+
+        $userPriceService = new Core\CheapestUserPriceService($this->bootstrap, $coreService, $validator, $helper);
+        Shopware()->Container()->set('shopware_storefront.cheapest_price_service', $userPriceService);
+    }
+
+    /**
+     * Registers the extension for the default GraduatedPricesService component.
+     *
+     * @see GraduatedPricesService
+     */
+    public function onGetGraduatedPricesService(\Enlight_Event_EventArgs $arguments)
+    {
+        $coreService = $this->bootstrap->get('shopware_storefront.graduated_prices_service');
+        $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
+        $helper = $this->bootstrap->get('swaguserprice.servicehelper');
+
+        $userPriceService = new Core\GraduatedUserPricesService($this->bootstrap, $coreService, $validator, $helper);
+        Shopware()->Container()->set('shopware_storefront.graduated_prices_service', $userPriceService);
+    }
+
+    /**
+     * Main entry point for the plugin: Registers various subscribers to hook into shopware
      *
      * @param Enlight_Event_EventArgs $args
-     * @return string
      */
-    public function onGetControllerPathUserPrice(Enlight_Event_EventArgs $args)
+    public function onStartDispatch(Enlight_Event_EventArgs $args)
     {
-        return $this->Path() . 'Controllers/Backend/UserPrice.php';
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return array
-     */
-    public function onAfterGetArticleById($args)
-    {
-        return $this->manupulateSingeArticle($args);
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return array
-     */
-    public function onAfterGetPromotionById($args)
-    {
-        return $this->manupulateSingeArticle($args);
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return array
-     */
-    public function onAfterGetArticleConfigurator($args)
-    {
-        return $this->manupulateSingeArticle($args);
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return mixed
-     */
-    public function onAfterGetArticlesByCategory($args)
-    {
-        $articlesData = $args->getReturn();
-
-        if(!empty($articlesData['sArticles'])) {
-            foreach($articlesData['sArticles'] as &$article) {
-                $priceData = $this->refreshArticlePrices($article['price'], $article['sBlockPrices'], $article['ordernumber']);
-                if($priceData !== false) {
-                    $article['price'] = $priceData['price'];
-                    $article['sBlockPrices'] = $priceData['blockPrices'];
-                    if(empty($priceData['blockPrices'])) {
-                        unset($article['priceStartingFrom']);
-                    }                    
-                    
-                    if(!empty($priceData['cheapestPrice'])) {
-                        $article['price'] = $priceData['cheapestPrice'];
-                        $article['priceStartingFrom'] = $priceData['cheapestPrice'];
-                    }
-                }
-            }
-        }
-
-
-        return $articlesData;
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     */
-    public function onAfterUpdateArticle($args)
-    {
-        $basketData = Shopware()->Db()->fetchAll("
-            SELECT * FROM `s_order_basket` WHERE `sessionID` = ?
-        ", array( Shopware()->System()->sSESSION_ID ));
-
-        if(!empty($basketData)) {
-            foreach($basketData as $basketItem) {
-
-                $priceData = $this->refreshArticlePrices($basketItem['price'], $basketItem['sBlockPrices'], $basketItem['ordernumber'], $basketItem['quantity'], false);
-                if($priceData !== false) {
-                    Shopware()->Db()->query("
-                        UPDATE `s_order_basket` SET `price` = ?, `netprice` = ? WHERE `id` = ?
-                    ", array($priceData['price'], $priceData['netPrice'], $basketItem['id']));
-                }
-            }
-        }
-    }
-
-    /**
-     * Fetches the current return of the method,
-     * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return array
-     */
-    protected function manupulateSingeArticle($args)
-    {
-        $articleData = $args->getReturn();
-        $priceData = $this->refreshArticlePrices(
-            $articleData['price'],
-            $articleData['sBlockPrices'],
-            $articleData['ordernumber']
+        $subscribers = array(
+            new Subscriber\ControllerPath($this),
+            new Subscriber\Hooks($this),
+            new Subscriber\Resource($this)
         );
 
-        if($priceData !== false) {
-            $articleData['price'] = $priceData['price'];
-            $articleData['sBlockPrices'] = $priceData['blockPrices'];
-            if(empty($priceData['blockPrices'])) {
-                unset($articleData['priceStartingFrom']);
-            }
+        foreach ($subscribers as $subscriber) {
+            $this->get('events')->addSubscriber($subscriber);
         }
-
-
-        return $articleData;
-    }
-
-    /**
-     * Fetches the price group id of the current user
-     *
-     * @return bool|string
-     */
-    protected function getPriceGroupId()
-    {
-        $userId = intval(Shopware()->System()->_SESSION['sUserId']);
-        if(empty($userId)) {
-            return false;
-        }
-
-        $priceGroupId = Shopware()->Db()->fetchOne("
-            SELECT pg.id FROM `s_user` as u
-            INNER JOIN `s_core_customerpricegroups` as pg
-            ON pg.id = u.pricegroupID
-            WHERE u.`id` = ?
-            AND pg.`active` = 1
-        ", array($userId));
-        if(empty($priceGroupId)) {
-            return false;
-        }
-
-        return $priceGroupId;
-    }
-
-    /**
-     * Checks if there is a different price for the current user.
-     * In this case the actually price will be replaced
-     *
-     * @param $oldPrice the old price
-     * @param $oldBlockPrices
-     * @param $orderNumber
-     * @param int $quantity
-     * @param bool $formatPrice
-     * @internal param $articleDetailsID
-     * @return array|bool
-     */
-    protected function refreshArticlePrices($oldPrice, $oldBlockPrices, $orderNumber, $quantity = 1, $formatPrice = true)
-    {
-        $priceGroupId = $this->getPriceGroupId();
-        if(empty($priceGroupId)) {
-            return false;
-        }
-
-        $articleDetailsID = Shopware()->Db()->fetchOne("
-            SELECT id FROM `s_articles_details` WHERE `ordernumber` = ?
-        ", array($orderNumber));
-        if(empty($articleDetailsID)) {
-            return false;
-        }
-
-        $taxData = Shopware()->Db()->fetchRow("
-            SELECT a.taxID, t.tax
-            FROM `s_articles_details` as ad
-
-            INNER JOIN `s_articles` as a
-            ON a.id = ad.articleID
-
-            INNER JOIN `s_core_tax` as t
-            ON a.taxID = t.id
-
-            WHERE ad.`id` = ?
-        ", array( $articleDetailsID ));
-        if(empty($taxData)) {
-            return false;
-        }
-
-        $priceData = $this->getPriceGroupPrice(
-            $priceGroupId,
-            $articleDetailsID,
-            $taxData['tax'],
-            $taxData['taxID'],
-            $quantity,
-            $formatPrice
-        );
-        if($priceData === false) {
-            return false;
-        }
-
-        //Checks if there are more than one variants for this
-        //article. Fetches the cheapest price
-        $articleId = Shopware()->Db()->fetchOne("
-            SELECT articleID FROM `s_articles_details` WHERE `id` = ?
-        ", array($articleDetailsID));
-
-        $variantsCount = Shopware()->Db()->fetchOne("
-            SELECT COUNT(*) FROM `s_core_customerpricegroups_prices`
-            WHERE `articleID` = ?
-            AND `pricegroup` = ?
-        ", array($articleId, 'PG' . $priceGroupId));
-
-        $cheapestPrice = 0;
-        if(!empty($articleId) && intval($variantsCount) > 1) {
-            $cheapestPrice = Shopware()->Db()->fetchOne("
-                SELECT price FROM `s_core_customerpricegroups_prices`
-                WHERE `articleID` = ?
-                AND `pricegroup` = ?
-                AND `to` = 'beliebig'
-                ORDER BY `price` ASC
-                LIMIT 1
-            ", array(
-                $articleId,
-                'PG' . $priceGroupId
-            ));
-
-            if(!empty($cheapestPrice)) {
-                if($formatPrice === true) {
-                    $cheapestPrice = Shopware()->Modules()->Articles()->sCalculatingPrice($cheapestPrice, $taxData['tax'], $taxData['taxID']);
-                } else {
-                    $cheapestPrice = Shopware()->Modules()->Articles()->sCalculatingPriceNum($cheapestPrice, $taxData['tax'], false, false, $taxData['taxID'], false);
-                }
-            }
-        }
-
-        return array( 'price' => $priceData['price'], 'netPrice' => $priceData['netPrice'], 'blockPrices' => $priceData['blockPrices'], 'cheapestPrice' => $cheapestPrice );
-    }
-
-    /**
-     * Loads the price for the given article
-     * by using the given price group
-     *
-     * @param $priceGroupId
-     * @param $articleDetailsID
-     * @param $tax
-     * @param $taxId
-     * @param int $quantity
-     * @param bool $formatPrice
-     * @return array|bool
-     */
-    protected function getPriceGroupPrice($priceGroupId, $articleDetailsID, $tax, $taxId, $quantity = 1, $formatPrice = true)
-    {
-        $price = Shopware()->Db()->fetchOne("
-            SELECT price FROM `s_core_customerpricegroups_prices`
-            WHERE `articledetailsID` = ?
-            AND `pricegroup` = ?
-            AND (
-                (
-                    `from` <= ?
-                    AND `to` >= ".Shopware()->Db()->quote($quantity, Zend_Db::INT_TYPE)."
-                )
-                OR `to` = 'beliebig'
-            )
-            ORDER BY `from` ASC
-            LIMIT 1
-        ", array(
-            $articleDetailsID,
-            'PG' . $priceGroupId,
-            $quantity
-        ));
-        if(empty($price)) {
-            return false;
-        }
-
-        $netPrice = $price;
-        if($formatPrice === true) {
-            $price = Shopware()->Modules()->Articles()->sCalculatingPrice($price, $tax, $taxId);
-        } else {
-            $price = Shopware()->Modules()->Articles()->sCalculatingPriceNum($price, $tax, false, false, $taxId, false);
-        }
-
-        //Block prices
-        $blockPrices = null;
-        $priceCount = Shopware()->Db()->fetchOne("
-            SELECT COUNT(*) FROM `s_core_customerpricegroups_prices`
-            WHERE `pricegroup` = ?
-            AND `articledetailsID` = ?
-        ", array(
-            'PG' . $priceGroupId,
-            $articleDetailsID
-        ));
-
-        if($priceCount > 1) {
-            $blockPrices = Shopware()->Db()->fetchAll("
-                SELECT * FROM `s_core_customerpricegroups_prices`
-                WHERE `pricegroup` = ?
-                AND `articledetailsID` = ?
-                ORDER BY `from` ASC
-            ", array(
-                'PG' . $priceGroupId,
-                $articleDetailsID
-            ));
-
-            foreach($blockPrices as &$blockPrice) {
-                if($formatPrice === true) {
-                    $blockPrice['price'] = Shopware()->Modules()->Articles()->sCalculatingPrice($blockPrice['price'], $tax, $taxId);
-                } else {
-                    $blockPrice['price'] = Shopware()->Modules()->Articles()->sCalculatingPriceNum($blockPrice['price'], $tax, false, false, $taxId, false);
-                }
-            }
-        }
-
-        return array( 'price' => $price, 'netPrice' => $netPrice, 'blockPrices' => $blockPrices );
-    }
-
-    /**
-     * On user login when httpcache plugin is active
-     * set no cache tag for product prices
-     */
-    public function onFrontendLogin()
-    {
-        if ($this->cachePluginActive()) {
-            $cache = Shopware()->Plugins()->Core()->HttpCache();
-            $cache->setNoCacheTag('price');
-        }
-    }
-
-    /**
-     * Check if HttpCache plugin is installed and activate
-     *
-     * @return boolean
-     */
-    private function cachePluginActive()
-    {
-        $cachePlugin = Shopware()->Models()->getRepository('\Shopware\Models\Plugin\Plugin')->findOneBy(array('name' => 'HttpCache'));
-        if ($cachePlugin->getActive()) {
-            return true;
-        }
-
-        return false;
     }
 }

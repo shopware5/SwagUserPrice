@@ -1,7 +1,7 @@
 <?php
 /**
- * Shopware 4.0
- * Copyright (c) 2012 shopware AG
+ * Shopware 5
+ * Copyright (c) shopware AG
  *
  * According to our dual licensing model, this program can be used either
  * under the terms of the GNU Affero General Public License, version 3,
@@ -20,625 +20,692 @@
  * The licensing of the program under the AGPLv3 does not imply a
  * trademark license. Therefore any rights, title and interest in
  * our trademarks remain entirely with us.
- *
- * @category   Shopware
- * @package    Shopware_Controllers_Backend_UserPrice
- * @subpackage Result
- * @copyright  Copyright (c) 2012, shopware AG (http://www.shopware.de)
- * @version    $Id$
- * @author     Stefan Hamann
- * @author     $Author$
  */
-class Shopware_Controllers_Backend_UserPrice extends Enlight_Controller_Action
+
+/**
+ * Plugin backend-controller class.
+ *
+ * The Shopware_Controllers_Backend_UserPrice class is the backend controller class.
+ *
+ * @category Shopware
+ * @package Shopware\Plugin\SwagUserPrice
+ * @copyright Copyright (c) shopware AG (http://www.shopware.de)
+ */
+class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backend_ExtJs
 {
+    /**
+     * @var $userPriceRepository \Shopware\CustomModels\UserPrice\Repository
+     */
+    protected $userPriceRepository = null;
+
+    /**
+     * @var $entityManager Shopware\Components\Model\ModelManager
+     */
+    protected $entityManager = null;
+
+    /**
+     * Disable template engine for most actions
+     *
+     * @return void
+     */
     public function preDispatch()
     {
-        if(!in_array($this->Request()->getActionName(), array('index', 'skeleton'))) {
-            Shopware()->Plugins()->Controller()->ViewRenderer()->setNoRender();
+        if (!in_array($this->Request()->getActionName(), array('index', 'load'))) {
+            $this->Front()->Plugins()->Json()->setRenderer(true);
         }
     }
 
-    public function indexAction() { }
-    public function skeletonAction() { }
-
-    public function getValuesAction() {
-        //@todo: Missing value? $feedID
-        $feedID = '';
-
-        $delete = intval($this->Request()->delete);
-
-        if(!empty($delete))
-        {
-        	switch ($this->Request()->name)
-        	{
-        		case "customerpricegroups":
-        			Shopware()->Db()->query("DELETE FROM s_core_customerpricegroups_prices WHERE pricegroup=?", array('PG' . $delete));
-//                    Shopware()->Db()->query("DELETE FROM s_articles_groups_prices WHERE groupkey=?", array('PG' . $delete));
-                    Shopware()->Db()->query("UPDATE s_user SET pricegroupID=NULL WHERE pricegroupID=?", array($delete));
-                    Shopware()->Db()->query("DELETE FROM s_core_customerpricegroups WHERE id=?", array($delete));
-        			break;
-        		default:
-        			exit();
-        	}
-        }
-
-        $limit = empty($this->Request()->limit) ? 25 : (int)$this->Request()->limit;
-        $start = empty($this->Request()->start) ? 0 : (int)$this->Request()->start;
-
-        switch ($this->Request()->name)
-        {
-        	case "customergroup":
-        		$sql = "
-        			SELECT 0 as id, 'allgemein gültig' as name
-        			UNION (
-        				SELECT id, description as name
-        				FROM s_core_customergroups
-        				ORDER BY name
-        			)
-        		";
-        		break;
-        	case "multishop":
-        		$sql = "
-        			SELECT 0 as id, 'allgemein gültig' as name
-        			UNION (
-        				SELECT id, name
-        				FROM s_core_multilanguage
-        				ORDER BY `default` DESC, name
-        			)
-        		";
-        		break;
-        	case "language":
-        		$sql = "
-        			SELECT 0 as id, 'Standard' as name
-        			UNION
-        			SELECT id, isocode as name
-        			FROM s_core_multilanguage
-        			WHERE skipbackend=0
-        			GROUP BY isocode
-        		";
-        		break;
-        	case "tax":
-        		$sql = "
-        			SELECT 0 as id, 'höchster Steuersatz aus dem Warenkorb nehmen' as name
-        			UNION
-        			SELECT id, description as name
-        			FROM `s_core_tax`
-        		";
-        		break;
-        	case "supplier":
-        		if(empty($this->Request()->active))
-        		{
-        			$sql = "
-        				SELECT s.id, s.name, s.img
-        				FROM s_articles_supplier s
-        				LEFT JOIN s_articles AS a ON a.supplierID = s.id
-        				LEFT JOIN s_export_suppliers AS es ON es.supplierID = s.id AND feedID = $feedID
-        				WHERE es.supplierID IS NULL
-        				GROUP BY s.id ORDER BY name
-        			";
-        		}
-        		else
-        		{
-        			$sql = "
-        				SELECT s.id, s.name, s.img
-        				FROM s_articles_supplier s
-        				LEFT JOIN s_articles AS a ON a.supplierID = s.id
-        				JOIN s_export_suppliers AS es ON es.supplierID = s.id AND feedID = $feedID
-        				GROUP BY s.id ORDER BY name
-        			";
-        		}
-        		break;
-        	case "currency":
-        		$sql = "
-        			SELECT id, name
-        			FROM s_core_currencies
-        		";
-        		break;
-        	case "category";
-        		$node = (empty($this->Request()->node)||!is_numeric($this->Request()->node)) ? 1 : (int) $this->Request()->node;
-        		$sql = "
-        			SELECT c.id, c.description as text, c.parent as parentId, IF(COUNT(c2.id)>0,0,1) as leaf FROM s_categories c LEFT JOIN s_categories c2 ON c2.parent=c.id  WHERE c.parent=$node GROUP BY c.id ORDER BY c.position, c.description
-        		";
-        		break;
-        	case "holiday";
-        		$sql = "
-        			SELECT id, CONCAT(name,' (',DATE_FORMAT(`date`,'%d.%m.%Y'),')') as name
-        			FROM s_premium_holidays
-        			ORDER BY `date`, name
-        		";
-        		break;
-        	case "article":
-        		if(empty($this->Request()->active))
-        		{
-        			$sql = "
-        				SELECT a.id, a.name
-        				FROM s_articles a, s_export_articles ea
-        				WHERE a.id=ea.articleID
-        				AND ea.feedID=$feedID
-        			";
-        		}
-        		elseif(!empty($this->Request()->filter))
-        		{
-        			$sql_filter = Shopware()->Db()->quote('%' . trim($this->Request()->filter) . '%');
-        			$sql = "
-        				SELECT
-        					a.id, a.name
-        				FROM
-        					s_articles as a,
-        				(
-        					SELECT DISTINCT articleID
-        					FROM
-        					(
-        							SELECT DISTINCT articleID
-        							FROM s_articles_details
-        							WHERE ordernumber LIKE $sql_filter
-        							LIMIT 10
-        						UNION
-        							SELECT DISTINCT articleID
-        							FROM s_articles_translations
-        							WHERE name LIKE $sql_filter
-        							LIMIT 10
-        						UNION
-        							SELECT DISTINCT articleID
-        							FROM s_articles_translations
-        							WHERE name LIKE $sql_filter
-        							LIMIT 10
-        						UNION
-        							SELECT id as articleID
-        							FROM s_articles
-        							WHERE name LIKE $sql_filter
-        							LIMIT 10
-        					) as amu
-        				) as am
-        				WHERE am.articleID=a.id
-        				ORDER BY a.name ASC
-        				LIMIT 20
-        			";
-        		}
-        		break;
-        	case "paymentmean":
-        		if(empty($this->Request()->active))
-        		{
-        			$sql = "
-        				SELECT p.id, p.description as name
-        				FROM s_core_paymentmeans p
-        				LEFT JOIN s_premium_dispatch_paymentmeans AS dp ON dp.paymentID = p.id AND dispatchID = $feedID
-        				WHERE dispatchID IS NULL
-        				ORDER BY name
-        			";
-        		}
-        		else
-        		{
-        			$sql = "
-        				SELECT p.id, p.description as name
-        				FROM s_core_paymentmeans p
-        				JOIN s_premium_dispatch_paymentmeans AS dp ON dp.paymentID = p.id AND dispatchID = $feedID
-        				ORDER BY name
-        			";
-        		}
-        		break;
-        	case "countries":
-        		if(empty($this->Request()->active))
-        		{
-        			$sql = "
-        				SELECT c.id, c.countryname as name
-        				FROM s_core_countries c
-        				LEFT JOIN s_premium_dispatch_countries AS dc ON dc.countryID = c.id AND dispatchID = $feedID
-        				WHERE dispatchID IS NULL
-        				ORDER BY name
-        			";
-        		}
-        		else
-        		{
-        			$sql = "
-        				SELECT c.id, c.countryname as name
-        				FROM s_core_countries c
-        				JOIN s_premium_dispatch_countries AS dc ON dc.countryID = c.id AND dispatchID = $feedID
-        				ORDER BY name
-        			";
-        		}
-        		break;
-        	case "dispatch":
-        		$sql = "
-        			SELECT id, name
-        			FROM s_shippingcosts_dispatch d
-        		";
-        		break;
-        	case "premium_dispatch":
-        		$sql = "
-        			SELECT id, name
-        			FROM s_premium_dispatch
-        			ORDER BY position, name
-        		";
-        		break;
-        	case "users":
-        		if(!empty($this->Request()->pricegroupID))
-        			$sql_where = 'AND u.pricegroupID='.intval($this->Request()->pricegroupID);
-        		else
-        			$sql_where = 'AND u.pricegroupID IS NULL';
-        		$dir = (empty($this->Request()->dir)|| $this->Request()->dir=='ASC') ? 'ASC' : 'DESC';
-        		$sort = (empty($this->Request()->sort)||is_array($this->Request()->sort)) ? 'customernumber' : preg_replace('#[^\w]#','',$this->Request()->sort);
-        		if(!empty($this->Request()->search))
-        		{
-        			$search = Shopware()->Db()->quote(trim($this->Request()->search) . '%');
-        			$search2 = Shopware()->Db()->quote('%' . trim($this->Request()->search) . '%');
-        			$sql_where .= " AND ( ub.customernumber LIKE  $search ";
-        			$sql_where .= "OR u.email LIKE $search2 ";
-        			$sql_where .= "OR ub.company LIKE $search ";
-        			$sql_where .= "OR ub.firstname LIKE $search ";
-        			$sql_where .= "OR ub.lastname LIKE $search )";
-        		}
-        		$sql = "
-        			SELECT SQL_CALC_FOUND_ROWS u.id, ub.customernumber, u.email, u.customergroup, ub.company, ub.firstname ,ub.lastname
-        			FROM s_user u, s_user_billingaddress ub
-        			WHERE u.id=ub.userID
-        			$sql_where
-        			ORDER BY $sort $dir
-        			LIMIT $start, $limit
-        		";
-        		break;
-        	case "customerpricegroups":
-        		$sql = "
-        			SELECT *
-        			FROM s_core_customerpricegroups
-        		";
-        		break;
-        	default:
-        		exit();
-        }
-
-        $result = Shopware()->Db()->fetchAll($sql);
-        $nodes = array();
-        if (!empty($result)){
-        foreach ($result as $row)
-        {
-        	if(isset($row["id"]))
-        		$row["id"] = intval($row["id"]);
-        	if(isset($row["leaf"]))
-        		$row["leaf"] = !empty($row["leaf"]);
-        	if(isset($row["netto"]))
-        		$row["netto"] = empty($row["netto"]) ? 0 : 1;
-        	if(isset($row["active"]))
-        		$row["active"] =empty($row["active"]) ? 0 : 1;
-        	if(!empty($row["count"]))
-        		$row["name"] .= " (".$row["count"].")";
-        	$nodes[] = $row;
-        }
-        }
-
-        if(!empty($limit))
-        {
-            $count = Shopware()->Db()->fetchOne('SELECT FOUND_ROWS() as count');
-        }
-        else
-        {
-        	$count = count($nodes);
-        }
-
-        switch ($this->Request()->name) {
-        	case "category":
-        		echo  json_encode($nodes);
-        		break;
-        	default:
-        		echo  json_encode(array("articles"=>$nodes,"count"=>$count));
-        		break;
-        }
-    }
-
-    public function savePricegroupsAction()
+    /**
+     * This initializes the acl-rules.
+     * We need to configure which acl-rules should be considered for the different
+     */
+    public function initAcl()
     {
-        $upset = array();
+        $this->addAclPermission('getGroups', 'read', 'Insufficient Permissions');
+        $this->addAclPermission('getCustomers', 'read', 'Insufficient Permissions');
+        $this->addAclPermission('getArticles', 'read', 'Insufficient Permissions');
+        $this->addAclPermission('getPrices', 'read', 'Insufficient Permissions');
 
-        $upset[] = "active=".(empty($this->Request()->active) ? 0 : 1);
-        $upset[] = "netto=".(empty($this->Request()->netto) ? 0 : 1);
+        $this->addAclPermission('editGroup', 'editGroups', 'Insufficient Permissions');
+        $this->addAclPermission('deleteGroup', 'editGroups', 'Insufficient Permissions');
 
-        $name = str_replace("\xe2\x82\xac","&euro;",$this->Request()->name);
-        $name = trim($name);
-        $upset[] = "name=".((empty($name)) ? "''" : Shopware()->Db()->quote($name));
+        $this->addAclPermission('addCustomer', 'editCustomer', 'Insufficient Permissions');
+        $this->addAclPermission('removeCustomer', 'editCustomer', 'Insufficient Permissions');
 
-        $upset = implode(",",$upset);
-        if(!empty($this->Request()->id)&&is_numeric($this->Request()->id))
-        {
-        	$id = (int) $this->Request()->id;
-        	Shopware()->Db()->query("UPDATE s_core_customerpricegroups SET $upset WHERE id=?", array($id));
-        }
-        else
-        {
-        	Shopware()->Db()->query("REPLACE INTO s_core_customerpricegroups SET $upset");
-        	//$id = Shopware()->Db()->lastInsertId('s_core_customerpricegroups');
-        }
+        $this->addAclPermission('updatePrice', 'editPrices', 'Insufficient Permissions');
+        $this->addAclPermission('deletePrice', 'editPrices', 'Insufficient Permissions');
     }
 
+    /**
+     * @return Shopware\Components\Model\ModelManager
+     */
+    private function getEntityManager()
+    {
+        if ($this->entityManager === null) {
+            $this->entityManager = $this->get('models');
+        }
+
+        return $this->entityManager;
+    }
+
+    /**
+     * Helper method to return the repository.
+     *
+     * @return Shopware\CustomModels\UserPrice\Repository
+     */
+    private function getRepository()
+    {
+        if ($this->userPriceRepository === null) {
+            $this->userPriceRepository = $this->getEntityManager()->getRepository(
+                'Shopware\CustomModels\UserPrice\Group'
+            );
+        }
+
+        return $this->userPriceRepository;
+    }
+
+    /**
+     * This is the event listener method for the user-price backend-module.
+     * It returns all creates groups.
+     */
+    public function getGroupsAction()
+    {
+        $this->View()->assign(
+            $this->getGroups(
+                $this->Request()->getQuery()
+            )
+        );
+    }
+
+    /**
+     * This is the event listener method to create or edit groups.
+     * It is used for both creating and editing.
+     * If an id is set in the post-parameters, the user wants to edit the group, otherwise a new group will be created.
+     */
+    public function editGroupAction()
+    {
+        $this->View()->assign(
+            $this->handleEdit(
+                $this->Request()->getPost()
+            )
+        );
+    }
+
+    /**
+     * This event listener method is fired when the user wants to delete a group.
+     * It deletes the group itself and additionally resets the customer-attributes, so the assigned customers are reset.
+     * Even the assigned prices are deleted again.
+     */
+    public function deleteGroupAction()
+    {
+        $this->View()->assign(
+            $this->handleDeletion(
+                $this->Request()->getPost()
+            )
+        );
+    }
+
+    /**
+     * This event listener method is used to load customers.
+     * It will be fired twice.
+     * The first request loads all customers, that are not currently assigned to any group yet.
+     * The second request only loads the customers, which are assigned to a specific group already.
+     */
+    public function getCustomersAction()
+    {
+        $this->View()->assign(
+            $this->getCustomers(
+                $this->Request()->getQuery()
+            )
+        );
+    }
+
+    /**
+     * This event listener method is called when the user adds a customer to a group.
+     */
+    public function addCustomerAction()
+    {
+        $this->View()->assign(
+            $this->addCustomer(
+                $this->Request()->getPost()
+            )
+        );
+    }
+
+    /**
+     * This event listener method is called when the user removes a customer from a group.
+     */
+    public function removeCustomerAction()
+    {
+        $this->View()->assign(
+            $this->removeCustomer(
+                $this->Request()->getPost()
+            )
+        );
+    }
+
+    /**
+     * This event listener method is needed to load all articles.
+     * Additionally you can filter the articles to only show main-products.
+     */
     public function getArticlesAction()
     {
-        if(isset($this->Request()->pricegroupID))
-        {
-        	$sql_pricegroup = "PG".intval($this->Request()->pricegroupID);
-        }
-
-        if(!empty($this->Request()->delete))
-        {
-            $delete = trim($this->Request()->delete);
-//            Shopware()->Db()->query("
-//        		DELETE gp FROM s_articles_groups_value gv, s_articles_groups_prices gp
-//        		WHERE gv.ordernumber=? AND gp.groupkey=? AND gp.valueID=gv.valueID
-//        	", array($delete, $sql_pricegroup));
-
-            Shopware()->Db()->query("
-        		DELETE p FROM s_articles_details d, s_core_customerpricegroups_prices p
-        		WHERE d.ordernumber=?	AND p.pricegroup=? AND p.articledetailsID=d.id
-        	", array($delete, $sql_pricegroup));
-        }
-
-        if(!empty($this->Request()->search))
-        {
-        	$search = Shopware()->Db()->quote(trim($this->Request()->search) . "%");
-        	$sql_where = "WHERE d.ordernumber LIKE  $search ";
-        	$sql_where .= "OR a.name LIKE $search";
-        }
-        $limit = empty($this->Request()->limit) ? 25 : (int)$this->Request()->limit;
-        $start = empty($this->Request()->start) ? 0 : (int)$this->Request()->start;
-        $dir = (empty($this->Request()->dir)||$this->Request()->dir=='ASC') ? 'ASC' : 'DESC';
-        $sort = (empty($this->Request()->sort)||is_array($this->Request()->sort)) ? 'ordernumber' : preg_replace('#[^\w]#','',$this->Request()->sort);
-
-            $result = Shopware()->Db()->fetchAll("
-        		SELECT SQL_CALC_FOUND_ROWS
-        			a.id as articleID,
-        			d.ordernumber as ordernumber,
-        			TRIM( CONCAT( a.name, ' ', d.additionaltext ) ) AS name,
-        			p.pricegroup AS pricegroup,
-        			p.price as price,
-        			p2.price as defaultprice,
-        			0 as config,
-        			t.tax
-        		FROM s_articles a
-        		INNER JOIN s_articles_details d
-        		ON d.articleID=a.id
-        		INNER JOIN s_core_tax t
-        		ON t.id=a.taxID
-
-        		LEFT JOIN s_core_customerpricegroups_prices p
-        		ON p.articledetailsID = d.id
-        		AND p.`to` = 'beliebig'
-        		AND p.pricegroup = ?
-
-        		LEFT JOIN s_articles_prices p2
-        		ON p2.articledetailsID = d.id
-        		AND p2.`to` = 'beliebig'
-        		AND p2.pricegroup = 'EK'
-
-        		$sql_where
-
-        		ORDER BY $sort $dir
-
-        		LIMIT $start, $limit
-        	", array($sql_pricegroup));
-        	$rows = array();
-
-        	if(!empty($result))
-        	foreach($result as $row)
-        	{
-        		$row['name'] = trim($row['name']);
-        		$row['ordernumber'] = trim($row['ordernumber']);
-        		$row['pricegroup'] = trim($row['pricegroup']);
-        		$row['config'] = empty($row['config']) ? 0 : 1;
-        		if(!empty($row['tax'])&&empty($this->Request()->netto))
-        		{
-        			$row['price'] = $row['price']*(100+$row['tax'])/100;
-        			$row['defaultprice'] = $row['defaultprice']*(100+$row['tax'])/100;
-        		}
-        		if(!empty($row['price']))
-        		{
-        			$row['price'] = number_format($row['price'],2,',','');
-        		}
-        		else
-        		{
-        			$row['price'] = '';
-        		}
-        		if(!empty($row['defaultprice']))
-        		{
-        			$row['defaultprice'] = number_format($row['defaultprice'],2,',','');
-        		}
-        		$rows[] = $row;
-        	}
-            $count = Shopware()->Db()->fetchOne("
-        		SELECT FOUND_ROWS() as count
-        	");
-
-        	echo  json_encode(array("articles"=>$rows,"count"=>$count));
+        $this->View()->assign(
+            $this->getArticles(
+                $this->Request()->getQuery()
+            )
+        );
     }
 
-    public function getPricescaleAction()
+    /**
+     * This event listener method returns all prices being assigned to an article and a group.
+     */
+    public function getPricesAction()
     {
-        $minChange = (empty($this->Request()->minChange)||!is_numeric($this->Request()->minChange)) ? 0 : (float) $this->Request()->minChange;
-        $startValue = (empty($this->Request()->startValue)||!is_numeric($this->Request()->startValue)) ? 0 : (float) $this->Request()->startValue;
-        if(empty($this->Request()->netto)&&!empty($this->Request()->tax))
-        {
-        	$tax = (float) $this->Request()->tax;
-        }
-        else
-        {
-        	$tax = 0;
-        }
-
-        $result = Shopware()->Db()->fetchAll("
-            SELECT `from`, `price`, `pseudoprice`, `baseprice`, `percent`
-            FROM s_articles_details d, s_core_customerpricegroups_prices p
-            WHERE d.ordernumber=?
-            AND p.articledetailsID=d.id
-            AND p.pricegroup=?
-            ORDER BY `from`
-        ", array($this->Request()->ordernumber, $this->Request()->pricegroup));
-        if(empty($result))
-        {
-            $result = Shopware()->Db()->fetchAll("
-                SELECT `from`, `price`, `pseudoprice`, `baseprice`, `percent`
-                FROM s_articles_details d, s_core_customerpricegroups_prices p
-                WHERE d.ordernumber=?
-                AND p.articledetailsID=d.id
-                AND p.pricegroup='EK'
-                ORDER BY `from`
-            ", array($this->Request()->ordernumber));
-        }
-
-        $nodes = array();
-
-        if (!empty($result)){
-            $i=0;
-        	foreach($result as $node)
-        	{
-        		if($i)
-        		{
-        			$nodes[$i-1]["to"] = $node["from"]-$minChange;
-        		}
-        		$node["price"] = round($node["price"]*(100+$tax)/100,2);
-        		if(empty($node["pseudoprice"])) $node["pseudoprice"] = '';
-        		if(empty($node["baseprice"])) $node["baseprice"] = '';
-        		if(empty($node["percent"])) $node["percent"] = '';
-        		$nodes[$i] = $node;
-
-                $i++;
-        	}
-//        	for($i=0;$node = mysql_fetch_assoc($result);$i++)
-//        	{
-//        		if($i)
-//        		{
-//        			$nodes[$i-1]["to"] = $node["from"]-$minChange;
-//        		}
-//        		$node["price"] = round($node["price"]*(100+$tax)/100,2);
-//        		if(empty($node["pseudoprice"])) $node["pseudoprice"] = '';
-//        		if(empty($node["baseprice"])) $node["baseprice"] = '';
-//        		if(empty($node["percent"])) $node["percent"] = '';
-//        		$nodes[$i] = $node;
-//        	}
-        }
-        if(empty($nodes)&&!empty($this->Request()->ordernumber))
-        {
-        	$nodes[] = array(
-        		"from"=>$startValue,
-        		"value"=>"",
-        		"factor"=>""
-        	);
-        }
-        echo  json_encode(array("articles"=>array_values($nodes),"count"=>count($nodes)));
+        $this->View()->assign(
+            $this->getPrices(
+                $this->Request()->getQuery()
+            )
+        );
     }
 
-    public function savePricescaleAction()
+    /**
+     * This event listener method is called to edit the configured prices for an article in a specific group.
+     */
+    public function updatePriceAction()
     {
-        $from = (empty($this->Request()->from)||!is_numeric($this->Request()->from)) ? 1 : (int) $this->Request()->from;
-        $price = (empty($this->Request()->price)||!is_numeric($this->Request()->price)) ? "0" : (float) $this->Request()->price;
-        $pseudoprice = (empty($this->Request()->pseudoprice)||!is_numeric($this->Request()->pseudoprice)) ? "0" : (float) $this->Request()->pseudoprice;
-        $baseprice = (empty($this->Request()->baseprice)||!is_numeric($this->Request()->baseprice)) ? "0" : (float) $this->Request()->baseprice;
-        $percent = (empty($this->Request()->percent)||!is_numeric($this->Request()->percent)) ? "0" : (float) $this->Request()->percent;
-        $pricegroup =  "PG" . (int) $this->Request()->pricegroupID;
-        $tax = empty($this->Request()->tax) ? 0 : (float) $this->Request()->tax;
-        if(!empty($tax))
-        	$price = $price/(100+$tax)*100;
-        if(!empty($tax)&&!empty($pseudoprice))
-        	$pseudoprice = $pseudoprice/(100+$tax)*100;
+        $this->View()->assign(
+            $this->updatePrice(
+                $this->Request()->getPost()
+            )
+        );
+    }
 
-//        $sql = "
-//        	SELECT articleID, valueID
-//        	FROM s_articles_groups_value
-//        	WHERE ordernumber='".mysql_real_escape_string($this->Request()->ordernumber)."'
-//        ";
-//        $result = mysql_query($sql);
-//        if(!$result)
-//        	exit();
-//        if(mysql_num_rows($result))
-//        {
-//        	list($articleID, $valueID) = mysql_fetch_row($result);
-//        	if($from!=1)
-//        	{
-//        		exit();
-//        	}
-//        	$sql = "
-//        		DELETE FROM s_articles_groups_prices WHERE groupkey=$pricegroup AND valueID=$valueID
-//        	";
-//        	mysql_query($sql);
-//        	if(!empty($price))
-//        	{
-//        		$sql = "
-//        			INSERT INTO s_articles_groups_prices
-//        				(articleID, valueID, groupkey, price)
-//        			VALUES
-//        				($articleID, $valueID, '$pricegroup', $price);
-//        		";
-//        		mysql_query($sql);
-//        	}
-//        	exit();
-//        }
+    /**
+     * This event listener method is called to delete the last price-row of an article in a specific group.
+     */
+    public function deletePriceAction()
+    {
+        $this->View()->assign(
+            $this->deletePrice(
+                $this->Request()->getPost()
+            )
+        );
+    }
 
-        $result = Shopware()->Db()->fetchRow("
-        	SELECT articleID, id as articledetailsID
-        	FROM s_articles_details
-        	WHERE ordernumber=?
-        ", array($this->Request()->ordernumber));
-        if(!empty($result))
-        {
-            $articleID = $result['articleID'];
-            $articledetailsID = $result['articledetailsID'];
+    /**
+     * Helper method to read the groups and its total-count.
+     * It supports searching- and paging-functions.
+     *
+     * @param $params
+     * @return array
+     */
+    private function getGroups($params)
+    {
+        try {
+            $filterValue = null;
+            //filter from the search-field
+            if ($filter = $this->Request()->get('filter')) {
+                $filterValue = $filter[0]['value'];
+            } else {
+                if ($filter = $params['query']) {
+                    $filterValue = $filter;
+                }
+            }
 
-        	Shopware()->Db()->query("
-        		DELETE FROM s_core_customerpricegroups_prices WHERE pricegroup=? AND articledetailsID=? AND `from`>=?
-        	", array($pricegroup, $articledetailsID, $from));
+            $query = $this->getRepository()->getGroupsQuery(
+                $filterValue,
+                $params['start'],
+                $params['limit'],
+                (array) $this->Request()->getParam('sort', array())
+            );
 
-        	if($from!=1)
-        	{
-                Shopware()->Db()->query("
-        			UPDATE `s_core_customerpricegroups_prices`
-        			SET `to` = ?
-        			WHERE pricegroup = ?
-        			AND articledetailsID = ?
-        			ORDER BY `from` DESC
-        			LIMIT 1
-        		", array($from-1, $pricegroup, $articledetailsID));
-        	}
-        	if(!empty($price))
-        	{
-                Shopware()->Db()->query("
+            $totalResult = $this->getEntityManager()->getQueryCount($query);
 
-        			INSERT INTO `s_core_customerpricegroups_prices`
-        				(`pricegroup`, `from`, `to`, `articleID`, `articledetailsID`, `price`, `pseudoprice`, `baseprice`, `percent`)
-        			VALUES
-        				(?, ?, 'beliebig', ?, ?, ?, ?, ?, ?);
-        		", array(
-                    $pricegroup,
-                    $from,
-                    $articleID,
-                    $articledetailsID,
-                    $price,
-                    $pseudoprice,
-                    $baseprice,
-                    $percent
-                ));
-        	}
+            return array('success' => true, 'data' => $query->getArrayResult(), 'total' => $totalResult);
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
         }
     }
 
-    public function saveUsersAction()
+    /**
+     * Helper method to edit a group.
+     * This is either creating a new group if no id is set in the parameters.
+     * Otherwise the group with the given id will be edited.
+     *
+     * @param $params
+     * @return array
+     */
+    private function handleEdit($params)
     {
-        $pricegroupID = $this->Request()->pricegroupID;
-        if(!empty($this->Request()->userIDs))
-        {
-        	foreach ($this->Request()->userIDs as &$userID)
-        	{
-        		$userID = (int) $userID;
-        	}
-        	$userIDs = implode(',',$this->Request()->userIDs);
-        	Shopware()->Db()->query("
-        	    UPDATE s_user SET pricegroupID=NULL WHERE pricegroupID=? AND id NOT IN ($userIDs)
-            ", array($pricegroupID));
+        try {
+            $em = $this->getEntityManager();
+            $id = $params['id'];
 
-            Shopware()->Db()->query("
-                UPDATE s_user SET pricegroupID=? WHERE id IN ($userIDs)
-            ", array($pricegroupID));
+            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
+
+            if (empty($id)) {
+                $model = new Shopware\CustomModels\UserPrice\Group();
+                $msg = $namespace->get('growlMessage/create/message', 'The group was succesfully created');
+            } else {
+                $model = $em->find('Shopware\CustomModels\UserPrice\Group', $id);
+                $msg = $namespace->get('growlMessage/edit/message', 'The group was succesfully edited');
+            }
+
+            $model->fromArray($params);
+
+            $em->persist($model);
+            $em->flush();
+
+            $success = true;
+        } catch (Exception $e) {
+            $success = false;
+            $msg = $e->getMessage();
         }
-        else
-        {
-            Shopware()->Db()->query("
-                UPDATE s_user SET pricegroupID=NULL WHERE pricegroupID=?
-            ", array($pricegroupID));
+
+        return array('success' => $success, 'msg' => $msg);
+    }
+
+    /**
+     * Helper method to delete a group.
+     * This will not only delete the group itself, but also remove all assigned values.
+     * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
+     *
+     * @param $params
+     * @return array
+     */
+    private function handleDeletion($params)
+    {
+        try {
+            $records = $params;
+
+            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
+
+            //The array structure of $params depends on the amount of records being deleted.
+            //This way we create the same array-structure in every case
+            if (!$this->isMultiDimensional($params)) {
+                $records = array($params);
+            }
+
+            foreach ($records as $record) {
+                $this->getEntityManager()->remove($this->getRepository()->find($record['id']));
+
+                //We also need to delete the attribute-entries
+                $attrModels = $this->getEntityManager()->getRepository('Shopware\Models\Attribute\Customer')->findBy(
+                    array(
+                        'swagPricegroup' => $record['id']
+                    )
+                );
+
+                foreach ($attrModels as $attr) {
+                    $attr->setSwagPricegroup(null);
+                    $this->getEntityManager()->persist($attr);
+                }
+
+                //We also need to delete the assigned prices
+                $priceModels = $this->getEntityManager()->getRepository(
+                    'Shopware\CustomModels\UserPrice\Price'
+                )->findBy(
+                    array(
+                        'priceGroupId' => $record['id']
+                    )
+                );
+
+                foreach ($priceModels as $price) {
+                    $this->getEntityManager()->remove($price);
+                }
+            }
+
+            $this->getEntityManager()->flush();
+
+            $success = true;
+            $msg = $namespace->get('growlMessage/delete/message', 'The groups were succesfully deleted');
+        } catch (Exception $e) {
+            $success = false;
+            $msg = $e->getMessage();
         }
+
+        return array('success' => $success, 'msg' => $msg);
+    }
+
+    /**
+     * Helper method to read all customers.
+     * Depending on the "priceGroup"-parameter, this will return either
+     * 1st - all customers, which are currently not assigned to any group at all if the parameter is not set
+     * 2nd - only selected customers, which are currently assigned to the group whose id is in the parameter.
+     *
+     * It supports searching- and paging-functions.
+     *
+     * @param $params
+     * @return array
+     */
+    private function getCustomers($params)
+    {
+        try {
+            $search = '';
+            $groupId = null;
+            foreach ($this->Request()->getParam('filter') as $filter) {
+                if ($filter['property'] == 'priceGroup') {
+                    $groupId = $filter["value"];
+                } else {
+                    if ($filter['property'] == 'searchValue') {
+                        $search = $filter['value'];
+                    }
+                }
+            }
+
+            $query = $this->getRepository()->getCustomersQuery(
+                $search,
+                $params['start'],
+                $params['limit'],
+                (array) $this->Request()->getParam('sort', array()),
+                $groupId
+            );
+
+            return array(
+                'success' => true,
+                'data' => $query->getArrayResult(),
+                'total' => $this->getEntityManager()->getQueryCount($query)
+            );
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to add a customer to a group.
+     *
+     * @param $params
+     * @return array
+     */
+    private function addCustomer($params)
+    {
+        try {
+            $customerIds = json_decode($params['customerIds']);
+
+            foreach ($customerIds as $customerId) {
+                /** @var Shopware\Models\Customer\Customer $customer */
+                $customer = $this->getEntityManager()->find('Shopware\Models\Customer\Customer', $customerId);
+
+                if (!$attribute = $customer->getAttribute()) {
+                    $attribute = new \Shopware\Models\Attribute\Customer();
+                }
+                $attribute->setCustomer($customer);
+                $attribute->setSwagPricegroup($params['priceGroupId']);
+                $customer->setAttribute($attribute);
+
+                $this->getEntityManager()->persist($customer);
+            }
+
+            $this->getEntityManager()->flush();
+
+            return array('success' => true);
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to remove a customer from a given group.
+     *
+     * @param $params
+     * @return array|void
+     */
+    private function removeCustomer($params)
+    {
+        try {
+            $customerIds = json_decode($params['customerIds']);
+            foreach ($customerIds as $customerId) {
+                /** @var Shopware\Models\Customer\Customer $customer */
+                $customer = $this->getEntityManager()->find('Shopware\Models\Customer\Customer', $customerId);
+
+                if (!$customer) {
+                    throw new \Doctrine\ORM\EntityNotFoundException('Could not find customer with ID ' . $customerId);
+                }
+
+                $attrModel = $customer->getAttribute();
+                if (!$attrModel) {
+                    return;
+                }
+
+                $attrModel->setSwagPricegroup(null);
+                $this->getEntityManager()->persist($attrModel);
+            }
+
+            $this->getEntityManager()->flush();
+
+            return array('success' => true);
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to return all articles.
+     * This can also be configured to only show main-articles.
+     *
+     * It supports searching- and paging-functions.
+     *
+     * @param $params
+     * @return array
+     */
+    private function getArticles($params)
+    {
+        try {
+            $search = '';
+            $main = null;
+            $groupId = null;
+
+            foreach ($this->Request()->getParam('filter') as $filter) {
+                if ($filter['property'] == 'mainOnly') {
+                    $main = $filter["value"];
+                } else {
+                    if ($filter['property'] == 'searchValue') {
+                        $search = $filter['value'];
+                    } else {
+                        if ($filter['property'] == 'priceGroup') {
+                            $groupId = $filter['value'];
+                        }
+                    }
+                }
+            }
+
+            /** @var Doctrine\DBAL\Driver\Statement $stmt */
+            $stmt = $this->getRepository()->getArticlesQuery(
+                $search,
+                $params['start'],
+                $params['limit'],
+                (array) $this->Request()->getParam('sort', array()),
+                $main,
+                $groupId
+            );
+
+            /** @var Shopware\SwagUserPrice\Components\UserPrice $comp */
+            $comp = $this->get('swaguserprice.userprice');
+            $articles = $comp->formatArticlePrices($stmt->fetchAll(), $groupId);
+
+            /** @var Doctrine\DBAL\Driver\Statement $countStmt */
+            $countStmt = $this->getRepository()->getArticlesCountQuery($search, $main, $groupId);
+
+            return array('success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn());
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to read all prices being set for a specific article and a specific group.
+     * This way you can configure prices for each group and for each article in the groups then.
+     *
+     * @return array
+     */
+    private function getPrices()
+    {
+        try {
+            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/view/prices');
+
+            $detailId = null;
+            $groupId = null;
+            foreach ($this->Request()->getParam('filter') as $filter) {
+                if ($filter['property'] == 'detailId') {
+                    $detailId = $filter["value"];
+                } else {
+                    if ($filter['property'] == 'priceGroup') {
+                        $groupId = $filter['value'];
+                    }
+                }
+            }
+
+            if ($groupId === null || $detailId === null) {
+                throw new \Shopware\Components\Api\Exception\ParameterMissingException('Detail or group id missing');
+            }
+
+            $article = $this->getEntityManager()->find('Shopware\Models\Article\Detail', $detailId)->getArticle();
+            $group = $this->getRepository()->find($groupId);
+
+            $query = $this->getRepository()->getPricesQuery($detailId, $groupId);
+            $data = $query->getArrayResult();
+
+            $firstPrice = true;
+            foreach ($data as &$item) {
+                $item['percent'] = 0;
+
+                if ($group->getGross() === 1) {
+                    $item["price"] = $item["price"] / 100 * (100 + $article->getTax()->getTax());
+                }
+
+                $item['percent'] = "0%";
+                if (!$firstPrice) {
+                    $item['percent'] = round(100 - ($item["price"] / $data[0]["price"]) * 100, 2) . "%";
+                }
+                $firstPrice = false;
+            }
+
+            $lastEntry = end($data);
+
+            //This must not be translated!
+            //Do not translate, this is not shown to the user and only used for the logic!
+            $addEntry = $lastEntry['to'] != 'beliebig';
+
+            if ($addEntry) {
+                //No prices defined yet
+                if (!$lastEntry) {
+                    $from = 1;
+                } else {
+                    $from = $lastEntry['to'] + 1;
+                }
+
+                $data[] = array(
+                    'from' => $from,
+                    'to' => $namespace->get('prices/any', 'Arbitrary')
+                );
+            }
+
+            return array('success' => true, 'data' => $data);
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to update the price for a specific article in a specific group.
+     *
+     * @param $params
+     * @return array
+     */
+    private function updatePrice($params)
+    {
+        try {
+            $id = $params['id'];
+
+            $priceGroupId = $params["priceGroup"];
+            $articleId = $params["articleId"];
+            $articleDetailId = $params["articleDetailsId"];
+
+            if (!$priceGroupId) {
+                throw new InvalidArgumentException('Price group id is missing!');
+            }
+
+            if (!$articleId) {
+                throw new InvalidArgumentException('Article id is missing!');
+            }
+
+            if (!$articleDetailId) {
+                throw new InvalidArgumentException('Article detail id is missing!');
+            }
+
+            if (!$id) {
+                $model = new \Shopware\CustomModels\UserPrice\Price();
+            } else {
+                $model = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Price', $id);
+            }
+
+            //This must not be translated!
+            //Do not translate, this is not shown to the user and only used for the logic!
+            if (intval($params['to']) === 0) {
+                $params['to'] = 'beliebig';
+            }
+
+            $priceGroup = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Group', $priceGroupId);
+            $article = $this->getEntityManager()->find('Shopware\Models\Article\Article', $articleId);
+
+            if ($priceGroup->getGross() === 1 && $params["price"]) {
+                $params["price"] = $params["price"] / ((100 + $article->getTax()->getTax()) / 100);
+            }
+
+            $model->fromArray($params);
+            $model->setPriceGroup($priceGroup);
+            $model->setArticle($article);
+            $model->setDetail($this->getEntityManager()->find('Shopware\Models\Article\Detail', $articleDetailId));
+
+            $this->getEntityManager()->persist($model);
+            $this->getEntityManager()->flush();
+
+            return array('success' => true);
+        } catch (InvalidArgumentException $e) {
+            return array('success' => true, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to delete a price by a given id.
+     *
+     * @param $params
+     * @return array
+     */
+    private function deletePrice($params)
+    {
+        try {
+            if (!$id = $params['id']) {
+                throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
+            }
+            $model = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Price', $params['id']);
+
+            if (!$model) {
+                throw new \Doctrine\ORM\EntityNotFoundException('No entity with id ' . $id . ' found.');
+            }
+
+            $this->getEntityManager()->remove($model);
+
+            $this->getEntityManager()->flush();
+
+            return array('success' => true);
+        } catch (Exception $e) {
+            return array('success' => false, 'msg' => $e->getMessage());
+        }
+    }
+
+    /**
+     * Helper method to check if an array is multi-dimensional.
+     *
+     * @param $array
+     * @return bool
+     */
+    private function isMultiDimensional($array)
+    {
+        return count($array) != count($array, COUNT_RECURSIVE);
     }
 }
