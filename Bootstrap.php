@@ -222,7 +222,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     {
         $subscribers = array(
             new Subscriber\ControllerPath($this->Path()),
-            new Subscriber\Hooks($this, $this->bootstrap->get('swaguserprice.accessvalidator')),
+            new Subscriber\Hooks($this),
             new Subscriber\Resource()
         );
 
