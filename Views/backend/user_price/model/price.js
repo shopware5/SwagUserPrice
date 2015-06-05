@@ -55,35 +55,6 @@ Ext.define('Shopware.apps.UserPrice.model.Price', {
         { name: 'articleDetailsId', type: 'int' },
         { name: 'price', type: 'float', useNull: true },
         { name: 'percent', type: 'float', useNull: true }
-    ],
-
-    /**
-     * Configure the data communication
-     * @object
-     */
-    proxy: {
-        type: 'ajax',
-        /**
-         * Configure the url mapping for the different operations
-         * @object
-         */
-        api: {
-            //read prices
-            read: '{url controller="UserPrice" action="getPrices"}',
-
-            update: '{url controller="UserPrice" action="updatePrice"}',
-            destroy: '{url controller="UserPrice" action="deletePrice"}'
-        },
-        /**
-         * Configure the data reader
-         * @object
-         */
-        reader: {
-            type: 'json',
-            root: 'data',
-            //total values, used for paging
-            totalProperty: 'total'
-        }
-    }
+    ]
 });
 //{/block}

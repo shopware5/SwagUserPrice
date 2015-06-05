@@ -75,7 +75,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Main', {
     },
 
     /**
-     * Helper method to create the groups-tab.
+     * Creates the groups-tab.
      *
      * @returns Shopware.apps.UserPrice.view.TabPanel.Groups
      */
@@ -87,7 +87,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Main', {
     },
 
     /**
-     * Helper method to return the customers-tab.
+     * Returns the customers-tab.
      *
      * @returns Shopware.apps.UserPrice.view.TabPanel.Customers
      */
@@ -99,7 +99,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Main', {
     },
 
     /**
-     * Helper method to return the prices-tab.
+     * Returns the prices-tab.
      *
      * @returns Shopware.apps.UserPrice.view.TabPanel.Prices
      */

@@ -81,8 +81,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        if (!$this->assertVersionGreaterThen('5.0.0')) {
-            throw new Exception("This plugin requires Shopware 5.0.0x or a later version");
+        if (!$this->assertVersionGreaterThen('5.0.2')) {
+            throw new Exception("This plugin requires Shopware 5.0.2 or a later version");
         }
 
         $this->getSetupService()->install();
@@ -95,17 +95,16 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * in the info.txt.
      *
      * @return array
+     * @throws Exception
      */
     public function getInfo()
     {
-        return array(
-            'version' => $this->getVersion(),
-            'label' => $this->getLabel(),
-            'link' => 'http://www.shopware.de/',
-            'description' => file_get_contents($this->Path() . 'info_de.txt') . file_get_contents(
-                    $this->Path() . 'info_en.txt'
-                )
-        );
+        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
+        if ($info) {
+            return $info['label']['en'];
+        } else {
+            throw new Exception('The plugin has an invalid version file.');
+        }
     }
 
     /**
@@ -195,10 +194,6 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
         $helper = $this->bootstrap->get('swaguserprice.servicehelper');
 
-        $test = function() {
-
-        };
-
         $userPriceService = new Core\CheapestUserPriceService($this->bootstrap, $coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.cheapest_price_service', $userPriceService);
     }
@@ -226,9 +221,9 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     public function onStartDispatch(Enlight_Event_EventArgs $args)
     {
         $subscribers = array(
-            new Subscriber\ControllerPath($this),
-            new Subscriber\Hooks($this),
-            new Subscriber\Resource($this)
+            new Subscriber\ControllerPath($this->Path()),
+            new Subscriber\Hooks($this, $this->bootstrap->get('swaguserprice.accessvalidator')),
+            new Subscriber\Resource()
         );
 
         foreach ($subscribers as $subscriber) {

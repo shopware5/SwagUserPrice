@@ -76,7 +76,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     }
 
     /**
-     * Method to get a single price for a product.
+     * Gets a single price for a product.
      *
      * @param Struct\BaseProduct $product
      * @param Struct\ShopContextInterface $context
@@ -90,7 +90,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     }
 
     /**
-     * Method to get all prices for a product.
+     * Gets all prices for a product.
      *
      * @param Struct\BaseProduct[] $products
      * @param Struct\ShopContextInterface $context
@@ -111,7 +111,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     }
 
     /**
-     * Helper method to build a custom rule-struct.
+     * Builds a custom rule-struct.
      *
      * @param $rule
      * @param $number

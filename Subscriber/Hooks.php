@@ -44,11 +44,17 @@ class Hooks implements SubscriberInterface
     protected $bootstrap;
 
     /**
+     * Instance of Components\AccessValidator
+     */
+    protected $accessValidator;
+
+    /**
      * Constructor of the subscriber. Sets the instance of the bootstrap.
      */
-    public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
+    public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap, Components\AccessValidator $accessValidator)
     {
         $this->bootstrap = $bootstrap;
+        $this->accessValidator = $accessValidator;
     }
 
     /**
@@ -72,8 +78,6 @@ class Hooks implements SubscriberInterface
     {
         $return = $args->getReturn();
         $id = $args->getId();
-        /** @var Components\AccessValidator $validator */
-        $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
 
         $orderNumber = Shopware()->Db()->fetchOne(
             "
@@ -82,7 +86,7 @@ class Hooks implements SubscriberInterface
             array($id)
         );
 
-        if (!$validator->validateProduct($orderNumber)) {
+        if (!$this->accessValidator->validateProduct($orderNumber)) {
             return $return;
         }
 

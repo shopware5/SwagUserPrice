@@ -39,14 +39,14 @@ class ControllerPath implements SubscriberInterface
     /**
      * Instance of Shopware_Plugins_Backend_SwagUserPrice_Bootstrap
      */
-    protected $bootstrap;
+    protected $path;
 
     /**
      * Constructor of the subscriber. Sets the instance of the bootstrap.
      */
-    public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
+    public function __construct($path)
     {
-        $this->bootstrap = $bootstrap;
+        $this->path = $path;
     }
 
     /**
@@ -69,9 +69,9 @@ class ControllerPath implements SubscriberInterface
      */
     public function onGetControllerPathUserPrice(\Enlight_Event_EventArgs $arguments)
     {
-        Shopware()->Template()->addTemplateDir($this->bootstrap->Path() . 'Views/', 'swag_user_price');
-        Shopware()->Snippets()->addConfigDir($this->bootstrap->Path() . 'Snippets/');
+        Shopware()->Template()->addTemplateDir($this->path . 'Views/', 'swag_user_price');
+        Shopware()->Snippets()->addConfigDir($this->path . 'Snippets/');
 
-        return $this->bootstrap->Path() . 'Controllers/Backend/UserPrice.php';
+        return $this->path . 'Controllers/Backend/UserPrice.php';
     }
 }

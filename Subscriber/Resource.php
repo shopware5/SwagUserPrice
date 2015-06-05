@@ -39,19 +39,6 @@ use Shopware\SwagUserPrice\Components;
 class Resource implements SubscriberInterface
 {
     /**
-     * Instance of Shopware_Plugins_Backend_SwagUserPrice_Bootstrap
-     */
-    protected $bootstrap;
-
-    /**
-     * Constructor of the subscriber. Sets the instance of the bootstrap.
-     */
-    public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
-    {
-        $this->bootstrap = $bootstrap;
-    }
-
-    /**
      * Method to subscribe all needed events.
      *
      * @return array

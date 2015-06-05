@@ -84,27 +84,38 @@ class AccessValidator
         }
 
         $userId = $session->offsetGet('sUserId');
-        $detailId = $this->getEntityManager()->getDBALQueryBuilder()->select('detail.id')->from(
-            's_articles_details',
-            'detail'
-        )->where('detail.ordernumber = :number')->setParameter('number', $number)->execute()->fetchColumn();
+        $detailId = $this->getEntityManager()->getDBALQueryBuilder()
+            ->select('detail.id')
+            ->from(
+                's_articles_details',
+                'detail'
+            )->where('detail.ordernumber = :number')
+            ->setParameter('number', $number)
+            ->execute()->fetchColumn();
 
         /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
-        $stmt = $builder->select('COUNT(prices.id)')->from('s_plugin_pricegroups_prices', 'prices')->innerJoin(
-            'prices',
-            's_user_attributes',
-            'attributes',
-            'attributes.swag_pricegroup = prices.pricegroup'
-        )->innerJoin('attributes', 's_user', 'user', 'user.id = attributes.userID')->where(
-            'user.id = :id'
-        )->andWhere('prices.articledetailsID = :detailId')->setParameters(
-            array(
-                'id' => $userId,
-                'detailId' => $detailId
-            )
-        )->execute();
+        $stmt = $builder->select('COUNT(prices.id)')
+            ->from('s_plugin_pricegroups_prices', 'prices')
+            ->innerJoin(
+                'prices',
+                's_user_attributes',
+                'attributes',
+                'attributes.swag_pricegroup = prices.pricegroup'
+            )->innerJoin(
+                'attributes',
+                's_user',
+                'user',
+                'user.id = attributes.userID'
+            )->where('user.id = :id')
+            ->andWhere('prices.articledetailsID = :detailId')
+            ->setParameters(
+                array(
+                    'id' => $userId,
+                    'detailId' => $detailId
+                )
+            )->execute();
 
         if ($stmt->fetchColumn() > 0) {
             return true;

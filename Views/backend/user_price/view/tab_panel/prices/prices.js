@@ -67,7 +67,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to initialize the needed variables for this component.
+     * Initializes the needed variables for this component.
      * It adds a store to the grid, configures the needed columns and creates the cell-editing-plugin.
      */
     initVars: function () {
@@ -80,7 +80,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -106,7 +106,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to return the cell-editing-plugin.
+     * Returns the cell-editing-plugin.
      *
      * @returns Ext.grid.plugin.CellEditing
      */
@@ -125,7 +125,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to configure the needed columns.
+     * Configures the needed columns.
      *
      * @returns []
      */
@@ -203,7 +203,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to render the "to"-field properly.
+     * Renders the "to"-field properly.
      * There may be no 0 or a string, every 0 or string has to be replaced with the string "Arbitrary".
      *
      * @param value - The new value of the cell.
@@ -218,7 +218,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
     },
 
     /**
-     * Helper method to render the "percent"-field properly.
+     * Renders the "percent"-field properly.
      * It only adds the percent-icon to each value.
      *
      * @param value - The new value of the cell.

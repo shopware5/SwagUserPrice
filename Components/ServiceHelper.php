@@ -70,7 +70,7 @@ class ServiceHelper
     }
 
     /**
-     * Helper method to get the prices for a product.
+     * Get the prices for a product.
      *
      * @param $number
      * @return mixed
@@ -81,7 +81,7 @@ class ServiceHelper
     }
 
     /**
-     * Helper method to get a single price for a product.
+     * Get a single price for a product.
      *
      * @param $number
      * @return mixed
@@ -92,7 +92,7 @@ class ServiceHelper
     }
 
     /**
-     * Helper method to get the price for a specified quantity.
+     * Get the price for a specified quantity.
      * Will be only used in the checkout-process.
      *
      * @param $number
@@ -101,13 +101,17 @@ class ServiceHelper
      */
     public function getPriceForQuantity($number, $quantity)
     {
-        return $this->getPricesQueryBuilder($number)->andWhere('prices.from <= :quantity')->andWhere(
-            'CAST(prices.to as DECIMAL) >= :quantity OR CAST(prices.to as DECIMAL) = 0'
-        )->orderBy('prices.from', 'DESC')->setMaxResults(1)->setParameter('quantity', $quantity)->execute()->fetch();
+        return $this->getPricesQueryBuilder($number)
+            ->andWhere('prices.from <= :quantity')
+            ->andWhere('CAST(prices.to as DECIMAL) >= :quantity OR CAST(prices.to as DECIMAL) = 0')
+            ->orderBy('prices.from', 'DESC')
+            ->setMaxResults(1)
+            ->setParameter('quantity', $quantity)
+            ->execute()->fetch();
     }
 
     /**
-     * This method builds the query to read all the prices for a product-number.
+     * Builds the query to read all the prices for a product-number.
      * It returns the basic-query without any special filters, limits or offsets.
      *
      * @param $number
@@ -120,25 +124,32 @@ class ServiceHelper
         $userId = $session->offsetGet('sUserId');
 
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
-        $builder->select('prices.*')->from('s_plugin_pricegroups_prices', 'prices')->innerJoin(
-            'prices',
-            's_user_attributes',
-            'attributes',
-            'attributes.swag_pricegroup = prices.pricegroup'
-        )->innerJoin('attributes', 's_user', 'user', 'user.id = attributes.userID')->where(
-            'user.id = :id'
-        )->andWhere('prices.articledetailsID = :detailId')->setParameters(
-            array(
-                'id' => $userId,
-                'detailId' => $this->getDetailIdByNumber($number)
-            )
-        );
+        $builder->select('prices.*')
+            ->from('s_plugin_pricegroups_prices', 'prices')
+            ->innerJoin(
+                'prices',
+                's_user_attributes',
+                'attributes',
+                'attributes.swag_pricegroup = prices.pricegroup')
+            ->innerJoin(
+                'attributes',
+                's_user',
+                'user',
+                'user.id = attributes.userID'
+            )->where('user.id = :id')
+            ->andWhere('prices.articledetailsID = :detailId')
+            ->setParameters(
+                array(
+                    'id' => $userId,
+                    'detailId' => $this->getDetailIdByNumber($number)
+                )
+            );
 
         return $builder;
     }
 
     /**
-     * Helper method to build a price-rule.
+     * Build a price-rule.
      *
      * @param $price
      * @return Struct\Product\PriceRule
@@ -155,17 +166,20 @@ class ServiceHelper
     }
 
     /**
-     * Helper method to get the detail-id of a product by using the number.
+     * Get the detail-id of a product by using the number.
      *
      * @param $number
      * @return mixed
      */
     private function getDetailIdByNumber($number)
     {
-        return $this->getEntityManager()->getDBALQueryBuilder()->select('detail.id')->from(
-            's_articles_details',
-            'detail'
-        )->where('detail.ordernumber = :number')->setParameter('number', $number)->execute()->fetchColumn();
+        return $this->getEntityManager()->getDBALQueryBuilder()->select('detail.id')
+            ->from(
+                's_articles_details',
+                'detail'
+            )->where('detail.ordernumber = :number')
+            ->setParameter('number', $number)
+            ->execute()->fetchColumn();
     }
 
 }

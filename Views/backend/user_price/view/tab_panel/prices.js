@@ -61,7 +61,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Prices', {
     },
 
     /**
-     * Helper method to create the items for the prices-tab.
+     * Creates the items for the prices-tab.
      *
      * @returns []
      */
@@ -74,7 +74,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Prices', {
     },
 
     /**
-     * Helper method to create the main container for the prices-tab.
+     * Creates the main container for the prices-tab.
      * It will contain all further components, e.g. the grids being used.
      *
      * @returns Ext.container.Container
@@ -94,7 +94,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Prices', {
     },
 
     /**
-     * Helper method to create the items for the main container.
+     * Creates the items for the main container.
      * In this case two grids and a spacer are created.
      *
      * @returns []
@@ -128,7 +128,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Prices', {
     },
 
     /**
-     * Helper method to create the groups-combo.
+     * Creates the groups-combo.
      *
      * @returns Shopware.apps.UserPrice.view.TabPanel.Combo
      */

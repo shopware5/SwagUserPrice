@@ -75,7 +75,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to initialize the needed variables for this component.
+     * Initializes the needed variables for this component.
      * It adds the used items and adds the docked-components.
      */
     initVars: function () {
@@ -86,7 +86,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -102,7 +102,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to create the used items.
+     * Creates the used items.
      * In this case we only create a form-panel with its several form-fields.
      *
      * @returns Ext.form.Panel
@@ -122,7 +122,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to create the items for the fieldset of the form-panel in the detail-window.
+     * Creates the items for the fieldset of the form-panel in the detail-window.
      *
      * @returns array
      */
@@ -151,7 +151,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to create the docked items, in this case only two buttons on the bottom of the detail-window.
+     * Creates the docked items, in this case only two buttons on the bottom of the detail-window.
      *
      * @returns object
      */
@@ -167,7 +167,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
     },
 
     /**
-     * Helper method to actually created the buttons for the bottom-bar.
+     * Creates the buttons for the bottom-bar.
      *
      * @returns array
      */

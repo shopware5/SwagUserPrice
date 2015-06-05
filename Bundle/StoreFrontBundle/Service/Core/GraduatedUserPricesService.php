@@ -35,6 +35,13 @@ class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterf
         $this->helper = $helper;
     }
 
+    /**
+     * Get a single price for a product.
+     *
+     * @param Struct\ListProduct $product
+     * @param Struct\ProductContextInterface $context
+     * @return mixed
+     */
     public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
     {
         $graduatedPrices = $this->getList([$product], $context);
@@ -42,6 +49,13 @@ class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterf
         return array_shift($graduatedPrices);
     }
 
+    /**
+     * Gets all prices for a product.
+     *
+     * @param Struct\BaseProduct[] $products
+     * @param Struct\ProductContextInterface $context
+     * @return array|Struct\BaseProduct[]|Struct\Product\PriceRule[]
+     */
     public function getList($products, Struct\ProductContextInterface $context)
     {
         $products = $this->service->getList($products, $context);
@@ -56,6 +70,13 @@ class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterf
         return $products;
     }
 
+    /**
+     * Builds a custom price-rule to implement the plugins prices.
+     *
+     * @param Struct\Product\PriceRule $coreRule
+     * @param $number
+     * @return array
+     */
     private function getCustomRules(Struct\Product\PriceRule $coreRule, $number)
     {
         $prices = $this->helper->getPrices($number);

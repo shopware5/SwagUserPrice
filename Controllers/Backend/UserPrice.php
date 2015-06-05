@@ -89,7 +89,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to return the repository.
+     * Returns the repository.
      *
      * @return Shopware\CustomModels\UserPrice\Repository
      */
@@ -234,7 +234,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to read the groups and its total-count.
+     * Reads the groups and its total-count.
      * It supports searching- and paging-functions.
      *
      * @param $params
@@ -269,7 +269,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to edit a group.
+     * Edits a group.
      * This is either creating a new group if no id is set in the parameters.
      * Otherwise the group with the given id will be edited.
      *
@@ -308,7 +308,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to delete a group.
+     * Deletes a group.
      * This will not only delete the group itself, but also remove all assigned values.
      * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
      *
@@ -371,7 +371,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to read all customers.
+     * Reads all customers.
      * Depending on the "priceGroup"-parameter, this will return either
      * 1st - all customers, which are currently not assigned to any group at all if the parameter is not set
      * 2nd - only selected customers, which are currently assigned to the group whose id is in the parameter.
@@ -415,7 +415,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to add a customer to a group.
+     * Adds a customer to a group.
      *
      * @param $params
      * @return array
@@ -448,7 +448,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to remove a customer from a given group.
+     * Removes a customer from a given group.
      *
      * @param $params
      * @return array|void
@@ -483,7 +483,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to return all articles.
+     * Returns all articles.
      * This can also be configured to only show main-articles.
      *
      * It supports searching- and paging-functions.
@@ -536,7 +536,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to read all prices being set for a specific article and a specific group.
+     * Reads all prices being set for a specific article and a specific group.
      * This way you can configure prices for each group and for each article in the groups then.
      *
      * @return array
@@ -611,7 +611,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to update the price for a specific article in a specific group.
+     * Updates the price for a specific article in a specific group.
      *
      * @param $params
      * @return array
@@ -671,7 +671,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to delete a price by a given id.
+     * Deletes a price by a given id.
      *
      * @param $params
      * @return array
@@ -699,7 +699,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Helper method to check if an array is multi-dimensional.
+     * Checks if an array is multi-dimensional.
      *
      * @param $array
      * @return bool

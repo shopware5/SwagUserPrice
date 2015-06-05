@@ -67,7 +67,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called when after rendering the customers-tab.
+     * Called after rendering the customers-tab.
      * It locks the drop-zone after rendering since there is no way to lock the dropzone initially.
      *
      * @param tab - The customers-tab.
@@ -78,7 +78,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is fired when the user selects a group from the group-combobox.
+     * Fired when the user selects a group from the group-combobox.
      * It enables the second customers-grid and loads the assigned customers, if there are any.
      *
      * @param records The selected records. Will always be a single record in an array.
@@ -91,7 +91,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called upon clicking the "add"-button to add a single or multiple customers.
+     * Called upon clicking the "add"-button to add a single or multiple customers.
      * It adds customers to the currently selected group.
      *
      * @param tab - The customers-tab.
@@ -110,7 +110,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called upon dropping a single or multiple customers in the second grid.
+     * Called upon dropping a single or multiple customers in the second grid.
      * It adds customers to the currently selected group.
      *
      * @param tab - The customers-tab.
@@ -129,7 +129,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called upon clicking the "remove"-button to remove a single or multiple customers.
+     * Called upon clicking the "remove"-button to remove a single or multiple customers.
      * It removes customers from the currently selected group.
      *
      * @param tab - The customers-tab.
@@ -147,7 +147,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called upon dropping a single or multiple customers in the first grid.
+     * Called upon dropping a single or multiple customers in the first grid.
      * It removes customers from the currently selected group.
      *
      * @param tab - The customers-tab.
@@ -165,7 +165,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is triggered when the user types a search-term into the search-field.
+     * Triggered when the user types a search-term into the search-field.
      * It triggers the request to actually filter the store.
      *
      * @param field - The search-field.
@@ -185,7 +185,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * This method is called when the user wants to open a customer from the customer-tab.
+     * Called when the user wants to open a customer from the customer-tab.
      * It only creates the detail-window of the "customer"-application containing the currently selected customer.
      *
      * @param record - The clicked row in the grid.
@@ -201,7 +201,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * Helper method to send a request to add a customer to a group.
+     * Sends a request to add a customer to a group.
      *
      * @param ids - The ids of the customers which should be added to a group.
      * @param priceGroup - The id of the selected group.
@@ -228,7 +228,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * Helper method to send a request to remove a customer from a group.
+     * Sends a request to remove a customer from a group.
      * A group-id is not needed here, since we only delete the database-entries from the customers and we do not re-assign them.
      *
      * @param ids - The ids of the customers which should be removed from a group.
@@ -254,7 +254,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * Helper method to load both grids: All customers- and selected customers-grid.
+     * Loads both grids: All customers- and selected customers-grid.
      *
      * @param tab - The customers-tab.
      */
@@ -264,7 +264,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Customer', {
     },
 
     /**
-     * Helper method to load the "selected customers"-grid.
+     * Loads the "selected customers"-grid.
      * It enables and unlocks the grid for Drag'n'Drop-plugin.
      * Additionally it loads the customers being assigned to the currently selected group.
      *

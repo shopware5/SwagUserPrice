@@ -107,11 +107,11 @@ class Setup
     }
 
     /**
-     * Helper method to create all tables, that we need for the plugin.
+     * Creates all tables, that we need for the plugin.
      */
     private function createTables()
     {
-        Shopware()->Db()->query(
+        $this->bootstrap->get('db')->query(
             "
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups` (
 			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -123,7 +123,7 @@ class Setup
         "
         );
 
-        Shopware()->Db()->query(
+        $this->bootstrap->get('db')->query(
             "
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups_prices` (
               `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
@@ -140,7 +140,7 @@ class Setup
     }
 
     /**
-     * Helper method to create the attributes we need for the plugin.
+     * Creates the attributes we need for the plugin.
      */
     private function addAttribute()
     {
@@ -161,7 +161,7 @@ class Setup
     }
 
     /**
-     * Helper method to create the menu-entry.
+     * Creates the menu-entry.
      */
     private function createMenu()
     {
@@ -178,7 +178,7 @@ class Setup
     }
 
     /**
-     * Helper method to create the acl-rules for the plugin.
+     * Creates the acl-rules for the plugin.
      *
      * @throws \Enlight_Exception
      */
@@ -202,7 +202,7 @@ class Setup
     }
 
     /**
-     * Helper method to import old data.
+     * Imports old data.
      *
      * @throws \ErrorException
      */
@@ -264,15 +264,15 @@ class Setup
             }
 
             $sql = "SELECT u.*, ua.id as attributeId FROM s_user u LEFT JOIN s_user_attributes ua ON ua.userID = u.id WHERE u.pricegroupID IS NOT NULL";
-            $existingAttributes = Shopware()->Db()->fetchAll($sql, array());
+            $existingAttributes = $db->fetchAll($sql, array());
 
             foreach ($existingAttributes as $user) {
                 if ($user['attributeId']) {
                     $sql = "UPDATE s_user_attributes SET swag_pricegroup = ? WHERE id = ?";
-                    Shopware()->Db()->query($sql, array($user["attributeId"]));
+                    $db->query($sql, array($user["attributeId"]));
                 } else {
                     $sql = "INSERT INTO s_user_attributes (userID, swag_pricegroup) VALUES (?, ?)";
-                    Shopware()->Db()->query($sql, array($user['id'], $user['pricegroupID']));
+                    $db->query($sql, array($user['id'], $user['pricegroupID']));
                 }
             }
 

@@ -156,7 +156,7 @@ class PriceHelper implements PriceHelperInterface
     }
 
     /**
-     * Helper method to build the query to join all the needed prices.
+     * Builds the query to join all the needed prices.
      * Default-price for the default customer-group, customer-price for the current customer-group and
      * the own user-prices from this plugin.
      *
@@ -192,7 +192,7 @@ class PriceHelper implements PriceHelperInterface
     }
 
     /**
-     * Helper method to build the user-subquery.
+     * Builds the user-subquery.
      * It basically returns the id of the currently logged-in user.
      *
      * @return \Doctrine\DBAL\Query\QueryBuilder
@@ -211,7 +211,7 @@ class PriceHelper implements PriceHelperInterface
     }
 
     /**
-     * Helper method to build the general-subquery to manipulate the table-joins.
+     * Builds the general-subquery to manipulate the table-joins.
      * We are joining a table via subquery to fake the "default"- and "customer"-prices.
      *
      * @param $subQueryName

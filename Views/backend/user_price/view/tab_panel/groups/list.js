@@ -69,7 +69,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to initialize the needed variables for this component.
+     * Initializes the needed variables for this component.
      * It adds a store to the grid, creates the custom selection-model and configures the needed columns.
      *
      * Additionally the docked-items are set and a row-editing-plugin is added.
@@ -90,7 +90,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -129,7 +129,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to create a custom selection model for the grid.
+     * Creates a custom selection model for the grid.
      *
      * @returns Ext.selection.CheckboxModel
      */
@@ -150,7 +150,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to configure the needed columns.
+     * Configures the needed columns.
      * It also configures the editor-settings for each column.
      *
      * @returns []
@@ -191,7 +191,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to get the toolbar for the grid.
+     * Gets the toolbar for the grid.
      *
      * @returns Ext.toolbar.Toolbar
      */
@@ -214,7 +214,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to create a search-field for the toolbar.
+     * Creates a search-field for the toolbar.
      *
      * @returns Ext.form.field.Text
      */
@@ -242,7 +242,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to create the needed buttons for the toolbar.
+     * Creates the needed buttons for the toolbar.
      * In this case we need an "add"- and a "delete"-button.
      *
      * @returns []
@@ -286,7 +286,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to create the row-editing-plugin.
+     * Creates the row-editing-plugin.
      *
      * @returns Ext.grid.plugin.RowEditing
      */
@@ -305,7 +305,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
     },
 
     /**
-     * Helper method to return the bottom-bar, which only contains the paging.
+     * Returns the bottom-bar, which only contains the paging.
      *
      * @returns object
      */

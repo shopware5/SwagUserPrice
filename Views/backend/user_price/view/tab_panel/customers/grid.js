@@ -66,7 +66,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to initialize the needed variables for this component.
+     * Initializes the needed variables for this component.
      * It adds the columns, creates a custom selection-model and adds the docked-items.
      */
     initVars: function () {
@@ -81,7 +81,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -102,7 +102,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to collect all columns.
+     * Collects all columns.
      *
      * @returns []
      */
@@ -149,7 +149,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to create a custom selection-model.
+     * Creates a custom selection-model.
      *
      * @returns Ext.selection.RowModel
      */
@@ -160,7 +160,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to create the tool-bar which is docked to the top of the customers-grid.
+     * Creates the tool-bar which is docked to the top of the customers-grid.
      *
      * @returns Ext.toolbar.Toolbar
      */
@@ -179,7 +179,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to create a searchfield.
+     * Creates a searchfield.
      * It also fires an event when the user enters a search-term with at least three characters or deletes the search-term again.
      *
      * @returns Ext.form.field.Text
@@ -208,7 +208,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.customers.Grid', {
     },
 
     /**
-     * Helper method to return the bottom-bar, which is needed for the paging.
+     * Returns the bottom-bar, which is needed for the paging.
      *
      * @returns object
      */

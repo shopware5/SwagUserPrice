@@ -72,7 +72,7 @@ class UserPrice
     }
 
     /**
-     * Helper method for the backend to format the prices for an article.
+     * Formats the prices for an article in the backend.
      *
      * @param $articles
      * @param $groupId

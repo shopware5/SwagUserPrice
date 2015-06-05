@@ -66,7 +66,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to initialize the needed variables for this component.
+     * Initializes the needed variables for this component.
      * It adds a store to the grid, creates the custom selection-model and configures the needed columns.
      *
      * Additionally the docked-items are set.
@@ -85,7 +85,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -107,7 +107,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to return the bottom-bar, which only contains the paging.
+     * Returns the bottom-bar, which only contains the paging.
      *
      * @returns object
      */
@@ -123,7 +123,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to get the toolbar for the grid.
+     * Gets the toolbar for the grid.
      *
      * @returns Ext.toolbar.Toolbar
      */
@@ -146,7 +146,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to create a search-field for the toolbar.
+     * Creates a search-field for the toolbar.
      *
      * @returns Ext.form.field.Text
      */
@@ -174,7 +174,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to create the checkbox to only show main-products for the toolbar.
+     * Creates the checkbox to only show main-products for the toolbar.
      *
      * @returns []
      */
@@ -195,7 +195,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Articles', {
     },
 
     /**
-     * Helper method to configure the needed columns.
+     * Configures the needed columns.
      *
      * @returns []
      */

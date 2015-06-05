@@ -62,7 +62,12 @@ Ext.define('Shopware.apps.UserPrice', {
      * Requires controllers for sub-application
      * @array
      */
-    controllers: ['Main', 'Group', 'Customer', 'Price'],
+    controllers: [
+        'Main',
+        'Group',
+        'Customer',
+        'Price'
+    ],
 
     /**
      * Requires stores for sub-application

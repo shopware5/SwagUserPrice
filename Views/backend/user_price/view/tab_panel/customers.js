@@ -59,7 +59,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Customers', {
     },
 
     /**
-     * Helper method to register the fired events for the event-manager.
+     * Registers the fired events for the event-manager.
      * Needed to also destroy the events upon destroying the application.
      */
     registerEvents: function () {
@@ -105,7 +105,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Customers', {
     },
 
     /**
-     * Helper method to create the items for the tab.
+     * Creates the items for the tab.
      *
      * @returns []
      */
@@ -118,7 +118,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Customers', {
     },
 
     /**
-     * Helper method to create the main-container containing the two grids and the buttons between them.
+     * Creates the main-container containing the two grids and the buttons between them.
      *
      * @returns Ext.container.Container
      */
@@ -137,7 +137,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Customers', {
     },
 
     /**
-     * Helper method to create and configure the two grids and the buttons between them.
+     * Creates and configures the two grids and the buttons between them.
      *
      * @returns []
      */
@@ -228,7 +228,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.Customers', {
     },
 
     /**
-     * Helper method to create the group-combobox.
+     * Creates the group-combobox.
      *
      * @returns Shopware.apps.UserPrice.view.TabPanel.Combo
      */

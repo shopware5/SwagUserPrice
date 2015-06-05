@@ -86,7 +86,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * This method is called when the user wants to add a group by filling the detail-window and submitting it.
+     * Called when the user wants to add a group by filling the detail-window and submitting it.
      *
      * @param form - The form from the detail-window.
      * @param store - The store of the grid.
@@ -100,7 +100,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * This method is called when the user edits a group by using the row-editing-plugin.
+     * Called when the user edits a group by using the row-editing-plugin.
      *
      * @param editor - The editor-plugin.
      * @param context - The edited context.
@@ -114,7 +114,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * This method is called when the user wants to delete a single or multiple groups.
+     * Called when the user wants to delete a single or multiple groups.
      * It collects all needed data and submits it to the controller.
      * Afterwards the grid is reloaded and the several tabs are resetted.
      *
@@ -152,7 +152,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * This method is triggered when the user types a search-term into the search-field.
+     * Triggered when the user types a search-term into the search-field.
      * It triggers the request to actually filter the store.
      *
      * @param field - The search-field.
@@ -171,7 +171,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * This method is called when the user wants to add a group by clicking on the "add"-button.
+     * Called when the user wants to add a group by clicking on the "add"-button.
      * It only opens the detail-window.
      *
      * @param store - The store of the groups-grid.
@@ -183,7 +183,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * Helper method to save the record upon creating or editing a group.
+     * Save the record upon creating or editing a group.
      *
      * @param record - The created/edited group.
      * @param store - The store of the groups-grid.
@@ -216,7 +216,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * Helper method to reset the customers-tab.
+     * Resets the customers-tab.
      * It reloads the stores with empty data, disables the second customers-grid and also resets the group-combo.
      *
      * @param customerTab - The customers-tab.
@@ -237,7 +237,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
     },
 
     /**
-     * Helper method to reset the prices-tab.
+     * Resets the prices-tab.
      * It reloads the stores with empty data, disables both grids and also resets the group-combo.
      *
      * @param pricesTab - The prices-tab.

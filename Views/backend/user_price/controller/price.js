@@ -76,7 +76,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called when editing a price.
+     * Called when editing a price.
      * It loads all needed data into a price-record and saves it afterwards.
      *
      * @param editor - The cell-editor plugin.
@@ -137,7 +137,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called before actually editing a price by using the cell-editing plugin.
+     * Called before actually editing a price by using the cell-editing plugin.
      * It prevents editing the "to"-column of the any but the last rows.
      * There should be no way to any "to"-value but the last "arbitrary" one.
      *
@@ -182,7 +182,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called when the user wants to delete the last price-row.
+     * Called when the user wants to delete the last price-row.
      * This automatically resets the "to"-value of the second to last row.
      * Additionally we need to check here if the deleted row actually owns an id.
      * If so, the record must be deleted.
@@ -224,7 +224,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is triggered when the user types a search-term into the search-field.
+     * Triggered when the user types a search-term into the search-field.
      * It triggers the request to actually filter the store.
      *
      * @param field - The search-field.
@@ -244,7 +244,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called when the user clicks on the "show main products only"-checkbox.
+     * Called when the user clicks on the "show main products only"-checkbox.
      * It filters the store to only load main-articles.
      *
      * @param grid - The articles-grid.
@@ -266,7 +266,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called when the user selects an article from the articles-grid.
+     * Called when the user selects an article from the articles-grid.
      * It enables the prices-grid and loads the assigned prices.
      *
      * @param view - The view of the prices-grid.
@@ -280,7 +280,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * This method is called when the user clicks on a group from the group-combo.
+     * Called when the user clicks on a group from the group-combo.
      * It enables the articles-grid and loads the articles then.
      *
      * @param records - The clicked record from the group-combo. Always only contains a single group in an array.
@@ -293,7 +293,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * Helper method to load the prices-grid.
+     * Loads the prices-grid.
      * It enabled the grid, loads the prices from the selected article and resets all store-filters.
      *
      * @param tab - The prices-tab.
@@ -327,7 +327,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
     },
 
     /**
-     * Helper method to load the articles-grid.
+     * Loads the articles-grid.
      * It enables the grid and sets the filter due to the selected group.
      *
      * @param tab - The prices-tab.
