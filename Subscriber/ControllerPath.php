@@ -37,12 +37,12 @@ use Enlight\Event\SubscriberInterface;
 class ControllerPath implements SubscriberInterface
 {
     /**
-     * Instance of Shopware_Plugins_Backend_SwagUserPrice_Bootstrap
+     * Path to the plugin directory
      */
     protected $path;
 
     /**
-     * Constructor of the subscriber. Sets the instance of the bootstrap.
+     * Constructor of the subscriber. Sets the path to the directory.
      */
     public function __construct($path)
     {

@@ -189,6 +189,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
                          * @param value
                          * @param metadata
                          * @param record
+                         * @param rowIdx
                          * @return string
                          */
                         getClass: function (value, metadata, record, rowIdx) {
