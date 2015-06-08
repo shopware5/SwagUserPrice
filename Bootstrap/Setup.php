@@ -94,12 +94,12 @@ class Setup
 
     private function createEvents()
     {
-        $events = [
+        $events = array(
             'Enlight_Controller_Front_StartDispatch' => 'onStartDispatch',
             'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService'
-        ];
+        );
 
         foreach ($events as $event => $listener) {
             $this->bootstrap->subscribeEvent($event, $listener);
@@ -212,9 +212,9 @@ class Setup
         $db = $this->bootstrap->get('db');
         try {
             $sql = "
-            SELECT *, groups.id as groupId, prices.id as priceId
-            FROM s_core_customerpricegroups groups
-            INNER JOIN s_core_customerpricegroups_prices prices ON prices.pricegroup = CONCAT('PG', groups.id)";
+                SELECT *, groups.id as groupId, prices.id as priceId
+                FROM s_core_customerpricegroups groups
+                INNER JOIN s_core_customerpricegroups_prices prices ON prices.pricegroup = CONCAT('PG', groups.id)";
             $values = $db->fetchAll($sql, array());
 
             $groups = array();
@@ -276,8 +276,8 @@ class Setup
                 }
             }
 
-        } catch (\ErrorException $e) {
-            throw new \ErrorException('Migrating data failed');
+        } catch (\Exception $e) {
+            return;
         }
     }
 

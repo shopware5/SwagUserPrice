@@ -90,24 +90,6 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
-     * Returns the meta information about the plugin.
-     * Keep in mind that the plugin description is located
-     * in the info.txt.
-     *
-     * @return array
-     * @throws Exception
-     */
-    public function getInfo()
-    {
-        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
-        if ($info) {
-            return $info['label']['en'];
-        } else {
-            throw new Exception('The plugin has an invalid version file.');
-        }
-    }
-
-    /**
      * The update method is needed for the update via plugin manager.
      *
      * @param $oldVersion
@@ -139,10 +121,16 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * Get (nice) name for plugin manager list
      *
      * @return string
+     * @throws Exception
      */
     public function getLabel()
     {
-        return 'User Prices';
+        $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
+        if ($info) {
+            return $info['label']['en'];
+        } else {
+            throw new Exception('The plugin has an invalid version file.');
+        }
     }
 
     /**
