@@ -1,26 +1,25 @@
 {
     "label": {
         "de": "Kundenspezifische Preise",
-        "en": "Customer specific Prices"
+        "en": "Specific Pricing for Customers"
     },
     "copyright": "(c) by Shopware AG",
     "license": "proprietary",
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
-
-    "currentVersion": "1.0.3",
-
+    "currentVersion": "2.0.0",
     "changelog": {
         "de": {
+            "2.0.0": "PT-3076 - Feature: Shopware 5 Kompatibilität",
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.0.0": "PT-3076 - Feature: Shopware 5 compatibility",
             "1.0.3": "Fixed wrong encoding; PT-2388: Fixed ssl usage in the backend; PT-2552: Replaced superglobal REQUEST variable; PT-2614 fix article price with active HTTP cache"
         }
     },
-
     "compatibility": {
-        "minimumVersion": "4.0.0",
+        "minimumVersion": "5.0.2",
         "maximumVersion": null,
         "blacklist": [
         ]
