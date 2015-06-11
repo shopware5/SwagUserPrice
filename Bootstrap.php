@@ -46,7 +46,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     private $setupService;
 
     /**
-     * After init method is called everytime after initializing this plugin
+     * After init method is called every time after initializing this plugin
      */
     public function afterInit()
     {
@@ -178,11 +178,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function onGetCheapestPriceService(\Enlight_Event_EventArgs $arguments)
     {
-        $coreService = $this->bootstrap->get('shopware_storefront.cheapest_price_service');
-        $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
-        $helper = $this->bootstrap->get('swaguserprice.servicehelper');
+        $coreService = $this->get('shopware_storefront.cheapest_price_service');
+        $validator = $this->get('swaguserprice.accessvalidator');
+        $helper = $this->get('swaguserprice.servicehelper');
 
-        $userPriceService = new Core\CheapestUserPriceService($this->bootstrap, $coreService, $validator, $helper);
+        $userPriceService = new Core\CheapestUserPriceService($this, $coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.cheapest_price_service', $userPriceService);
     }
 
@@ -193,11 +193,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function onGetGraduatedPricesService(\Enlight_Event_EventArgs $arguments)
     {
-        $coreService = $this->bootstrap->get('shopware_storefront.graduated_prices_service');
-        $validator = $this->bootstrap->get('swaguserprice.accessvalidator');
-        $helper = $this->bootstrap->get('swaguserprice.servicehelper');
+        $coreService = $this->get('shopware_storefront.graduated_prices_service');
+        $validator = $this->get('swaguserprice.accessvalidator');
+        $helper = $this->get('swaguserprice.servicehelper');
 
-        $userPriceService = new Core\GraduatedUserPricesService($this->bootstrap, $coreService, $validator, $helper);
+        $userPriceService = new Core\GraduatedUserPricesService($this, $coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.graduated_prices_service', $userPriceService);
     }
 
