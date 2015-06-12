@@ -53,6 +53,31 @@ Ext.define('Shopware.apps.UserPrice.model.Customer', {
         { name: 'company', type: 'string' },
         { name: 'firstName', type: 'string' },
         { name: 'lastName', type: 'string' }
-    ]
+    ],
+
+    /**
+     * Configure the data communication
+     * @object
+     */
+    proxy: {
+        type: 'ajax',
+        /**
+         * Configure the url mapping for the different operations
+         * @object
+         */
+        api: {
+            read: '{url controller="UserPrice" action="getCustomers"}'
+        },
+        /**
+         * Configure the data reader
+         * @object
+         */
+        reader: {
+            type: 'json',
+            root: 'data',
+            //total values, used for paging
+            totalProperty: 'total'
+        }
+    }
 });
 //{/block}

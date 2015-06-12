@@ -67,32 +67,6 @@ Ext.define('Shopware.apps.UserPrice.store.Articles', {
      * Define the used model for this store
      * @string
      */
-    model: 'Shopware.apps.UserPrice.model.Article',
-
-
-    /**
-     * Configure the data communication
-     * @object
-     */
-    proxy: {
-        type: 'ajax',
-        /**
-         * Configure the url mapping for the different operations
-         * @object
-         */
-        api: {
-            read: '{url controller="UserPrice" action="getArticles"}'
-        },
-        /**
-         * Configure the data reader
-         * @object
-         */
-        reader: {
-            type: 'json',
-            root: 'data',
-            //total values, used for paging
-            totalProperty: 'total'
-        }
-    }
+    model: 'Shopware.apps.UserPrice.model.Article'
 });
 //{/block}

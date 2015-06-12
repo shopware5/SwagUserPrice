@@ -252,7 +252,8 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
      */
     showMainProducts: function (grid, value) {
         var me = this,
-            store = grid.store;
+            store = grid.store,
+            pricesTab = me.getPricesTab();
 
         if (value === false) {
             store.filters.removeAtKey('main');
@@ -263,6 +264,8 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
                 property: 'mainOnly', value: value, id: 'main'
             });
         }
+        pricesTab.pricesGrid.getStore().removeAll();
+        pricesTab.pricesGrid.setDisabled(true);
     },
 
     /**
