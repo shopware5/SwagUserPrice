@@ -656,6 +656,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $params["price"] = $params["price"] / ((100 + $article->getTax()->getTax()) / 100);
             }
 
+            $params["price"] = $params["price"] ? $params["price"] : null;
+
             $model->fromArray($params);
             $model->setPriceGroup($priceGroup);
             $model->setArticle($article);
