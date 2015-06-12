@@ -53,6 +53,32 @@ Ext.define('Shopware.apps.UserPrice.model.Article', {
         { name: 'name', type: 'string' },
         { name: 'defaultPrice', type: 'float' },
         { name: 'current', type: 'float' }
-    ]
+    ],
+
+
+    /**
+     * Configure the data communication
+     * @object
+     */
+    proxy: {
+        type: 'ajax',
+        /**
+         * Configure the url mapping for the different operations
+         * @object
+         */
+        api: {
+            read: '{url controller="UserPrice" action="getArticles"}'
+        },
+        /**
+         * Configure the data reader
+         * @object
+         */
+        reader: {
+            type: 'json',
+            root: 'data',
+            //total values, used for paging
+            totalProperty: 'total'
+        }
+    }
 });
 //{/block}

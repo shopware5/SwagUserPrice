@@ -51,6 +51,38 @@ Ext.define('Shopware.apps.UserPrice.model.Group', {
         { name: 'name', type: 'string' },
         { name: 'gross', type: 'boolean' },
         { name: 'active', type: 'boolean' }
-    ]
+    ],
+
+    /**
+     * Configure the data communication
+     * @object
+     */
+    proxy: {
+    type: 'ajax',
+    /**
+     * Configure the url mapping for the different operations
+     * @object
+     */
+        api: {
+            //create group
+            create: '{url controller="UserPrice" action="editGroup"}',
+            //update group
+            update: '{url controller="UserPrice" action="editGroup"}',
+            //read out all groups
+            read: '{url controller="UserPrice" action="getGroups"}',
+            //delete group
+            destroy: '{url controller="UserPrice" action="deleteGroup"}'
+    },
+    /**
+     * Configure the data reader
+     * @object
+     */
+    reader: {
+        type: 'json',
+            root: 'data',
+            //total values, used for paging
+            totalProperty: 'total'
+    }
+}
 });
 //{/block}
