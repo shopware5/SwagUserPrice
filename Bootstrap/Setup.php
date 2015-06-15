@@ -150,7 +150,7 @@ class Setup
             'pricegroup',
             'int(11)',
             true,
-            0
+            NULL
         );
 
         $this->getEntityManager()->generateAttributeModels(
@@ -167,7 +167,7 @@ class Setup
     {
         $this->bootstrap->createMenuItem(
             array(
-                'label' => 'User Prices',
+                'label' => 'Customer-specific prices',
                 'controller' => 'UserPrice',
                 'class' => 'sprite-user--list',
                 'action' => 'Index',

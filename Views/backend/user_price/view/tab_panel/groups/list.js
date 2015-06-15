@@ -164,7 +164,8 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.List', {
                 dataIndex: 'name',
                 flex: 3,
                 editor: {
-                    xtype: 'textfield'
+                    xtype: 'textfield',
+                    allowBlank: false
                 }
             }, {
                 header: me.snippets.header.gross,
