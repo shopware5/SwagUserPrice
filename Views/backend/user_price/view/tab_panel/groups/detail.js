@@ -133,7 +133,8 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.groups.Detail', {
             {
                 xtype: 'textfield',
                 name: 'name',
-                fieldLabel: me.snippets.labels.name
+                fieldLabel: me.snippets.labels.name,
+                allowBlank: false
             }, {
                 xtype: 'checkbox',
                 name: 'gross',

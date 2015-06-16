@@ -96,6 +96,9 @@ Ext.define('Shopware.apps.UserPrice.controller.Group', {
         var me = this,
             record = Ext.create('Shopware.apps.UserPrice.model.Group', form.getValues());
 
+        if (!form.getForm().isValid()) {
+            return;
+        }
         me.saveRecord(record, store, detailWin);
     },
 
