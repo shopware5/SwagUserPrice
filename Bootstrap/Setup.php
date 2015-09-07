@@ -63,16 +63,24 @@ class Setup
     }
 
     /**
+     * Create plugin tables, attributes, add plugin events and acl permissions
+     */
+    private function setup()
+    {
+        $this->createEvents();
+        $this->createTables();
+        $this->addAttribute();
+        $this->createAcl();
+    }
+
+    /**
      * Setup install method.
      * Creates/installs everything being needed by the plugin, e.g. the database-tables, menu-entries, attributes.
      */
     public function install()
     {
-        $this->createEvents();
-        $this->createTables();
-        $this->addAttribute();
+        $this->setup();
         $this->createMenu();
-        $this->createAcl();
     }
 
     /**
@@ -83,10 +91,15 @@ class Setup
      */
     public function update($oldVersion)
     {
-        $this->install();
+        $this->setup();
+
         if (version_compare($oldVersion, '2.0.0', '<')) {
             $this->removeMenuEntry();
             $this->importOldData();
+        }
+
+        if (version_compare($oldVersion, '2.0.1', '<')) {
+            $this->addIndexToPriceTable();
         }
 
         return true;
@@ -133,7 +146,9 @@ class Setup
               `articleID` int(11) NOT NULL DEFAULT '0',
               `articledetailsID` int(11) NOT NULL DEFAULT '0',
               `price` double DEFAULT '0',
-              PRIMARY KEY (`id`)
+              PRIMARY KEY (`id`),
+              KEY `articleID` (`articleID`),
+              KEY `articledetailsID` (`articledetailsID`)
             ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
         "
         );
@@ -298,5 +313,16 @@ class Setup
 
         $this->getEntityManager()->remove($menuItem);
         $this->getEntityManager()->flush();
+    }
+
+    private function addIndexToPriceTable()
+    {
+        $this->bootstrap->get('db')->query(
+            "
+              ALTER TABLE `s_plugin_pricegroups_prices`
+	          ADD KEY `articleID` (`articleID`),
+	          ADD KEY `articledetailsID` (`articledetailsID`)
+              "
+        );
     }
 }

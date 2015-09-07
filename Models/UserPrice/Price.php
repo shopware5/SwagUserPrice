@@ -29,7 +29,7 @@ use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_plugin_pricegroups_prices")
+ * @ORM\Table(name="s_plugin_pricegroups_prices", indexes={@ORM\Index(name="articleDetailsId", columns={"articleDetailsId"})})
  */
 class Price extends LazyFetchModelEntity
 {
