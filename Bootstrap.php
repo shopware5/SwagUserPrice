@@ -141,7 +141,9 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function onPostDispatchBackend(Enlight_Event_EventArgs $args)
     {
+        /** @var Enlight_Controller_Request_RequestHttp $request */
         $request = $args->getSubject()->Request();
+        /** @var Enlight_Controller_Response_ResponseHttp $response */
         $response = $args->getSubject()->Response();
 
         // Load this code only in the backend
@@ -162,6 +164,10 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function registerPriceHelper()
     {
+        if (!$this->Application()->Container()->has('shop')) {
+            return;
+        }
+
         $helper = new PriceHelper(
             $this->get('shopware_searchdbal.search_price_helper_dbal'),
             $this->get('config'),
@@ -176,7 +182,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      *
      * @see CheapestPriceService
      */
-    public function onGetCheapestPriceService(\Enlight_Event_EventArgs $arguments)
+    public function onGetCheapestPriceService()
     {
         $coreService = $this->get('shopware_storefront.cheapest_price_service');
         $validator = $this->get('swaguserprice.accessvalidator');
@@ -191,7 +197,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      *
      * @see GraduatedPricesService
      */
-    public function onGetGraduatedPricesService(\Enlight_Event_EventArgs $arguments)
+    public function onGetGraduatedPricesService()
     {
         $coreService = $this->get('shopware_storefront.graduated_prices_service');
         $validator = $this->get('swaguserprice.accessvalidator');
@@ -203,10 +209,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
 
     /**
      * Main entry point for the plugin: Registers various subscribers to hook into shopware
-     *
-     * @param Enlight_Event_EventArgs $args
      */
-    public function onStartDispatch(Enlight_Event_EventArgs $args)
+    public function onStartDispatch()
     {
         $subscribers = array(
             new Subscriber\ControllerPath($this->Path()),

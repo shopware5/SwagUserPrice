@@ -203,9 +203,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     public function getPricesAction()
     {
         $this->View()->assign(
-            $this->getPrices(
-                $this->Request()->getQuery()
-            )
+            $this->getPrices()
         );
     }
 

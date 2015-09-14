@@ -150,7 +150,7 @@ class Setup
             'pricegroup',
             'int(11)',
             true,
-            NULL
+            null
         );
 
         $this->getEntityManager()->generateAttributeModels(

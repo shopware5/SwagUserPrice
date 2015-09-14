@@ -113,7 +113,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * Builds a custom rule-struct.
      *
-     * @param $rule
+     * @param $rule Struct\Product\PriceRule
      * @param $number
      * @return Struct\Product\PriceRule
      */
