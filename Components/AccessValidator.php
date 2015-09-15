@@ -46,7 +46,7 @@ class AccessValidator
     /**
      * @return \Shopware
      */
-    private function Application()
+    private function getApplication()
     {
         if ($this->application === null) {
             $this->application = Shopware();
@@ -61,7 +61,7 @@ class AccessValidator
     private function getEntityManager()
     {
         if ($this->entityManager === null) {
-            $this->entityManager = $this->Application()->Container()->get('models');
+            $this->entityManager = $this->getApplication()->Container()->get('models');
         }
 
         return $this->entityManager;
@@ -73,12 +73,16 @@ class AccessValidator
      * In case there is no logged in user or the current article has no custom user-prices, it returns false.
      *
      * @param $number
-     * @return bool
+     * @return bool|void
      * @throws \Exception
      */
     public function validateProduct($number)
     {
-        $session = $this->Application()->Container()->get('session');
+        if (!$this->getApplication()->Container()->has('shop')) {
+            return false;
+        }
+
+        $session = $this->getApplication()->Container()->get('session');
         if (!$session->offsetExists('sUserId') || !$session->offsetGet('sUserId')) {
             return false;
         }

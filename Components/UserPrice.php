@@ -38,7 +38,7 @@ class UserPrice
     /**
      * @return \Shopware
      */
-    private function Application()
+    private function getApplication()
     {
         if ($this->application === null) {
             $this->application = Shopware();
@@ -53,7 +53,7 @@ class UserPrice
     private function getEntityManager()
     {
         if ($this->entityManager === null) {
-            $this->entityManager = $this->Application()->Container()->get('models');
+            $this->entityManager = $this->getApplication()->Container()->get('models');
         }
 
         return $this->entityManager;

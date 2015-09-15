@@ -68,7 +68,7 @@ class PriceHelper implements PriceHelperInterface
      * @param \Shopware_Components_Config $config
      * @param Connection $connection
      */
-    function __construct(
+    public function __construct(
         PriceHelperInterface $coreHelper,
         \Shopware_Components_Config $config,
         Connection $connection,

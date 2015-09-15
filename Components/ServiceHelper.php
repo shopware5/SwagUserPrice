@@ -48,7 +48,7 @@ class ServiceHelper
     /**
      * @return \Shopware
      */
-    private function Application()
+    private function getApplication()
     {
         if ($this->application === null) {
             $this->application = Shopware();
@@ -63,7 +63,7 @@ class ServiceHelper
     private function getEntityManager()
     {
         if ($this->entityManager === null) {
-            $this->entityManager = $this->Application()->Container()->get('models');
+            $this->entityManager = $this->getApplication()->Container()->get('models');
         }
 
         return $this->entityManager;
@@ -120,7 +120,7 @@ class ServiceHelper
      */
     private function getPricesQueryBuilder($number)
     {
-        $session = $this->Application()->Container()->get('session');
+        $session = $this->getApplication()->Container()->get('session');
         $userId = $session->offsetGet('sUserId');
 
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
@@ -130,7 +130,8 @@ class ServiceHelper
                 'prices',
                 's_user_attributes',
                 'attributes',
-                'attributes.swag_pricegroup = prices.pricegroup')
+                'attributes.swag_pricegroup = prices.pricegroup'
+            )
             ->innerJoin(
                 'attributes',
                 's_user',
@@ -181,5 +182,4 @@ class ServiceHelper
             ->setParameter('number', $number)
             ->execute()->fetchColumn();
     }
-
 }
