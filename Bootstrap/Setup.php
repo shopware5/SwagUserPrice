@@ -63,16 +63,24 @@ class Setup
     }
 
     /**
+     * Create plugin tables, attributes, add plugin events and acl permissions
+     */
+    private function setup()
+    {
+        $this->createEvents();
+        $this->createTables();
+        $this->addAttribute();
+        $this->createAcl();
+    }
+
+    /**
      * Setup install method.
      * Creates/installs everything being needed by the plugin, e.g. the database-tables, menu-entries, attributes.
      */
     public function install()
     {
-        $this->createEvents();
-        $this->createTables();
-        $this->addAttribute();
+        $this->setup();
         $this->createMenu();
-        $this->createAcl();
     }
 
     /**
@@ -83,10 +91,15 @@ class Setup
      */
     public function update($oldVersion)
     {
-        $this->install();
+        $this->setup();
+
         if (version_compare($oldVersion, '2.0.0', '<')) {
             $this->removeMenuEntry();
             $this->importOldData();
+        }
+
+        if (version_compare($oldVersion, '2.0.1', '<')) {
+            $this->addIndexToPriceTable();
         }
 
         return true;
@@ -114,10 +127,10 @@ class Setup
         $this->bootstrap->get('db')->query(
             "
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups` (
-			`id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-			  `name` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
-			  `gross` int(1) unsigned NOT NULL,
-			  `active` int(1) unsigned NOT NULL,
+			`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+			  `name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
+			  `gross` INT(1) UNSIGNED NOT NULL,
+			  `active` INT(1) UNSIGNED NOT NULL,
 			  PRIMARY KEY (`id`)
 			) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
         "
@@ -126,14 +139,16 @@ class Setup
         $this->bootstrap->get('db')->query(
             "
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups_prices` (
-              `id` int(11) unsigned NOT NULL AUTO_INCREMENT,
-              `pricegroup` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-              `from` int(10) unsigned NOT NULL,
-              `to` varchar(30) COLLATE utf8_unicode_ci NOT NULL,
-              `articleID` int(11) NOT NULL DEFAULT '0',
-              `articledetailsID` int(11) NOT NULL DEFAULT '0',
-              `price` double DEFAULT '0',
-              PRIMARY KEY (`id`)
+              `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
+              `pricegroup` VARCHAR(30) COLLATE utf8_unicode_ci NOT NULL,
+              `from` INT(10) UNSIGNED NOT NULL,
+              `to` VARCHAR(30) COLLATE utf8_unicode_ci NOT NULL,
+              `articleID` INT(11) NOT NULL DEFAULT '0',
+              `articledetailsID` INT(11) NOT NULL DEFAULT '0',
+              `price` DOUBLE DEFAULT '0',
+              PRIMARY KEY (`id`),
+              KEY `articleID` (`articleID`),
+              KEY `articledetailsID` (`articledetailsID`)
             ) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
         "
         );
@@ -211,10 +226,10 @@ class Setup
         /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
         $db = $this->bootstrap->get('db');
         try {
-            $sql = "
-                SELECT *, groups.id as groupId, prices.id as priceId
-                FROM s_core_customerpricegroups groups
-                INNER JOIN s_core_customerpricegroups_prices prices ON prices.pricegroup = CONCAT('PG', groups.id)";
+            $sql = "SELECT *, groups.id AS groupId, prices.id AS priceId
+                    FROM s_core_customerpricegroups groups
+                    INNER JOIN s_core_customerpricegroups_prices prices
+                      ON prices.pricegroup = CONCAT('PG', groups.id)";
             $values = $db->fetchAll($sql, array());
 
             $groups = array();
@@ -241,13 +256,15 @@ class Setup
 
             foreach ($groups as $group) {
                 $db->beginTransaction();
-                $sql = "INSERT INTO s_plugin_pricegroups (name, gross, active) VALUES (?, ?, ?)";
+                $sql = "INSERT INTO s_plugin_pricegroups (name, gross, active)
+                        VALUES (?, ?, ?)";
                 $db->query($sql, array($group['name'], $group['gross'], $group['active']));
                 $lastInsertId = $db->lastInsertId();
 
                 foreach ($group["prices"] as $price) {
-                    $sql = "INSERT INTO s_plugin_pricegroups_prices (pricegroup, `from`, `to`, articleID, articledetailsID, price)
-                    VALUES (?, ?, ?, ?, ? ,?)";
+                    $sql = "INSERT INTO s_plugin_pricegroups_prices
+                              (pricegroup, `from`, `to`, articleID, articledetailsID, price)
+                            VALUES (?, ?, ?, ?, ? ,?)";
                     $db->query(
                         $sql,
                         array(
@@ -263,15 +280,22 @@ class Setup
                 $db->commit();
             }
 
-            $sql = "SELECT u.*, ua.id as attributeId FROM s_user u LEFT JOIN s_user_attributes ua ON ua.userID = u.id WHERE u.pricegroupID IS NOT NULL";
+            $sql = "SELECT u.*, ua.id AS attributeId
+                    FROM s_user u
+                    LEFT JOIN s_user_attributes ua
+                      ON ua.userID = u.id
+                    WHERE u.pricegroupID IS NOT NULL";
             $existingAttributes = $db->fetchAll($sql, array());
 
             foreach ($existingAttributes as $user) {
                 if ($user['attributeId']) {
-                    $sql = "UPDATE s_user_attributes SET swag_pricegroup = ? WHERE id = ?";
+                    $sql = "UPDATE s_user_attributes
+                            SET swag_pricegroup = ?
+                            WHERE id = ?";
                     $db->query($sql, array($user["attributeId"]));
                 } else {
-                    $sql = "INSERT INTO s_user_attributes (userID, swag_pricegroup) VALUES (?, ?)";
+                    $sql = "INSERT INTO s_user_attributes (userID, swag_pricegroup)
+                            VALUES (?, ?)";
                     $db->query($sql, array($user['id'], $user['pricegroupID']));
                 }
             }
@@ -298,5 +322,16 @@ class Setup
 
         $this->getEntityManager()->remove($menuItem);
         $this->getEntityManager()->flush();
+    }
+
+    /**
+     * helper method to add indexes
+     */
+    private function addIndexToPriceTable()
+    {
+        $sql = "ALTER TABLE `s_plugin_pricegroups_prices`
+	            ADD KEY `articleID` (`articleID`),
+	            ADD KEY `articledetailsID` (`articledetailsID`)";
+        $this->bootstrap->get('db')->query($sql);
     }
 }

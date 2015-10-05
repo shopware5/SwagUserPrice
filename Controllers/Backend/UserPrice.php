@@ -664,6 +664,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $this->getEntityManager()->persist($model);
             $this->getEntityManager()->flush();
 
+            Shopware()->Events()->notify("Shopware_Plugins_HttpCache_InvalidateCacheId", array('cacheId' => "a" . $articleId));
+
             return array('success' => true);
         } catch (InvalidArgumentException $e) {
             return array('success' => true, 'msg' => $e->getMessage());
