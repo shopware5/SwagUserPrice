@@ -8,15 +8,17 @@
     "link": "http://store.shopware.com",
     "author": "Shopware AG",
 
-    "currentVersion": "2.0.1",
+    "currentVersion": "2.0.2",
 
     "changelog": {
         "de": {
+            "2.0.2": "PT-3565 - Bugfix: HTTP-Cache Kompatibilität;",
             "2.0.1": "PT-3565 - Bugfix: Preisfilter Performance Verbesserungen; PT-3831 - Bugfix: Shopware 5.1 Kompatibilität;",
             "2.0.0": "PT-3076 - Feature: Shopware 5 Kompatibilität",
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.0.2": "PT-3565 - Bugfix: HTTP cache compatibility;",
             "2.0.1": "PT-3565 - Bugfix: Price filter performance improvements; PT-3831 - Bugfix: Shopware 5.1 compatibility;",
             "2.0.0": "PT-3076 - Feature: Shopware 5 compatibility",
             "1.0.3": "Fixed wrong encoding; PT-2388: Fixed ssl usage in the backend; PT-2552: Replaced superglobal REQUEST variable; PT-2614 fix article price with active HTTP cache"
