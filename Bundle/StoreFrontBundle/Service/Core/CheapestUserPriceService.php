@@ -78,11 +78,11 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * Gets a single price for a product.
      *
-     * @param Struct\BaseProduct $product
-     * @param Struct\ShopContextInterface $context
+     * @param Struct\ListProduct $product
+     * @param Struct\ProductContextInterface $context
      * @return mixed
      */
-    public function get(Struct\BaseProduct $product, Struct\ShopContextInterface $context)
+    public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
     {
         $cheapestPrices = $this->getList([$product], $context);
 
@@ -92,11 +92,11 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * Gets all prices for a product.
      *
-     * @param Struct\BaseProduct[] $products
-     * @param Struct\ShopContextInterface $context
+     * @param Struct\ListProduct[] $products
+     * @param Struct\ProductContextInterface $context
      * @return array|Struct\BaseProduct[]|Struct\Product\PriceRule[]
      */
-    public function getList($products, Struct\ShopContextInterface $context)
+    public function getList($products, Struct\ProductContextInterface $context)
     {
         $products = $this->service->getList($products, $context);
 

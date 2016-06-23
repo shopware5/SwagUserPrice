@@ -3,21 +3,23 @@
         "de": "Kundenspezifische Preise",
         "en": "Customer-specific prices"
     },
-    "copyright": "(c) by Shopware AG",
+    "copyright": "(c) by shopware AG",
     "license": "proprietary",
     "link": "http://store.shopware.com",
-    "author": "Shopware AG",
+    "author": "shopware AG",
 
-    "currentVersion": "2.0.2",
+    "currentVersion": "2.1.0",
 
     "changelog": {
         "de": {
+            "2.1.0": "PT-6068 - Bugfix: Shopware 5.2 Kompatibilität;",
             "2.0.2": "PT-3565 - Bugfix: HTTP-Cache Kompatibilität;",
             "2.0.1": "PT-3565 - Bugfix: Preisfilter Performance Verbesserungen; PT-3831 - Bugfix: Shopware 5.1 Kompatibilität;",
             "2.0.0": "PT-3076 - Feature: Shopware 5 Kompatibilität",
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.1.0": "PT-6068 - Bugfix: Shopware 5.2 Kompatibilität;",
             "2.0.2": "PT-3565 - Bugfix: HTTP cache compatibility;",
             "2.0.1": "PT-3565 - Bugfix: Price filter performance improvements; PT-3831 - Bugfix: Shopware 5.1 compatibility;",
             "2.0.0": "PT-3076 - Feature: Shopware 5 compatibility",
@@ -26,7 +28,7 @@
     },
 
     "compatibility": {
-        "minimumVersion": "5.0.2",
+        "minimumVersion": "5.2.0",
         "maximumVersion": null,
         "blacklist": [
         ]

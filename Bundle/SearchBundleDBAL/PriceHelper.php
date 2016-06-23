@@ -67,6 +67,7 @@ class PriceHelper implements PriceHelperInterface
      * @param PriceHelperInterface $coreHelper
      * @param \Shopware_Components_Config $config
      * @param Connection $connection
+     * @param \Enlight_Components_Session_Namespace $session
      */
     public function __construct(
         PriceHelperInterface $coreHelper,
@@ -83,7 +84,7 @@ class PriceHelper implements PriceHelperInterface
     /**
      * @inheritdoc
      */
-    public function getSelection(Struct\ShopContextInterface $context)
+    public function getSelection(Struct\ProductContextInterface $context)
     {
         return $this->coreHelper->getSelection($context);
     }
