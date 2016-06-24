@@ -2,16 +2,15 @@
 
 namespace Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 
-use Shopware\Bundle\StoreFrontBundle\Service\Core\CheapestPriceService;
+use Shopware\Bundle\StoreFrontBundle\Service\GraduatedPricesServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Struct;
 use Shopware\Bundle\StoreFrontBundle\Service;
 use Shopware\Bundle\StoreFrontBundle\Gateway;
 use Shopware\SwagUserPrice\Components;
 
-class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterface
+class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 {
-
-    /** @var CheapestPriceService */
+    /** @var GraduatedPricesServiceInterface */
     private $service;
 
     /** @var Components\AccessValidator */
@@ -25,7 +24,7 @@ class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterf
 
     public function __construct(
         \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap,
-        Service\CheapestPriceServiceInterface $service,
+        GraduatedPricesServiceInterface $service,
         Components\AccessValidator $validator,
         Components\ServiceHelper $helper
     ) {
@@ -52,7 +51,7 @@ class GraduatedUserPricesService implements Service\GraduatedPricesServiceInterf
     /**
      * Gets all prices for a product.
      *
-     * @param Struct\BaseProduct[] $products
+     * @param Struct\ListProduct[] $products
      * @param Struct\ProductContextInterface $context
      * @return array|Struct\BaseProduct[]|Struct\Product\PriceRule[]
      */

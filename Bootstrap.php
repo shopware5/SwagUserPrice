@@ -81,8 +81,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        if (!$this->assertVersionGreaterThen('5.0.2')) {
-            throw new Exception("This plugin requires Shopware 5.0.2 or a later version");
+        if (!$this->assertMinimumVersion('5.2.0')) {
+            throw new Exception("This plugin requires Shopware 5.2.0 or a later version");
         }
 
         $this->getSetupService()->install();
@@ -94,9 +94,14 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      *
      * @param $oldVersion
      * @return bool
+     * @throws Exception
      */
     public function update($oldVersion)
     {
+        if (!$this->assertMinimumVersion('5.2.0')) {
+            throw new Exception("This plugin requires Shopware 5.2.0 or a later version");
+        }
+
         return $this->getSetupService()->update($oldVersion);
     }
 
