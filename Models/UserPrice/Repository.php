@@ -137,7 +137,7 @@ class Repository extends ModelRepository
         $builder->select(
             array(
                 'customer.id as id',
-                'billing.number as number',
+                'customer.number as number',
                 'customer.groupKey as groupKey',
                 'billing.company as company',
                 'billing.firstName as firstName',
@@ -156,7 +156,7 @@ class Repository extends ModelRepository
         );
 
         if (!empty($filter)) {
-            $builder->andWhere('billing.number LIKE ?1')
+            $builder->andWhere('customer.number LIKE ?1')
                 ->orWhere('billing.firstName LIKE ?2')
                 ->orWhere('billing.lastName LIKE ?2')
                 ->orWhere('customer.email LIKE ?2')
@@ -175,7 +175,7 @@ class Repository extends ModelRepository
         if ($sort != null) {
             $builder->addOrderBy($sort);
         }
-        $builder->addOrderBy('billing.number', 'ASC');
+        $builder->addOrderBy('customer.number', 'ASC');
 
 
         return $builder;
