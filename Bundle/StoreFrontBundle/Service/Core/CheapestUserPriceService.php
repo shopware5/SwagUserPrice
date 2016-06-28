@@ -42,7 +42,6 @@ use Shopware\SwagUserPrice\Components;
  */
 class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
 {
-
     /** @var CheapestPriceService */
     private $service;
 

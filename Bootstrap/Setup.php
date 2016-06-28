@@ -299,7 +299,6 @@ class Setup
                     $db->query($sql, array($user['id'], $user['pricegroupID']));
                 }
             }
-
         } catch (\Exception $e) {
             return;
         }
