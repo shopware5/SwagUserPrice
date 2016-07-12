@@ -661,6 +661,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $model->setArticle($article);
             $model->setDetail($this->getEntityManager()->find('Shopware\Models\Article\Detail', $articleDetailId));
 
+            if ($this->shouldRemovePrice($params)) {
+                $this->getEntityManager()->remove($model);
+                $this->getEntityManager()->flush();
+
+                Shopware()->Events()->notify("Shopware_Plugins_HttpCache_InvalidateCacheId", array('cacheId' => "a" . $articleId));
+
+                return array('success' => true);
+            }
+
             $this->getEntityManager()->persist($model);
             $this->getEntityManager()->flush();
 
@@ -709,5 +718,19 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     private function isMultiDimensional($array)
     {
         return count($array) != count($array, COUNT_RECURSIVE);
+    }
+
+    /**
+     * Returns true if the price-stack should be removed.
+     * There may only be a single price defined in order to remove the whole user-price on this article.
+     * Therefore we check for both "from = 1", so it's the first price, as well as "to = beliebig", so it's the last price.
+     * If the price is then set to null, the user might want to remove this price.
+     *
+     * @param array $params
+     * @return bool
+     */
+    private function shouldRemovePrice(array $params)
+    {
+        return $params['to'] === 'beliebig' && $params['from'] === 1 && $params['price'] === null;
     }
 }
