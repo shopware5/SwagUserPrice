@@ -404,8 +404,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             return array(
                 'success' => true,
-                'data' => $query->getArrayResult(),
-                'total' => $this->getEntityManager()->getQueryCount($query)
+                'total' => $this->getEntityManager()->getQueryCount($query),
+                'data' => $query->getArrayResult()
             );
         } catch (Exception $e) {
             return array('success' => false, 'msg' => $e->getMessage());
