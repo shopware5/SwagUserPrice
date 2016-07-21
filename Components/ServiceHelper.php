@@ -84,11 +84,15 @@ class ServiceHelper
      * Get a single price for a product.
      *
      * @param $number
-     * @return mixed
+     * @return array
      */
     public function getPrice($number)
     {
-        return $this->getPricesQueryBuilder($number)->setMaxResults(1)->execute()->fetch();
+        $builder = $this->getPricesQueryBuilder($number);
+        if ($this->getApplication()->Container()->get('config')->get('useLastGraduationForCheapestPrice')) {
+            $builder->addOrderBy('prices.id', 'DESC');
+        }
+        return $builder->setMaxResults(1)->execute()->fetch();
     }
 
     /**
