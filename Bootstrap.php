@@ -6,6 +6,7 @@
  * file that was distributed with this source code.
  */
 
+use Shopware\SwagUserPrice\Bootstrap\Setup;
 use Shopware\SwagUserPrice\Bundle\SearchBundleDBAL\PriceHelper;
 use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 use Shopware\SwagUserPrice\Subscriber;
@@ -36,20 +37,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     {
         $this->get('loader')->registerNamespace('Shopware\SwagUserPrice', $this->Path());
         $this->registerCustomModels();
-    }
-
-    /**
-     * Returns an instance of the install / update helper service
-     *
-     * @return \Shopware\SwagUserPrice\Bootstrap\Setup
-     */
-    public function getSetupService()
-    {
-        if (!$this->setupService) {
-            $this->setupService = new \Shopware\SwagUserPrice\Bootstrap\Setup($this);
-        }
-
-        return $this->setupService;
+        $this->setupService = new Setup($this);
     }
 
     /**
@@ -58,18 +46,19 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      *
      * Additionally adds the events, which would not be triggered in every case otherwise.
      * The Enlight_Controller_Front_StartDispatch-event is not triggered when accessing shopware via command-line.
-     * Therefore we need to include those "AfterInitResource"-events in the bootstrap itself, since they need to be called when a command-line is used.
+     * Therefore we need to include those "AfterInitResource"-events in the bootstrap itself,
+     * since they need to be called when a command-line is used.
      *
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function install()
     {
         if (!$this->assertMinimumVersion('5.2.0')) {
-            throw new Exception("This plugin requires Shopware 5.2.0 or a later version");
+            throw new RuntimeException('This plugin requires Shopware 5.2.0 or a later version');
         }
 
-        $this->getSetupService()->install();
+        $this->setupService->install();
         return true;
     }
 
@@ -78,22 +67,22 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      *
      * @param $oldVersion
      * @return bool
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function update($oldVersion)
     {
         if (!$this->assertMinimumVersion('5.2.0')) {
-            throw new Exception("This plugin requires Shopware 5.2.0 or a later version");
+            throw new RuntimeException('This plugin requires Shopware 5.2.0 or a later version');
         }
 
-        return $this->getSetupService()->update($oldVersion);
+        return $this->setupService->update($oldVersion);
     }
 
     /**
      * Returns the current version of the plugin.
      *
-     * @return string|void
-     * @throws Exception
+     * @return string
+     * @throws RuntimeException
      */
     public function getVersion()
     {
@@ -102,7 +91,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         if ($info) {
             return $info['currentVersion'];
         } else {
-            throw new Exception('The plugin has an invalid version file.');
+            throw new RuntimeException('The plugin has an invalid version file.');
         }
     }
 
@@ -110,7 +99,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * Get (nice) name for plugin manager list
      *
      * @return string
-     * @throws Exception
+     * @throws RuntimeException
      */
     public function getLabel()
     {
@@ -118,38 +107,14 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         if ($info) {
             return $info['label']['en'];
         } else {
-            throw new Exception('The plugin has an invalid version file.');
+            throw new RuntimeException('The plugin has an invalid version file.');
         }
-    }
-
-    /**
-     * Registers on the post dispatch event for adding the local template folder for the backend-module.
-     *
-     * @param Enlight_Event_EventArgs $args
-     * @return mixed
-     */
-    public function onPostDispatchBackend(Enlight_Event_EventArgs $args)
-    {
-        /** @var Enlight_Controller_Request_RequestHttp $request */
-        $request = $args->getSubject()->Request();
-        /** @var Enlight_Controller_Response_ResponseHttp $response */
-        $response = $args->getSubject()->Response();
-
-        // Load this code only in the backend
-        if (!$request->isDispatched() || $response->isException() || $request->getModuleName() != 'backend') {
-            return;
-        }
-
-        //Adds the local directory to the template dirs
-        $this->Application()->Template()->addTemplateDir(
-            $this->Path() . 'Views/'
-        );
     }
 
     /**
      * Registers the extension for the default price-helper component.
      *
-     * @see Shopware\Bundle\SearchBundleDBAL\PriceHelper
+     * @see PriceHelper
      */
     public function registerPriceHelper()
     {
@@ -177,7 +142,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $validator = $this->get('swaguserprice.accessvalidator');
         $helper = $this->get('swaguserprice.servicehelper');
 
-        $userPriceService = new Core\CheapestUserPriceService($this, $coreService, $validator, $helper);
+        $userPriceService = new Core\CheapestUserPriceService($coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.cheapest_price_service', $userPriceService);
     }
 
@@ -192,7 +157,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $validator = $this->get('swaguserprice.accessvalidator');
         $helper = $this->get('swaguserprice.servicehelper');
 
-        $userPriceService = new Core\GraduatedUserPricesService($this, $coreService, $validator, $helper);
+        $userPriceService = new Core\GraduatedUserPricesService($coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.graduated_prices_service', $userPriceService);
     }
 
@@ -201,11 +166,11 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function onStartDispatch()
     {
-        $subscribers = array(
+        $subscribers = [
             new Subscriber\ControllerPath($this->Path()),
             new Subscriber\Hooks($this),
             new Subscriber\Resource()
-        );
+        ];
 
         foreach ($subscribers as $subscriber) {
             $this->get('events')->addSubscriber($subscriber);

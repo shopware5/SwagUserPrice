@@ -31,38 +31,28 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /** @var Components\AccessValidator */
     private $validator;
 
-    /** @var \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap */
-    private $bootstrap;
-
     /** @var Components\ServiceHelper */
     private $helper;
 
     /**
      * Constructor to set the variables, that we will need here.
      *
-     * @param \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap
      * @param Service\CheapestPriceServiceInterface $service
      * @param Components\AccessValidator $validator
      * @param Components\ServiceHelper $helper
      */
     public function __construct(
-        \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap,
         Service\CheapestPriceServiceInterface $service,
         Components\AccessValidator $validator,
         Components\ServiceHelper $helper
     ) {
         $this->service = $service;
         $this->validator = $validator;
-        $this->bootstrap = $bootstrap;
         $this->helper = $helper;
     }
 
     /**
-     * Gets a single price for a product.
-     *
-     * @param Struct\ListProduct $product
-     * @param Struct\ProductContextInterface $context
-     * @return mixed
+     * {@inheritdoc}
      */
     public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
     {
@@ -72,11 +62,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     }
 
     /**
-     * Gets all prices for a product.
-     *
-     * @param Struct\ListProduct[] $products
-     * @param Struct\ProductContextInterface $context
-     * @return array|Struct\BaseProduct[]|Struct\Product\PriceRule[]
+     * {@inheritdoc}
      */
     public function getList($products, Struct\ProductContextInterface $context)
     {

@@ -28,6 +28,8 @@ class ControllerPath implements SubscriberInterface
 
     /**
      * Constructor of the subscriber. Sets the path to the directory.
+     *
+     * @param string $path
      */
     public function __construct($path)
     {
@@ -41,18 +43,17 @@ class ControllerPath implements SubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Controller_Dispatcher_ControllerPath_Backend_UserPrice' => 'onGetControllerPathUserPrice'
-        );
+        ];
     }
 
     /**
      * Returns the path to the user price backend controller
      *
-     * @param \Enlight_Event_EventArgs $arguments
      * @return string
      */
-    public function onGetControllerPathUserPrice(\Enlight_Event_EventArgs $arguments)
+    public function onGetControllerPathUserPrice()
     {
         Shopware()->Template()->addTemplateDir($this->path . 'Views/', 'swag_user_price');
         Shopware()->Snippets()->addConfigDir($this->path . 'Snippets/');
