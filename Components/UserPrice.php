@@ -8,16 +8,18 @@
 
 namespace Shopware\SwagUserPrice\Components;
 
+use Shopware\CustomModels\UserPrice\Group;
+
 class UserPrice
 {
     /** @var $application \Shopware */
-    private $application = null;
+    private $application;
 
     /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager = null;
+    private $entityManager;
 
     /** @var $repo \Shopware\CustomModels\UserPrice\Repository */
-    private $repo = null;
+    private $repo;
 
     /**
      * @return \Shopware
@@ -49,7 +51,7 @@ class UserPrice
     private function getRepository()
     {
         if ($this->repo === null) {
-            $this->repo = $this->getEntityManager()->getRepository('Shopware\CustomModels\UserPrice\Group');
+            $this->repo = $this->getEntityManager()->getRepository(Group::class);
         }
 
         return $this->repo;
@@ -72,8 +74,8 @@ class UserPrice
         }
 
         foreach ($articles as &$article) {
-            $article["defaultPrice"] = round($article["defaultPrice"] / 100 * (100 + $article['tax']), 3);
-            $article["current"] = round($article["current"] / 100 * (100 + $article['tax']), 3);
+            $article['defaultPrice'] = round($article['defaultPrice'] / 100 * (100 + $article['tax']), 3);
+            $article['current'] = round($article['current'] / 100 * (100 + $article['tax']), 3);
         }
 
         return $articles;

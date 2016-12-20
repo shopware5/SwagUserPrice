@@ -24,10 +24,10 @@ use Shopware\Bundle\StoreFrontBundle\Struct;
 class ServiceHelper
 {
     /** @var $application \Shopware */
-    private $application = null;
+    private $application;
 
     /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager = null;
+    private $entityManager;
 
     /**
      * @return \Shopware
@@ -128,10 +128,10 @@ class ServiceHelper
             )->where('user.id = :id')
             ->andWhere('prices.articledetailsID = :detailId')
             ->setParameters(
-                array(
+                [
                     'id' => $userId,
                     'detailId' => $this->getDetailIdByNumber($number)
-                )
+                ]
             );
 
         return $builder;
@@ -146,10 +146,10 @@ class ServiceHelper
     public function buildRule($price)
     {
         $priceRuleStruct = new Struct\Product\PriceRule();
-        $priceRuleStruct->setPrice((floatval($price['price'])));
-        $priceRuleStruct->setFrom((intval($price['from'])));
-        $priceRuleStruct->setTo((intval($price['to'])) > 0 ? intval($price['to']) : null);
-        $priceRuleStruct->setPseudoPrice(floatval(0));
+        $priceRuleStruct->setPrice((float) $price['price']);
+        $priceRuleStruct->setFrom((int) $price['from']);
+        $priceRuleStruct->setTo((int) $price['to'] > 0 ? (int) $price['to'] : null);
+        $priceRuleStruct->setPseudoPrice((float) 0);
 
         return $priceRuleStruct;
     }

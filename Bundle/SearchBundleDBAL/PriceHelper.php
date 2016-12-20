@@ -77,8 +77,7 @@ class PriceHelper implements PriceHelperInterface
      * Joins the customer-prices for the current customer-group and additionally
      * joins the user-prices from the plugin now.
      *
-     * @param QueryBuilder $query
-     * @param Struct\ShopContextInterface $context
+     * {@inheritdoc}
      */
     public function joinPrices(QueryBuilder $query, Struct\ShopContextInterface $context)
     {
@@ -90,7 +89,7 @@ class PriceHelper implements PriceHelperInterface
         $query = $this->buildQuery(
             $query,
             'customerPrice',
-            array(':currentCustomerGroup', $context->getCurrentCustomerGroup()->getKey())
+            [':currentCustomerGroup', $context->getCurrentCustomerGroup()->getKey()]
         );
 
         $query->leftJoin(
@@ -112,8 +111,7 @@ class PriceHelper implements PriceHelperInterface
      * Joins the default prices for the default customer-group (most likely 'EK').
      * Additionally the user-prices from this plugin are joined.
      *
-     * @param QueryBuilder $query
-     * @param Struct\ShopContextInterface $context
+     * {@inheritdoc}
      */
     public function joinDefaultPrices(QueryBuilder $query, Struct\ShopContextInterface $context)
     {
@@ -126,7 +124,7 @@ class PriceHelper implements PriceHelperInterface
         $query = $this->buildQuery(
             $query,
             'defaultPrice',
-            array(':fallbackCustomerGroup', $context->getFallbackCustomerGroup()->getKey())
+            [':fallbackCustomerGroup', $context->getFallbackCustomerGroup()->getKey()]
         );
 
         $query->addState(CorePriceHelper::STATE_INCLUDES_DEFAULT_PRICE);
@@ -171,7 +169,7 @@ class PriceHelper implements PriceHelperInterface
             'availableVariant.id = ' . $name . '.articledetailsID'
         );
 
-        $query->setParameter($groupName, $groupValue)->setParameter(':userId', $this->session->sUserId);
+        $query->setParameter($groupName, $groupValue)->setParameter(':userId', $this->session->get('sUserId'));
 
         return $query;
     }

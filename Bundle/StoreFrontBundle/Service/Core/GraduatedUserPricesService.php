@@ -20,30 +20,26 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
     /** @var Components\AccessValidator */
     private $validator;
 
-    /** @var $bootstrap \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap */
-    private $bootstrap;
-
     /** @var Components\ServiceHelper */
     private $helper;
 
+    /**
+     * @param GraduatedPricesServiceInterface $service
+     * @param Components\AccessValidator $validator
+     * @param Components\ServiceHelper $helper
+     */
     public function __construct(
-        \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap,
         GraduatedPricesServiceInterface $service,
         Components\AccessValidator $validator,
         Components\ServiceHelper $helper
     ) {
         $this->service = $service;
         $this->validator = $validator;
-        $this->bootstrap = $bootstrap;
         $this->helper = $helper;
     }
 
     /**
-     * Get a single price for a product.
-     *
-     * @param Struct\ListProduct $product
-     * @param Struct\ProductContextInterface $context
-     * @return mixed
+     * {@inheritdoc}
      */
     public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
     {
@@ -53,11 +49,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
     }
 
     /**
-     * Gets all prices for a product.
-     *
-     * @param Struct\ListProduct[] $products
-     * @param Struct\ProductContextInterface $context
-     * @return array|Struct\BaseProduct[]|Struct\Product\PriceRule[]
+     * {@inheritdoc}
      */
     public function getList($products, Struct\ProductContextInterface $context)
     {
@@ -84,7 +76,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
     {
         $prices = $this->helper->getPrices($number);
 
-        $customRules = array();
+        $customRules = [];
         foreach ($prices as $price) {
             $userPriceRule = $this->helper->buildRule($price);
             $userPriceRule->setCustomerGroup($coreRule->getCustomerGroup());
@@ -103,9 +95,9 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
             return $customRules;
         }
 
-        $lastEntry["from"] = $lastEntry["to"] + 1;
-        $lastEntry["to"] = null;
-        $lastEntry["price"] = null;
+        $lastEntry['from'] = $lastEntry['to'] + 1;
+        $lastEntry['to'] = null;
+        $lastEntry['price'] = null;
         $rule = $this->helper->buildRule($lastEntry);
         $rule->setCustomerGroup($coreRule->getCustomerGroup());
         $rule->setUnit($coreRule->getUnit());

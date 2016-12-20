@@ -19,6 +19,8 @@ namespace Shopware\SwagUserPrice\Bootstrap;
  * @package Shopware\Plugin\SwagUserPrice
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
+use Shopware\Models\Menu\Menu;
+
 class Setup
 {
     /**
@@ -27,8 +29,11 @@ class Setup
     private $bootstrap;
 
     /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager = null;
+    private $entityManager;
 
+    /**
+     * @param \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap
+     */
     public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
@@ -91,12 +96,12 @@ class Setup
 
     private function createEvents()
     {
-        $events = array(
+        $events = [
             'Enlight_Controller_Front_StartDispatch' => 'onStartDispatch',
             'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService'
-        );
+        ];
 
         foreach ($events as $event => $listener) {
             $this->bootstrap->subscribeEvent($event, $listener);
@@ -109,7 +114,7 @@ class Setup
     private function createTables()
     {
         $this->bootstrap->get('db')->query(
-            "
+            '
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups` (
 			`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
 			  `name` VARCHAR(255) COLLATE utf8_unicode_ci NOT NULL,
@@ -117,7 +122,7 @@ class Setup
 			  `active` INT(1) UNSIGNED NOT NULL,
 			  PRIMARY KEY (`id`)
 			) ENGINE=InnoDB  DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci AUTO_INCREMENT=1;
-        "
+        '
         );
 
         $this->bootstrap->get('db')->query(
@@ -153,9 +158,9 @@ class Setup
         );
 
         $this->getEntityManager()->generateAttributeModels(
-            array(
+            [
                 's_user_attributes'
-            )
+            ]
         );
     }
 
@@ -165,21 +170,19 @@ class Setup
     private function createMenu()
     {
         $this->bootstrap->createMenuItem(
-            array(
+            [
                 'label' => 'Customer-specific prices',
                 'controller' => 'UserPrice',
                 'class' => 'sprite-user--list',
                 'action' => 'Index',
                 'active' => 1,
-                'parent' => $this->bootstrap->Menu()->findOneBy(array('label' => 'Kunden'))
-            )
+                'parent' => $this->bootstrap->Menu()->findOneBy(['label' => 'Kunden'])
+            ]
         );
     }
 
     /**
      * Creates the acl-rules for the plugin.
-     *
-     * @throws \Enlight_Exception
      */
     private function createAcl()
     {
@@ -189,12 +192,12 @@ class Setup
         $acl->deleteResource($pluginName);
         $acl->createResource(
             $pluginName,
-            array(
+            [
                 'read',
                 'editGroups',
                 'editCustomer',
                 'editPrices'
-            ),
+            ],
             'User Prices',
             $this->bootstrap->getId()
         );
@@ -214,20 +217,20 @@ class Setup
                     FROM s_core_customerpricegroups groups
                     INNER JOIN s_core_customerpricegroups_prices prices
                       ON prices.pricegroup = CONCAT('PG', groups.id)";
-            $values = $db->fetchAll($sql, array());
+            $values = $db->fetchAll($sql, []);
 
-            $groups = array();
+            $groups = [];
             foreach ($values as $group) {
                 if (!$groups[$group['groupId']]) {
-                    $groups[$group['groupId']] = array(
+                    $groups[$group['groupId']] = [
                         'id' => $group['groupId'],
                         'name' => $group['name'],
                         'gross' => $group['netto'],
                         'active' => $group['active']
-                    );
+                    ];
                 }
 
-                $groups[$group['groupId']]['prices'][$group['priceId']] = array(
+                $groups[$group['groupId']]['prices'][$group['priceId']] = [
                     'id' => $group['priceId'],
                     'pricegroup' => $group['pricegroup'],
                     'from' => $group['from'],
@@ -235,52 +238,52 @@ class Setup
                     'articleID' => $group['articleID'],
                     'articledetailsID' => $group['articledetailsID'],
                     'price' => $group['price'],
-                );
+                ];
             }
 
             foreach ($groups as $group) {
                 $db->beginTransaction();
-                $sql = "INSERT INTO s_plugin_pricegroups (name, gross, active)
-                        VALUES (?, ?, ?)";
-                $db->query($sql, array($group['name'], $group['gross'], $group['active']));
+                $sql = 'INSERT INTO s_plugin_pricegroups (name, gross, active)
+                        VALUES (?, ?, ?)';
+                $db->query($sql, [$group['name'], $group['gross'], $group['active']]);
                 $lastInsertId = $db->lastInsertId();
 
-                foreach ($group["prices"] as $price) {
-                    $sql = "INSERT INTO s_plugin_pricegroups_prices
+                foreach ($group['prices'] as $price) {
+                    $sql = 'INSERT INTO s_plugin_pricegroups_prices
                               (pricegroup, `from`, `to`, articleID, articledetailsID, price)
-                            VALUES (?, ?, ?, ?, ? ,?)";
+                            VALUES (?, ?, ?, ?, ? ,?)';
                     $db->query(
                         $sql,
-                        array(
+                        [
                             $lastInsertId,
                             $price['from'],
-                            $price["to"],
+                            $price['to'],
                             $price['articleID'],
                             $price['articledetailsID'],
                             $price['price']
-                        )
+                        ]
                     );
                 }
                 $db->commit();
             }
 
-            $sql = "SELECT u.*, ua.id AS attributeId
+            $sql = 'SELECT u.*, ua.id AS attributeId
                     FROM s_user u
                     LEFT JOIN s_user_attributes ua
                       ON ua.userID = u.id
-                    WHERE u.pricegroupID IS NOT NULL";
-            $existingAttributes = $db->fetchAll($sql, array());
+                    WHERE u.pricegroupID IS NOT NULL';
+            $existingAttributes = $db->fetchAll($sql, []);
 
             foreach ($existingAttributes as $user) {
                 if ($user['attributeId']) {
-                    $sql = "UPDATE s_user_attributes
+                    $sql = 'UPDATE s_user_attributes
                             SET swag_pricegroup = ?
-                            WHERE id = ?";
-                    $db->query($sql, array($user["attributeId"]));
+                            WHERE id = ?';
+                    $db->query($sql, [$user['attributeId']]);
                 } else {
-                    $sql = "INSERT INTO s_user_attributes (userID, swag_pricegroup)
-                            VALUES (?, ?)";
-                    $db->query($sql, array($user['id'], $user['pricegroupID']));
+                    $sql = 'INSERT INTO s_user_attributes (userID, swag_pricegroup)
+                            VALUES (?, ?)';
+                    $db->query($sql, [$user['id'], $user['pricegroupID']]);
                 }
             }
         } catch (\Exception $e) {
@@ -293,10 +296,10 @@ class Setup
      */
     private function removeMenuEntry()
     {
-        $menuItem = $this->getEntityManager()->getRepository('Shopware\Models\Menu\Menu')->findOneBy(
-            array(
+        $menuItem = $this->getEntityManager()->getRepository(Menu::class)->findOneBy(
+            [
                 'label' => 'Kundenspezifische Preise'
-            )
+            ]
         );
 
         if (!$menuItem) {
@@ -312,9 +315,9 @@ class Setup
      */
     private function addIndexToPriceTable()
     {
-        $sql = "ALTER TABLE `s_plugin_pricegroups_prices`
+        $sql = 'ALTER TABLE `s_plugin_pricegroups_prices`
 	            ADD KEY `articleID` (`articleID`),
-	            ADD KEY `articledetailsID` (`articledetailsID`)";
+	            ADD KEY `articledetailsID` (`articledetailsID`)';
         $this->bootstrap->get('db')->query($sql);
     }
 }

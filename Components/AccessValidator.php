@@ -21,10 +21,10 @@ namespace Shopware\SwagUserPrice\Components;
 class AccessValidator
 {
     /** @var $application \Shopware */
-    private $application = null;
+    private $application;
 
     /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager = null;
+    private $entityManager;
 
     /**
      * @return \Shopware
@@ -56,7 +56,7 @@ class AccessValidator
      * In case there is no logged in user or the current article has no custom user-prices, it returns false.
      *
      * @param $number
-     * @return bool|void
+     * @return bool
      * @throws \Exception
      */
     public function validateProduct($number)
@@ -104,10 +104,10 @@ class AccessValidator
             ->andWhere('prices.articledetailsID = :detailId')
             ->andWhere('groups.active = 1')
             ->setParameters(
-                array(
+                [
                     'id' => $userId,
                     'detailId' => $detailId
-                )
+                ]
             )->execute();
 
         if ($stmt->fetchColumn() > 0) {

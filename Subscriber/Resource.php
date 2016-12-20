@@ -29,24 +29,33 @@ class Resource implements SubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Enlight_Bootstrap_InitResource_swaguserprice.userprice' => 'onGetUserPriceComponent',
             'Enlight_Bootstrap_InitResource_swaguserprice.accessvalidator' => 'onGetAccessValidator',
             'Enlight_Bootstrap_InitResource_swaguserprice.servicehelper' => 'onGetServiceHelper'
-        );
+        ];
     }
 
-    public function onGetUserPriceComponent(\Enlight_Event_EventArgs $arguments)
+    /**
+     * @return Components\UserPrice
+     */
+    public function onGetUserPriceComponent()
     {
         return new Components\UserPrice();
     }
 
-    public function onGetAccessValidator(\Enlight_Event_EventArgs $arguments)
+    /**
+     * @return Components\AccessValidator
+     */
+    public function onGetAccessValidator()
     {
         return new Components\AccessValidator();
     }
 
-    public function onGetServiceHelper(\Enlight_Event_EventArgs $arguments)
+    /**
+     * @return Components\ServiceHelper
+     */
+    public function onGetServiceHelper()
     {
         return new Components\ServiceHelper();
     }
