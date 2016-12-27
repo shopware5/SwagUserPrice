@@ -86,7 +86,7 @@ class Setup
             $this->addIndexToPriceTable();
         }
 
-        if (version_compare($oldVersion, '2.1.1', '<')) {
+        if (version_compare($oldVersion, '2.1.1', '<=')) {
             $this->addPseudoPriceColumnToPriceTable();
         }
 
