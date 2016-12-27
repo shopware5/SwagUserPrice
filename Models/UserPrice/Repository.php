@@ -8,8 +8,9 @@
 
 namespace Shopware\CustomModels\UserPrice;
 
+use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Components\Model\ModelRepository;
-use Doctrine\ORM\Query\Expr;
+use Shopware\Models\Customer\Customer;
 
 /**
  * Plugin repository class.
@@ -55,12 +56,12 @@ class Repository extends ModelRepository
         $builder = $this->getEntityManager()->createQueryBuilder();
 
         $builder->select(
-            array(
+            [
                 'priceGroup.id as id',
                 'priceGroup.name as name',
                 'priceGroup.gross as gross',
                 'priceGroup.active as active'
-            )
+            ]
         )->from(
             $this->getEntityName(),
             'priceGroup'
@@ -119,16 +120,16 @@ class Repository extends ModelRepository
         $builder = $this->getEntityManager()->createQueryBuilder();
 
         $builder->select(
-            array(
+            [
                 'customer.id as id',
                 'customer.number as number',
                 'customer.groupKey as groupKey',
                 'billing.company as company',
                 'billing.firstName as firstName',
                 'billing.lastName as lastName'
-            )
+            ]
         )->from(
-            'Shopware\Models\Customer\Customer',
+            Customer::class,
             'customer'
         )->join(
             'customer.billing',
@@ -207,7 +208,7 @@ class Repository extends ModelRepository
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
         $builder->select(
-            array(
+            [
                 'detail.id as id',
                 'article.id as articleId',
                 'article.name as name',
@@ -215,7 +216,7 @@ class Repository extends ModelRepository
                 'aPrices.price as defaultPrice',
                 'prices.price as current',
                 'tax.tax as tax'
-            )
+            ]
         )->groupBy('detail.id');
 
         if ($main) {
@@ -283,7 +284,7 @@ class Repository extends ModelRepository
             $distinct = 'COUNT(DISTINCT detail.id)';
         }
 
-        $builder->select(array($distinct));
+        $builder->select([$distinct]);
 
         if (!empty($filter)) {
             $builder->andWhere('article.name LIKE :filter')
@@ -301,11 +302,11 @@ class Repository extends ModelRepository
      * Builds the query to read the articles having custom user-prices.
      * This is needed multiple times.
      *
-     * @param $builder
+     * @param QueryBuilder $builder
      * @param $groupId
-     * @return mixed
+     * @return QueryBuilder
      */
-    public function buildGetArticleQuery($builder, $groupId)
+    public function buildGetArticleQuery(QueryBuilder $builder, $groupId)
     {
         $builder->from('s_articles', 'article')->join(
             'article',
@@ -361,7 +362,7 @@ class Repository extends ModelRepository
         $builder = $this->getEntityManager()->createQueryBuilder();
 
         $builder->select(
-            array(
+            [
                 'prices.id',
                 'prices.priceGroupId as priceGroup',
                 'prices.from',
@@ -370,9 +371,9 @@ class Repository extends ModelRepository
                 'prices.pseudoPrice',
                 'prices.articleId',
                 'prices.articleDetailsId'
-            )
+            ]
         )->from(
-            'Shopware\CustomModels\UserPrice\Price',
+            Price::class,
             'prices'
         )->where('prices.priceGroupId = ?1')
         ->andWhere('prices.articleDetailsId = ?2')

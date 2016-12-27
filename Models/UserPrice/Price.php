@@ -28,6 +28,7 @@ class Price extends LazyFetchModelEntity
 
     /**
      * @var string $priceGroupId
+     *
      * @ORM\Column(name="pricegroup", length=30, type="string", nullable=false);
      */
     private $priceGroupId;
@@ -48,30 +49,34 @@ class Price extends LazyFetchModelEntity
 
     /**
      * @var integer $articleId
+     *
      * @ORM\Column(length=30, nullable=false)
      */
     private $articleId;
 
     /**
      * @var integer $articleDetailsID
+     *
      * @ORM\Column(name="articledetailsID", type="integer", nullable=false)
      */
     private $articleDetailsId;
 
     /**
      * @var float $price
+     *
      * @ORM\Column(type="float", nullable=false)
      */
     private $price;
 
     /**
      * @var float $pseudoPrice
+     *
      * @ORM\Column(type="float", nullable=false)
      */
     private $pseudoPrice;
 
     /**
-     * @var \Shopware\Models\Customer\PriceGroup $priceGroup
+     * @var Group $priceGroup
      *
      * @ORM\ManyToOne(targetEntity="\Shopware\CustomModels\UserPrice\Group")
      * @ORM\JoinColumn(name="pricegroup", referencedColumnName="id")
@@ -80,10 +85,11 @@ class Price extends LazyFetchModelEntity
 
     /**
      * OWNING SIDE
+     *
+     * @var \Shopware\Models\Article\Article $article
+     *
      * @ORM\OneToOne(targetEntity="Shopware\Models\Article\Article")
      * @ORM\JoinColumn(name="articleId", referencedColumnName="id")
-     *
-     * @var $article \Shopware\Models\Article\Article
      */
     protected $article;
 
@@ -181,7 +187,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @return \Shopware\CustomModels\UserPrice\Group
+     * @return Group
      */
     public function getPriceGroup()
     {
@@ -189,7 +195,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @param \Shopware\CustomModels\UserPrice\Group $priceGroup
+     * @param Group $priceGroup
      * @return $this
      */
     public function setPriceGroup($priceGroup)

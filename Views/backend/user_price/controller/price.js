@@ -303,8 +303,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
      * @param articleRecord - The selected article-record.
      */
     loadPricesGrid: function (tab, articleRecord) {
-        var me = this,
-            grid = tab.pricesGrid,
+        var grid = tab.pricesGrid,
             store = grid.store,
             combo = tab.groupCombo,
             priceGroup = combo.getValue();
@@ -337,8 +336,7 @@ Ext.define('Shopware.apps.UserPrice.controller.Price', {
      * @param record - The selected record from the group-combobox.
      */
     loadArticlesGrid: function (tab, record) {
-        var me = this,
-            grid = tab.allArticlesGrid;
+        var grid = tab.allArticlesGrid;
 
         if (!record) {
             return;

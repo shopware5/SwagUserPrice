@@ -8,9 +8,9 @@
 
 namespace Shopware\CustomModels\UserPrice;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Shopware\Components\Model\LazyFetchModelEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Shopware\Models\Customer\Customer;
 
 /**
  * @ORM\Table(name="s_plugin_pricegroups")
@@ -23,6 +23,7 @@ class Group extends LazyFetchModelEntity
      * doctrine associations can be defined over this field.
      *
      * @var integer $id
+     *
      * @ORM\Id
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\GeneratedValue(strategy="IDENTITY")
@@ -33,6 +34,7 @@ class Group extends LazyFetchModelEntity
      * Contains the customer price group name value.
      *
      * @var string $name
+     *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
     private $name;
@@ -41,6 +43,7 @@ class Group extends LazyFetchModelEntity
      * Flag which indicates a net price.
      *
      * @var integer $gross
+     *
      * @ORM\Column(name="gross", type="integer", nullable=false)
      */
     private $gross;
@@ -49,22 +52,24 @@ class Group extends LazyFetchModelEntity
      * Flag which indicates if a price group is active or not.
      *
      * @var integer $taxInput
+     *
      * @ORM\Column(name="active", type="integer", nullable=false)
      */
     private $active;
 
     /**
      * INVERSE SIDE
-     * @ORM\OneToMany(targetEntity="Shopware\Models\Customer\Customer", mappedBy="priceGroup")
      *
-     * @var ArrayCollection
+     * @var Customer[] $customers
+     *
+     * @ORM\OneToMany(targetEntity="Shopware\Models\Customer\Customer", mappedBy="priceGroup")
      */
     protected $customers;
 
     /**
      * INVERSE SIDE
      *
-     * @var $prices ArrayCollection
+     * @var Price[] $prices
      *
      * @ORM\OneToMany(targetEntity="Shopware\CustomModels\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
      */
@@ -136,7 +141,7 @@ class Group extends LazyFetchModelEntity
     }
 
     /**
-     * @return \Shopware\CustomModels\UserPrice\Group
+     * @return Price[]
      */
     public function getPrices()
     {

@@ -6,6 +6,13 @@
  * file that was distributed with this source code.
  */
 
+use Shopware\Models\Attribute\Customer as CustomerAttribute;
+use Shopware\Models\Customer\Customer;
+use Shopware\CustomModels\UserPrice\Group;
+use Shopware\Models\Article\Article;
+use Shopware\Models\Article\Detail;
+use Shopware\CustomModels\UserPrice\Price;
+
 /**
  * Plugin backend-controller class.
  *
@@ -20,12 +27,12 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * @var $userPriceRepository \Shopware\CustomModels\UserPrice\Repository
      */
-    protected $userPriceRepository = null;
+    protected $userPriceRepository;
 
     /**
      * @var $entityManager Shopware\Components\Model\ModelManager
      */
-    protected $entityManager = null;
+    protected $entityManager;
 
     /**
      * Disable template engine for most actions
@@ -34,7 +41,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      */
     public function preDispatch()
     {
-        if (!in_array($this->Request()->getActionName(), array('index', 'load'))) {
+        if (!in_array($this->Request()->getActionName(), ['index', 'load'])) {
             $this->Front()->Plugins()->Json()->setRenderer(true);
         }
     }
@@ -80,9 +87,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     private function getRepository()
     {
         if ($this->userPriceRepository === null) {
-            $this->userPriceRepository = $this->getEntityManager()->getRepository(
-                'Shopware\CustomModels\UserPrice\Group'
-            );
+            $this->userPriceRepository = $this->getEntityManager()->getRepository(Group::class);
         }
 
         return $this->userPriceRepository;
@@ -239,14 +244,14 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $filterValue,
                 $params['start'],
                 $params['limit'],
-                (array) $this->Request()->getParam('sort', array())
+                (array) $this->Request()->getParam('sort', [])
             );
 
             $totalResult = $this->getEntityManager()->getQueryCount($query);
 
-            return array('success' => true, 'data' => $query->getArrayResult(), 'total' => $totalResult);
+            return ['success' => true, 'data' => $query->getArrayResult(), 'total' => $totalResult];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -271,7 +276,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $model = new Shopware\CustomModels\UserPrice\Group();
                 $msg = $namespace->get('growlMessage/create/message', 'The group was succesfully created');
             } else {
-                $model = $em->find('Shopware\CustomModels\UserPrice\Group', $id);
+                $model = $em->find(Group::class, $id);
                 $msg = $namespace->get('growlMessage/edit/message', 'The group was succesfully edited');
             }
 
@@ -286,7 +291,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $msg = $e->getMessage();
         }
 
-        return array('success' => $success, 'msg' => $msg);
+        return ['success' => $success, 'msg' => $msg];
     }
 
     /**
@@ -308,18 +313,16 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             //The array structure of $params depends on the amount of records being deleted.
             //This way we create the same array-structure in every case
             if (!$this->isMultiDimensional($params)) {
-                $records = array($params);
+                $records = [$params];
             }
 
             foreach ($records as $record) {
                 $this->getEntityManager()->remove($this->getRepository()->find($record['id']));
 
                 //We also need to delete the attribute-entries
-                $attrModels = $this->getEntityManager()->getRepository('Shopware\Models\Attribute\Customer')->findBy(
-                    array(
-                        'swagPricegroup' => $record['id']
-                    )
-                );
+                $attrModels = $this->getEntityManager()->getRepository(CustomerAttribute::class)->findBy([
+                    'swagPricegroup' => $record['id']
+                ]);
 
                 foreach ($attrModels as $attr) {
                     $attr->setSwagPricegroup(null);
@@ -327,13 +330,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 }
 
                 //We also need to delete the assigned prices
-                $priceModels = $this->getEntityManager()->getRepository(
-                    'Shopware\CustomModels\UserPrice\Price'
-                )->findBy(
-                    array(
-                        'priceGroupId' => $record['id']
-                    )
-                );
+                $priceModels = $this->getEntityManager()->getRepository(Price::class)->findBy([
+                    'priceGroupId' => $record['id']
+                ]);
 
                 foreach ($priceModels as $price) {
                     $this->getEntityManager()->remove($price);
@@ -349,7 +348,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $msg = $e->getMessage();
         }
 
-        return array('success' => $success, 'msg' => $msg);
+        return ['success' => $success, 'msg' => $msg];
     }
 
     /**
@@ -370,7 +369,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $groupId = null;
             foreach ($this->Request()->getParam('filter') as $filter) {
                 if ($filter['property'] == 'priceGroup') {
-                    $groupId = $filter["value"];
+                    $groupId = $filter['value'];
                 } else {
                     if ($filter['property'] == 'searchValue') {
                         $search = $filter['value'];
@@ -382,17 +381,17 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $search,
                 $params['start'],
                 $params['limit'],
-                (array) $this->Request()->getParam('sort', array()),
+                (array) $this->Request()->getParam('sort', []),
                 $groupId
             );
 
-            return array(
+            return [
                 'success' => true,
                 'total' => $this->getEntityManager()->getQueryCount($query),
                 'data' => $query->getArrayResult()
-            );
+            ];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -408,11 +407,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $customerIds = json_decode($params['customerIds']);
 
             foreach ($customerIds as $customerId) {
-                /** @var Shopware\Models\Customer\Customer $customer */
-                $customer = $this->getEntityManager()->find('Shopware\Models\Customer\Customer', $customerId);
+                /** @var Customer $customer */
+                $customer = $this->getEntityManager()->find(Customer::class, $customerId);
 
                 if (!$attribute = $customer->getAttribute()) {
-                    $attribute = new \Shopware\Models\Attribute\Customer();
+                    $attribute = new CustomerAttribute();
                 }
                 $attribute->setCustomer($customer);
                 $attribute->setSwagPricegroup($params['priceGroupId']);
@@ -423,9 +422,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $this->getEntityManager()->flush();
 
-            return array('success' => true);
+            return ['success' => true];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -433,15 +432,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Removes a customer from a given group.
      *
      * @param $params
-     * @return array|void
+     * @return array
      */
     private function removeCustomer($params)
     {
         try {
             $customerIds = json_decode($params['customerIds']);
             foreach ($customerIds as $customerId) {
-                /** @var Shopware\Models\Customer\Customer $customer */
-                $customer = $this->getEntityManager()->find('Shopware\Models\Customer\Customer', $customerId);
+                /** @var Customer $customer */
+                $customer = $this->getEntityManager()->find(Customer::class, $customerId);
 
                 if (!$customer) {
                     throw new \Doctrine\ORM\EntityNotFoundException('Could not find customer with ID ' . $customerId);
@@ -449,7 +448,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
                 $attrModel = $customer->getAttribute();
                 if (!$attrModel) {
-                    return;
+                    continue;
                 }
 
                 $attrModel->setSwagPricegroup(null);
@@ -458,9 +457,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $this->getEntityManager()->flush();
 
-            return array('success' => true);
+            return ['success' => true];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -482,7 +481,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             foreach ($this->Request()->getParam('filter') as $filter) {
                 if ($filter['property'] == 'mainOnly') {
-                    $main = $filter["value"];
+                    $main = $filter['value'];
                 } else {
                     if ($filter['property'] == 'searchValue') {
                         $search = $filter['value'];
@@ -499,7 +498,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $search,
                 $params['start'],
                 $params['limit'],
-                (array) $this->Request()->getParam('sort', array()),
+                (array) $this->Request()->getParam('sort', []),
                 $main,
                 $groupId
             );
@@ -511,9 +510,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             /** @var Doctrine\DBAL\Driver\Statement $countStmt */
             $countStmt = $this->getRepository()->getArticlesCountQuery($search, $main, $groupId);
 
-            return array('success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn());
+            return ['success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn()];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -533,7 +532,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $groupId = null;
             foreach ($this->Request()->getParam('filter') as $filter) {
                 if ($filter['property'] == 'detailId') {
-                    $detailId = $filter["value"];
+                    $detailId = $filter['value'];
                 } else {
                     if ($filter['property'] == 'priceGroup') {
                         $groupId = $filter['value'];
@@ -545,7 +544,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 throw new \Shopware\Components\Api\Exception\ParameterMissingException('Detail or group id missing');
             }
 
-            $article = $this->getEntityManager()->find('Shopware\Models\Article\Detail', $detailId)->getArticle();
+            $article = $this->getEntityManager()->find(Detail::class, $detailId)->getArticle();
             $group = $this->getRepository()->find($groupId);
 
             $query = $this->getRepository()->getPricesQuery($detailId, $groupId);
@@ -556,13 +555,13 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $item['percent'] = 0;
 
                 if ($group->getGross() === 1) {
-                    $item["price"] = $item["price"] / 100 * (100 + $article->getTax()->getTax());
-                    $item["pseudoPrice"] = $item["pseudoPrice"] / 100 * (100 + $article->getTax()->getTax());
+                    $item['price'] = $item['price'] / 100 * (100 + $article->getTax()->getTax());
+                    $item['pseudoPrice'] = $item['pseudoPrice'] / 100 * (100 + $article->getTax()->getTax());
                 }
 
-                $item['percent'] = "0%";
+                $item['percent'] = '0%';
                 if (!$firstPrice) {
-                    $item['percent'] = round(100 - ($item["price"] / $data[0]["price"]) * 100, 2) . "%";
+                    $item['percent'] = round(100 - ($item['price'] / $data[0]['price']) * 100, 2) . '%';
                 }
                 $firstPrice = false;
             }
@@ -581,15 +580,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                     $from = $lastEntry['to'] + 1;
                 }
 
-                $data[] = array(
+                $data[] = [
                     'from' => $from,
                     'to' => $namespace->get('prices/any', 'Arbitrary')
-                );
+                ];
             }
 
-            return array('success' => true, 'data' => $data);
+            return ['success' => true, 'data' => $data];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
@@ -604,9 +603,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
         try {
             $id = $params['id'];
 
-            $priceGroupId = $params["priceGroup"];
-            $articleId = $params["articleId"];
-            $articleDetailId = $params["articleDetailsId"];
+            $priceGroupId = $params['priceGroup'];
+            $articleId = $params['articleId'];
+            $articleDetailId = $params['articleDetailsId'];
 
             if (!$priceGroupId) {
                 throw new InvalidArgumentException('Price group id is missing!');
@@ -623,51 +622,51 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             if (!$id) {
                 $model = new \Shopware\CustomModels\UserPrice\Price();
             } else {
-                $model = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Price', $id);
+                $model = $this->getEntityManager()->find(Price::class, $id);
             }
 
             //This must not be translated!
             //Do not translate, this is not shown to the user and only used for the logic!
-            if (intval($params['to']) === 0) {
+            if ((int) $params['to'] === 0) {
                 $params['to'] = 'beliebig';
             }
 
-            $priceGroup = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Group', $priceGroupId);
-            $article = $this->getEntityManager()->find('Shopware\Models\Article\Article', $articleId);
+            $priceGroup = $this->getEntityManager()->find(Group::class, $priceGroupId);
+            $article = $this->getEntityManager()->find(Article::class, $articleId);
 
-            if ($priceGroup->getGross() === 1 && $params["price"]) {
-                $params["price"] = $params["price"] / ((100 + $article->getTax()->getTax()) / 100);
+            if ($priceGroup->getGross() === 1 && $params['price']) {
+                $params['price'] = $params['price'] / ((100 + $article->getTax()->getTax()) / 100);
             }
 
             if ($priceGroup->getGross() === 1 && $params["pseudoPrice"]) {
-                $params["pseudoPrice"] = $params["pseudoPrice"] / ((100 + $article->getTax()->getTax()) / 100);
+                $params['pseudoPrice'] = $params['pseudoPrice'] / ((100 + $article->getTax()->getTax()) / 100);
             }
 
-            $params["price"] = $params["price"] ? $params["price"] : null;
-            $params["pseudoPrice"] = $params["pseudoPrice"] ? $params["pseudoPrice"] : null;
+            $params['price'] = $params['price'] ?: null;
+            $params['pseudoPrice'] = $params['pseudoPrice'] ?: null;
 
             $model->fromArray($params);
             $model->setPriceGroup($priceGroup);
             $model->setArticle($article);
-            $model->setDetail($this->getEntityManager()->find('Shopware\Models\Article\Detail', $articleDetailId));
+            $model->setDetail($this->getEntityManager()->find(Detail::class, $articleDetailId));
 
             if ($this->shouldRemovePrice($params)) {
                 $this->getEntityManager()->remove($model);
                 $this->getEntityManager()->flush();
 
-                Shopware()->Events()->notify("Shopware_Plugins_HttpCache_InvalidateCacheId", array('cacheId' => "a" . $articleId));
+                Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $articleId]);
 
-                return array('success' => true);
+                return ['success' => true];
             }
 
             $this->getEntityManager()->persist($model);
             $this->getEntityManager()->flush();
 
-            Shopware()->Events()->notify("Shopware_Plugins_HttpCache_InvalidateCacheId", array('cacheId' => "a" . $articleId));
+            Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $articleId]);
 
-            return array('success' => true);
+            return ['success' => true];
         } catch (InvalidArgumentException $e) {
-            return array('success' => true, 'msg' => $e->getMessage());
+            return ['success' => true, 'msg' => $e->getMessage()];
         }
     }
 
@@ -683,7 +682,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             if (!$id = $params['id']) {
                 throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
             }
-            $model = $this->getEntityManager()->find('Shopware\CustomModels\UserPrice\Price', $params['id']);
+            $model = $this->getEntityManager()->find(Price::class, $params['id']);
 
             if (!$model) {
                 throw new \Doctrine\ORM\EntityNotFoundException('No entity with id ' . $id . ' found.');
@@ -693,9 +692,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $this->getEntityManager()->flush();
 
-            return array('success' => true);
+            return ['success' => true];
         } catch (Exception $e) {
-            return array('success' => false, 'msg' => $e->getMessage());
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 

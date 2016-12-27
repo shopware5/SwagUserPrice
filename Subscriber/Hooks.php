@@ -50,10 +50,10 @@ class Hooks implements SubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
+        return [
             'Shopware_Modules_Basket_getPriceForUpdateArticle_FilterPrice' => 'onUpdatePrice',
             'sAdmin::sLogin::after' => 'onFrontendLogin'
-        );
+        ];
     }
 
     /**
@@ -68,9 +68,9 @@ class Hooks implements SubscriberInterface
         $return = $args->getReturn();
         $id = $args->get('id');
 
-        $sql = "SELECT ordernumber FROM `s_order_basket` WHERE `id` = ?";
+        $sql = 'SELECT ordernumber FROM `s_order_basket` WHERE `id` = ?';
 
-        $orderNumber = $this->bootstrap->get('db')->fetchOne($sql, array($id));
+        $orderNumber = $this->bootstrap->get('db')->fetchOne($sql, [$id]);
 
         if (!$this->bootstrap->get('swaguserprice.accessvalidator')->validateProduct($orderNumber)) {
             return $return;
@@ -84,8 +84,8 @@ class Hooks implements SubscriberInterface
             return $return;
         }
 
-        $return["price"] = $price["price"];
-        $return["pseudoPrice"] = $price["pseudoPrice"];
+        $return['price'] = $price['price'];
+        $return['pseudoPrice'] = $price['pseudoPrice'];
 
         return $return;
     }
@@ -111,7 +111,7 @@ class Hooks implements SubscriberInterface
     private function cachePluginActive()
     {
         /** @var Plugin $cachePlugin */
-        $cachePlugin = $this->bootstrap->get('models')->getRepository('\Shopware\Models\Plugin\Plugin')
+        $cachePlugin = $this->bootstrap->get('models')->getRepository(Plugin::class)
             ->findOneBy(['name' => 'HttpCache']);
         if ($cachePlugin->getActive()) {
             return true;
