@@ -557,6 +557,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
                 if ($group->getGross() === 1) {
                     $item["price"] = $item["price"] / 100 * (100 + $article->getTax()->getTax());
+                    $item["pseudoPrice"] = $item["pseudoPrice"] / 100 * (100 + $article->getTax()->getTax());
                 }
 
                 $item['percent'] = "0%";
@@ -638,7 +639,12 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $params["price"] = $params["price"] / ((100 + $article->getTax()->getTax()) / 100);
             }
 
+            if ($priceGroup->getGross() === 1 && $params["pseudoPrice"]) {
+                $params["pseudoPrice"] = $params["pseudoPrice"] / ((100 + $article->getTax()->getTax()) / 100);
+            }
+
             $params["price"] = $params["price"] ? $params["price"] : null;
+            $params["pseudoPrice"] = $params["pseudoPrice"] ? $params["pseudoPrice"] : null;
 
             $model->fromArray($params);
             $model->setPriceGroup($priceGroup);

@@ -149,7 +149,7 @@ class ServiceHelper
         $priceRuleStruct->setPrice((floatval($price['price'])));
         $priceRuleStruct->setFrom((intval($price['from'])));
         $priceRuleStruct->setTo((intval($price['to'])) > 0 ? intval($price['to']) : null);
-        $priceRuleStruct->setPseudoPrice(floatval(0));
+        $priceRuleStruct->setPseudoPrice(floatval($price['pseudoPrice']));
 
         return $priceRuleStruct;
     }

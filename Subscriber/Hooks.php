@@ -85,6 +85,7 @@ class Hooks implements SubscriberInterface
         }
 
         $return["price"] = $price["price"];
+        $return["pseudoPrice"] = $price["pseudoPrice"];
 
         return $return;
     }

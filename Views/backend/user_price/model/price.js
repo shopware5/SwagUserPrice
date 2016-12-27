@@ -54,6 +54,7 @@ Ext.define('Shopware.apps.UserPrice.model.Price', {
         { name: 'articleId', type: 'int' },
         { name: 'articleDetailsId', type: 'int' },
         { name: 'price', type: 'float', useNull: true },
+        { name: 'pseudoPrice', type: 'float', useNull: true },
         { name: 'percent', type: 'float', useNull: true }
     ],
 

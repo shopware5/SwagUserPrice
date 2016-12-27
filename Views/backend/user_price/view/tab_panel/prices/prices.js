@@ -50,6 +50,7 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
             from: '{s name=prices/header/from}From{/s}',
             to: '{s name=prices/header/to}To{/s}',
             price: '{s name=prices/header/price}Price{/s}',
+            pseudoPrice: '{s name=prices/header/pseudoPrice}Pseudo price{/s}',
             percentage: '{s name=prices/header/percent}Percentage{/s}',
             toolTip: '{s name=prices/header/toolTip}Delete{/s}'
         }
@@ -155,6 +156,16 @@ Ext.define('Shopware.apps.UserPrice.view.TabPanel.prices.Prices', {
             {
                 header: me.snippets.header.price,
                 dataIndex: 'price',
+                flex: 1,
+                xtype: 'numbercolumn',
+                editor: {
+                    xtype: 'numberfield',
+                    minValue: 0
+                }
+            },
+            {
+                header: me.snippets.header.pseudoPrice,
+                dataIndex: 'pseudoPrice',
                 flex: 1,
                 xtype: 'numbercolumn',
                 editor: {

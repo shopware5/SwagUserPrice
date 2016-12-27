@@ -130,6 +130,7 @@ class Setup
               `articleID` INT(11) NOT NULL DEFAULT '0',
               `articledetailsID` INT(11) NOT NULL DEFAULT '0',
               `price` DOUBLE DEFAULT '0',
+              `pseudoPrice` DOUBLE DEFAULT '0',
               PRIMARY KEY (`id`),
               KEY `articleID` (`articleID`),
               KEY `articledetailsID` (`articledetailsID`)
