@@ -86,6 +86,10 @@ class Setup
             $this->addIndexToPriceTable();
         }
 
+        if (version_compare($oldVersion, '2.1.1', '<')) {
+            $this->addPseudoPriceColumnToPriceTable();
+        }
+
         return true;
     }
 
@@ -316,6 +320,16 @@ class Setup
         $sql = "ALTER TABLE `s_plugin_pricegroups_prices`
 	            ADD KEY `articleID` (`articleID`),
 	            ADD KEY `articledetailsID` (`articledetailsID`)";
+        $this->bootstrap->get('db')->query($sql);
+    }
+
+    /**
+     * helper method to add the new pseudo price column to the price table
+     */
+    private function addPseudoPriceColumnToPriceTable()
+    {
+        $sql = "ALTER TABLE `s_plugin_pricegroups_prices`
+                ADD `pseudoPrice` double NULL DEFAULT '0'";
         $this->bootstrap->get('db')->query($sql);
     }
 }
