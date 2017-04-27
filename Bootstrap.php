@@ -1,9 +1,23 @@
 <?php
 /**
- * (c) shopware AG <info@shopware.com>
+ * Shopware Premium Plugins
+ * Copyright (c) shopware AG
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * According to our dual licensing model, this plugin can be used under
+ * a proprietary license as set forth in our Terms and Conditions,
+ * section 2.1.2.2 (Conditions of Usage).
+ *
+ * The text of our proprietary license additionally can be found at and
+ * in the LICENSE file you have received along with this plugin.
+ *
+ * This plugin is distributed in the hope that it will be useful,
+ * with LIMITED WARRANTY AND LIABILITY as set forth in our
+ * Terms and Conditions, sections 9 (Warranty) and 10 (Liability).
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the plugin does not imply a trademark license.
+ * Therefore any rights, title and interest in our trademarks
+ * remain entirely with us.
  */
 
 use Shopware\SwagUserPrice\Bootstrap\Setup;
@@ -20,15 +34,28 @@ use Shopware\SwagUserPrice\Subscriber;
  * Additionally it registers the needed events.
  *
  * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
+ *
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Components_Plugin_Bootstrap
 {
     /**
-     * @var $setupService \Shopware\SwagUserPrice\Bootstrap\Setup
+     * @var \Shopware\SwagUserPrice\Bootstrap\Setup
      */
     private $setupService;
+
+    /**
+     * @return array
+     */
+    public function getCapabilities()
+    {
+        return [
+            'install' => true,
+            'enable' => true,
+            'update' => true,
+            'secureUninstall' => true,
+        ];
+    }
 
     /**
      * After init method is called every time after initializing this plugin
@@ -49,8 +76,9 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * Therefore we need to include those "AfterInitResource"-events in the bootstrap itself,
      * since they need to be called when a command-line is used.
      *
-     * @return bool
      * @throws RuntimeException
+     *
+     * @return bool
      */
     public function install()
     {
@@ -59,6 +87,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         }
 
         $this->setupService->install();
+
         return true;
     }
 
@@ -66,8 +95,10 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      * The update method is needed for the update via plugin manager.
      *
      * @param $oldVersion
-     * @return bool
+     *
      * @throws RuntimeException
+     *
+     * @return bool
      */
     public function update($oldVersion)
     {
@@ -79,10 +110,24 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
+     * Uninstall method of the plugin.
+     * Triggers the uninstall method from the setup class.
+     *
+     * @return bool
+     */
+    public function uninstall()
+    {
+        $this->setupService->uninstall();
+
+        return true;
+    }
+
+    /**
      * Returns the current version of the plugin.
      *
-     * @return string
      * @throws RuntimeException
+     *
+     * @return string
      */
     public function getVersion()
     {
@@ -90,25 +135,24 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
 
         if ($info) {
             return $info['currentVersion'];
-        } else {
-            throw new RuntimeException('The plugin has an invalid version file.');
         }
+        throw new RuntimeException('The plugin has an invalid version file.');
     }
 
     /**
      * Get (nice) name for plugin manager list
      *
-     * @return string
      * @throws RuntimeException
+     *
+     * @return string
      */
     public function getLabel()
     {
         $info = json_decode(file_get_contents(__DIR__ . DIRECTORY_SEPARATOR . 'plugin.json'), true);
         if ($info) {
             return $info['label']['en'];
-        } else {
-            throw new RuntimeException('The plugin has an invalid version file.');
         }
+        throw new RuntimeException('The plugin has an invalid version file.');
     }
 
     /**
@@ -169,7 +213,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         $subscribers = [
             new Subscriber\ControllerPath($this->Path()),
             new Subscriber\Hooks($this),
-            new Subscriber\Resource()
+            new Subscriber\Resource(),
         ];
 
         foreach ($subscribers as $subscriber) {
