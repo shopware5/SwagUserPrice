@@ -1,14 +1,28 @@
 <?php
 /**
- * (c) shopware AG <info@shopware.com>
+ * Shopware Premium Plugins
+ * Copyright (c) shopware AG
  *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * According to our dual licensing model, this plugin can be used under
+ * a proprietary license as set forth in our Terms and Conditions,
+ * section 2.1.2.2 (Conditions of Usage).
+ *
+ * The text of our proprietary license additionally can be found at and
+ * in the LICENSE file you have received along with this plugin.
+ *
+ * This plugin is distributed in the hope that it will be useful,
+ * with LIMITED WARRANTY AND LIABILITY as set forth in our
+ * Terms and Conditions, sections 9 (Warranty) and 10 (Liability).
+ *
+ * "Shopware" is a registered trademark of shopware AG.
+ * The licensing of the plugin does not imply a trademark license.
+ * Therefore any rights, title and interest in our trademarks
+ * remain entirely with us.
  */
 
 namespace Shopware\SwagUserPrice\Bootstrap;
 
-/**
+/*
  * Plugin bootstrap setup class.
  *
  * This class handles most of the bootstrap-logic.
@@ -19,6 +33,7 @@ namespace Shopware\SwagUserPrice\Bootstrap;
  * @package Shopware\Plugin\SwagUserPrice
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
+use Shopware\Bundle\AttributeBundle\Service\CrudService;
 use Shopware\Models\Menu\Menu;
 
 class Setup
@@ -37,18 +52,6 @@ class Setup
     public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
     {
         $this->bootstrap = $bootstrap;
-    }
-
-    /**
-     * @return \Shopware\Components\Model\ModelManager
-     */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->bootstrap->get('models');
-        }
-
-        return $this->entityManager;
     }
 
     /**
@@ -73,9 +76,20 @@ class Setup
     }
 
     /**
+     * Setup uninstall method.
+     * Removes the attributes and the created tables of the plugin.
+     */
+    public function uninstall()
+    {
+        $this->removeAttribute();
+        $this->removeTables();
+    }
+
+    /**
      * The update method handles the migration of the old data.
      *
      * @param $oldVersion
+     *
      * @return bool
      */
     public function update($oldVersion)
@@ -94,13 +108,25 @@ class Setup
         return true;
     }
 
+    /**
+     * @return \Shopware\Components\Model\ModelManager
+     */
+    private function getEntityManager()
+    {
+        if ($this->entityManager === null) {
+            $this->entityManager = $this->bootstrap->get('models');
+        }
+
+        return $this->entityManager;
+    }
+
     private function createEvents()
     {
         $events = [
             'Enlight_Controller_Front_StartDispatch' => 'onStartDispatch',
             'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
-            'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService'
+            'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService',
         ];
 
         foreach ($events as $event => $listener) {
@@ -148,19 +174,13 @@ class Setup
      */
     private function addAttribute()
     {
-        $this->getEntityManager()->addAttribute(
-            's_user_attributes',
-            'swag',
-            'pricegroup',
-            'int(11)',
-            true,
-            null
-        );
+        /** @var CrudService $service */
+        $service = $this->bootstrap->get('shopware_attribute.crud_service');
 
-        $this->getEntityManager()->generateAttributeModels(
-            [
-                's_user_attributes'
-            ]
+        $service->update(
+            's_user_attributes',
+            'swag_pricegroup',
+            'integer'
         );
     }
 
@@ -176,7 +196,7 @@ class Setup
                 'class' => 'sprite-user--list',
                 'action' => 'Index',
                 'active' => 1,
-                'parent' => $this->bootstrap->Menu()->findOneBy(['label' => 'Kunden'])
+                'parent' => $this->bootstrap->Menu()->findOneBy(['label' => 'Kunden']),
             ]
         );
     }
@@ -196,7 +216,7 @@ class Setup
                 'read',
                 'editGroups',
                 'editCustomer',
-                'editPrices'
+                'editPrices',
             ],
             'User Prices',
             $this->bootstrap->getId()
@@ -226,7 +246,7 @@ class Setup
                         'id' => $group['groupId'],
                         'name' => $group['name'],
                         'gross' => $group['netto'],
-                        'active' => $group['active']
+                        'active' => $group['active'],
                     ];
                 }
 
@@ -260,7 +280,7 @@ class Setup
                             $price['to'],
                             $price['articleID'],
                             $price['articledetailsID'],
-                            $price['price']
+                            $price['price'],
                         ]
                     );
                 }
@@ -298,7 +318,7 @@ class Setup
     {
         $menuItem = $this->getEntityManager()->getRepository(Menu::class)->findOneBy(
             [
-                'label' => 'Kundenspezifische Preise'
+                'label' => 'Kundenspezifische Preise',
             ]
         );
 
@@ -319,5 +339,22 @@ class Setup
 	            ADD KEY `articleID` (`articleID`),
 	            ADD KEY `articledetailsID` (`articledetailsID`)';
         $this->bootstrap->get('db')->query($sql);
+    }
+
+    private function removeTables()
+    {
+        $this->bootstrap->get('db')->query('DROP TABLE IF EXISTS s_plugin_pricegroups');
+        $this->bootstrap->get('db')->query('DROP TABLE IF EXISTS s_plugin_pricegroups_prices');
+    }
+
+    private function removeAttribute()
+    {
+        /** @var CrudService $service */
+        $service = $this->bootstrap->get('shopware_attribute.crud_service');
+
+        $service->delete(
+            's_user_attributes',
+            'swag_pricegroup'
+        );
     }
 }
