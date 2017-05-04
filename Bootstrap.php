@@ -96,6 +96,22 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     }
 
     /**
+     * @return array
+     */
+    public function enable()
+    {
+        return ['success' => true, 'invalidateCache' => $this->getInvalidateCacheArray()];
+    }
+
+    /**
+     * @return array
+     */
+    public function disable()
+    {
+        return ['success' => true, 'invalidateCache' => $this->getInvalidateCacheArray()];
+    }
+
+    /**
      * Uninstall method of the plugin.
      * Triggers the uninstall method from the setup class.
      *
@@ -105,7 +121,7 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     {
         $this->setupService->uninstall();
 
-        return true;
+        return ['success' => true, 'invalidateCache' => $this->getInvalidateCacheArray()];
     }
 
     /**
@@ -205,5 +221,16 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         foreach ($subscribers as $subscriber) {
             $this->get('events')->addSubscriber($subscriber);
         }
+    }
+
+    /**
+     * Helper method to return all the caches, that need to be
+     * cleared after installing/uninstalling/enabling/disabling the plugin
+     *
+     * @return array
+     */
+    private function getInvalidateCacheArray()
+    {
+        return ['proxy', 'backend'];
     }
 }
