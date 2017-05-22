@@ -168,6 +168,8 @@ class Setup
             'swag_pricegroup',
             'integer'
         );
+
+        $this->getEntityManager()->generateAttributeModels(['s_user_attributes']);
     }
 
     /**
@@ -342,5 +344,7 @@ class Setup
             's_user_attributes',
             'swag_pricegroup'
         );
+
+        $this->getEntityManager()->generateAttributeModels(['s_user_attributes']);
     }
 }
