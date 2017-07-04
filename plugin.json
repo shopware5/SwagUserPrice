@@ -8,10 +8,11 @@
     "link": "http://store.shopware.com",
     "author": "shopware AG",
 
-    "currentVersion": "2.1.1",
+    "currentVersion": "2.1.2",
 
     "changelog": {
         "de": {
+            "2.1.2": "PT-7650 - 5.3 Kompatibilität und SecureUninstall Prozess hinzugefügt;",
             "2.1.1": "PT-5098 - Die Preise können wieder resettet werden; PT-5103 - Performance im Listing wurde verbessert; PT-5309 - Kunden-Paging Bug beseitigt; PT-6315 - Gruppen aktivieren und deaktivieren geht wieder;",
             "2.1.0": "PT-6068 - Feature: Shopware 5.2 Kompatibilität;",
             "2.0.2": "PT-3565 - Bugfix: HTTP-Cache Kompatibilität;",
@@ -20,6 +21,7 @@
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.1.2": "PT-7650 - Added 5.3 compatibility and secure uninstall process;",
             "2.1.1": "PT-5098 - Prices can be reset; PT-5103 - Performance of the listing has been improved; PT-5309 - Fix customer paging bug; PT-6315 - groups can set active and inactive again;",
             "2.1.0": "PT-6068 - Feature: Shopware 5.2 Kompatibilität;",
             "2.0.2": "PT-3565 - Bugfix: HTTP cache compatibility;",
