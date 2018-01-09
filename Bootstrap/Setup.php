@@ -113,6 +113,7 @@ class Setup
             'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService',
+            'Enlight_Controller_Dispatcher_ControllerPath_Api_UserPrices' => 'onGetUserPricesApiController'
         ];
 
         foreach ($events as $event => $listener) {
