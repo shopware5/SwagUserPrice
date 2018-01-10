@@ -49,6 +49,10 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
     public function afterInit()
     {
         $this->get('loader')->registerNamespace('Shopware\SwagUserPrice', $this->Path());
+         $this->Application()->Loader()->registerNamespace(
+            'Shopware\Components',
+            $this->Path() . 'Components/'
+        );
         $this->registerCustomModels();
         $this->setupService = new Setup($this);
     }
@@ -222,7 +226,17 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
             $this->get('events')->addSubscriber($subscriber);
         }
     }
-
+    
+    public function onGetUserPricesApiController()
+    {
+        return $this->Path() . 'Controllers/Api/UserPrices.php';
+    }
+    
+    public function onGetUserPriceGroupsApiController()
+    {
+        return $this->Path() . 'Controllers/Api/UserPriceGroups.php';
+    }
+    
     /**
      * Helper method to return all the caches, that need to be
      * cleared after installing/uninstalling/enabling/disabling the plugin

@@ -1,6 +1,6 @@
 <?php
 
-class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
+class Shopware_Controllers_Api_UserPriceGroups extends Shopware_Controllers_Api_Rest
 {
     protected $resource = null;
 
@@ -9,12 +9,12 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
 	 */
     public function init()
     {
-        $this->resource = \Shopware\Components\Api\Manager::getresource('UserPrice');
+        $this->resource = \Shopware\Components\Api\Manager::getresource('UserPriceGroup');
     }
 
     /* 
 	 * Action: GET
-	 * URI: /api/userprices/
+	 * URI: /api/userpricegroups/
 	 * Result: List	
 	 */
     public function indexAction()
@@ -32,30 +32,30 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
 
     /* 
 	 * Action: GET
-	 * URI: /api/userprices/{id}
+	 * URI: /api/userpricegroups/{id}
 	 * Result: Single Item
 	 */
     public function getAction()
     {
         $id = $this->Request()->getParam('id');		
 
-		$userprice = $this->resource->getOne($id);
+		$userpricegroup = $this->resource->getOne($id);
 
-        $this->View()->assign('data', $userprice);
+        $this->View()->assign('data', $userpricegroup);
         $this->View()->assign('success', true);
     }
     
     /**
      * Action: POST
-     * URI: /api/userprices
+     * URI: /api/userpricegroups
      */
     public function postAction()
     {
-        $userprice = $this->resource->create($this->Request()->getPost());
+        $userpricegroup = $this->resource->create($this->Request()->getPost());
 
-        $location = $this->apiBaseUrl . 'userprices/' . $userprice->getId();
+        $location = $this->apiBaseUrl . 'userpricegroups/' . $userpricegroup->getId();
         $data = [
-            'id' => $userprice->getId(),
+            'id' => $userpricegroup->getId(),
             'location' => $location,
         ];
 

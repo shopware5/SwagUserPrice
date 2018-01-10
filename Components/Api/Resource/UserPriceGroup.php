@@ -3,16 +3,16 @@
 namespace Shopware\Components\Api\Resource;
 
 use Shopware\Components\Api\Exception as ApiException;
-use Shopware\CustomModels\UserPrice\Price as PriceModel;
+use Shopware\CustomModels\UserPrice\Group as GroupModel;
 
-class UserPrice extends Resource
+class UserPriceGroup extends Resource
 {
     /**
-     * @return \Shopware\Models\Document\Repository
+     * @return \Shopware\CustomModels\UserPrice\Repository
      */
     public function getRepository()
     {
-        return $this->getManager()->getRepository('Shopware\CustomModels\UserPrice\Price');
+        return $this->getManager()->getRepository('Shopware\CustomModels\UserPrice\Group');
     }
 
 
@@ -25,18 +25,18 @@ class UserPrice extends Resource
         }
 
         $builder = $this->getRepository()
-                ->createQueryBuilder('Price')
-                ->select('Price')
-                ->where('Price.id = ?1')
+                ->createQueryBuilder('priceGroup')
+                ->select('priceGroup')
+                ->where('priceGroup.id = ?1')
                 ->setParameter(1, $id);
 
-        $price = $builder->getQuery()->getOneOrNullResult($this->getResultMode());
+        $group = $builder->getQuery()->getOneOrNullResult($this->getResultMode());
 
-        if (!$price) {
-            throw new ApiException\NotFoundException("User price by id $id not found");
+        if (!$group) {
+            throw new ApiException\NotFoundException("Group by id $id not found");
         }
-		
-        return $price;
+				
+        return $group;
     }
 
     /**
@@ -50,7 +50,7 @@ class UserPrice extends Resource
     {
         $this->checkPrivilege('read');
 
-        $builder = $this->getRepository()->createQueryBuilder('Price');
+        $builder = $this->getRepository()->createQueryBuilder('priceGroup');
 
         $builder->addFilter($criteria);
         $builder->addOrderBy($orderBy);
@@ -65,29 +65,29 @@ class UserPrice extends Resource
         
         $totalResult = $paginator->count();
         
-        $prices = $paginator->getIterator()->getArrayCopy();
+        $groups = $paginator->getIterator()->getArrayCopy();
 
-        return array('data' => $prices, 'total' => $totalResult);
+        return array('data' => $groups, 'total' => $totalResult);
     }
 
 
     /**
      * @param array $params
      *
-     * @return \Shopware\CustomModels\UserPrice\Price
+     * @return \Shopware\CustomModels\UserPrice\Group
      */
     public function create(array $params)
     {
         $this->checkPrivilege('create');
 
-        $userprice = new PriceModel();
+        $userpricegroup = new GroupModel();
         //$params = $this->prepareAssociatedData($params, $userprice);
 
-        $userprice->fromArray($params);
+        $userpricegroup->fromArray($params);
 
-        $this->getManager()->persist($userprice);
+        $this->getManager()->persist($userpricegroup);
         $this->flush();
 
-        return $userprice;
+        return $userpricegroup;
     }
 }
