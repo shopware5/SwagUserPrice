@@ -64,9 +64,9 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
     }
     
     /**
-     * Update article
+     * Update user price
      *
-     * PUT /api/articles/{id}
+     * PUT /api/userprices/{id}
      */
     public function putAction()
     {
@@ -85,9 +85,9 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
     }
     
     /**
-     * Delete article
+     * Delete user price
      *
-     * DELETE /api/articles/{id}
+     * DELETE /api/userprices{id}
      */
     public function deleteAction()
     {

@@ -62,4 +62,37 @@ class Shopware_Controllers_Api_UserPriceGroups extends Shopware_Controllers_Api_
         $this->View()->assign(['success' => true, 'data' => $data]);
         $this->Response()->setHeader('Location', $location);
     }
+        
+    /**
+     * Update user price group
+     *
+     * PUT /api/userpricegroups/{id}
+     */
+    public function putAction()
+    {
+        $id = $this->Request()->getParam('id');
+        $params = $this->Request()->getPost();
+
+        $userpricegroups = $this->resource->update($id, $params);
+
+        $location = $this->apiBaseUrl . 'userpricegroups/' . $userpricegroups->getId();
+        $data = [
+            'id' => $userpricegroups->getId(),
+            'location' => $location,
+        ];
+
+        $this->View()->assign(['success' => true, 'data' => $data]);
+    }
+    
+    /**
+     * Delete user price group
+     *
+     * DELETE /api/userpricegroups{id}
+     */
+    public function deleteAction()
+    {
+        $id = $this->Request()->getParam('id');
+        $this->resource->delete($id);
+        $this->View()->assign(['success' => true]);
+    }
 }

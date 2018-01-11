@@ -5,7 +5,7 @@ namespace Shopware\Components\Api\Resource;
 use Shopware\Components\Api\Exception as ApiException;
 use Shopware\CustomModels\UserPrice\Group as GroupModel;
 
-class UserPriceGroup extends Resource
+class UserPriceGroup extends Resource implements BatchInterface
 {
     /**
      * @return \Shopware\CustomModels\UserPrice\Repository
@@ -89,5 +89,92 @@ class UserPriceGroup extends Resource
         $this->flush();
 
         return $userpricegroup;
+    }
+        
+    /**
+     * @param int $id
+     * @param array $params
+     *
+     * @return \Shopware\CustomModels\UserPrice\Group
+     */
+    public function update($id, array $params)
+    {        
+        $this->checkPrivilege('update');
+        
+        if (empty($id)) {
+            throw new InvalidArgumentException('Id is missing!');
+        }
+                
+        $userpricegroup = $this->getManager()->find(GroupModel::class, $id);
+        
+        if (isset($params['name'])) {
+            $userpricegroup->setName($params['name']);
+        }
+        if (isset($params['gros'])) {
+            $userpricegroup->setGros($params['gros']);
+        }
+        if (isset($params['active'])) {
+            $userpricegroup->setActive($params['active']);
+        }
+        
+        $userpricegroup->fromArray($params);
+        
+        //$this->getManager()->persist($userprice);
+        $this->flush();
+
+        return $userpricegroup;
+    }
+        
+    
+    /**
+     * Deletes a group by a given id.
+     *
+     * @param $id
+     * @return \Shopware\CustomModels\UserPrice\Group
+     */
+    public function delete($id)
+    {
+        $this->checkPrivilege('delete');
+        
+        if (empty($id)) {
+            throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
+        }
+        $model = $this->getManager()->find(GroupModel::class, $id);
+        if (!$model) {
+            throw new \Doctrine\ORM\EntityNotFoundException("UserPriceGroup by id $id not found");
+        }
+
+        $this->getManager()->remove($model);
+
+        $this->getManager()->flush();
+
+        return $model;
+    }    
+        
+
+    /**
+     * Returns the primary ID of any data set.
+     *
+     * {@inheritdoc}
+     */
+    public function getIdByData($data)
+    {
+        $id = null;
+
+        if (isset($data['id'])) {
+            $id = $data['id'];
+        }
+
+        if (!$id) {
+            return false;
+        }
+
+        $model = $this->getManager()->find('Shopware\CustomModels\UserPrice\Group', $id);
+
+        if ($model) {
+            return $id;
+        }
+
+        return false;
     }
 }

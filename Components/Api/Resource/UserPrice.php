@@ -14,7 +14,7 @@ class UserPrice extends Resource implements BatchInterface
 {
 
     /**
-     * @return \Shopware\Models\Document\Repository
+     * @return \Shopware\CustomModels\UserPrice\Repository
      */
     public function getRepository()
     {
@@ -121,6 +121,7 @@ class UserPrice extends Resource implements BatchInterface
     
     
     /**
+     * @param int $id
      * @param array $params
      *
      * @return \Shopware\CustomModels\UserPrice\Price
@@ -171,12 +172,12 @@ class UserPrice extends Resource implements BatchInterface
     }
     
     
-        /**
+     /**
      * @param array|null $data
      *
      * @throws ApiException\CustomValidationException
      *
-     * @return null|AddressModel
+     * @return null|\Shopware\CustomModels\UserPrice\Group
      */
     private function createPriceGroup(array $data = null)
     {
@@ -194,7 +195,7 @@ class UserPrice extends Resource implements BatchInterface
     /**
      * Deletes a price by a given id.
      *
-     * @param $params
+     * @param $id
      * @return \Shopware\CustomModels\UserPrice\Price
      */
     public function delete($id)
