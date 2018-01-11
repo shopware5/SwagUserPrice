@@ -2,11 +2,16 @@
 
 namespace Shopware\Components\Api\Resource;
 
+use Shopware\Components\DependencyInjection\Container;
 use Shopware\Components\Api\Exception as ApiException;
+use Shopware\Models\Article\Article;
+use Shopware\Models\Article\Detail;
 use Shopware\CustomModels\UserPrice\Price as PriceModel;
+use Shopware\CustomModels\UserPrice\Group;
 
 class UserPrice extends Resource
 {
+
     /**
      * @return \Shopware\Models\Document\Repository
      */
@@ -77,17 +82,84 @@ class UserPrice extends Resource
      * @return \Shopware\CustomModels\UserPrice\Price
      */
     public function create(array $params)
-    {
+    {        
         $this->checkPrivilege('create');
+        
+        $priceGroupId = $params['priceGroupId'];
+        $articleId = $params['articleId'];
+        $articleDetailId = $params['articleDetailsId'];
 
-        $userprice = new PriceModel();
-        //$params = $this->prepareAssociatedData($params, $userprice);
+        if (!$priceGroupId) {
+            throw new InvalidArgumentException('Price group id is missing!');
+        }
 
+        if (!$articleId) {
+            throw new InvalidArgumentException('Article id is missing!');
+        }
+
+        if (!$articleDetailId) {
+            throw new InvalidArgumentException('Article detail id is missing!');
+        }
+        
+        $userprice = new PriceModel($params);
+        
+        $priceGroup = $this->getManager()->find(Group::class, $priceGroupId);
+        $article = $this->getManager()->find(Article::class, $articleId);
+        $detail = $this->getManager()->find(Detail::class, $articleDetailId);
+        $userprice->setPriceGroup($priceGroup);
+        $userprice->setArticle($article);
+        $userprice->setDetail($detail);
+        
         $userprice->fromArray($params);
-
+        
         $this->getManager()->persist($userprice);
         $this->flush();
 
         return $userprice;
+    }
+    
+        /**
+     * @param array|null $data
+     *
+     * @throws ApiException\CustomValidationException
+     *
+     * @return null|AddressModel
+     */
+    private function createPriceGroup(array $data = null)
+    {
+        if (empty($data)) {
+            return null;
+        }
+
+        $priceGroup = new Group();
+        $priceGroup->fromArray($data);
+
+        return $priceGroup;
+    }
+    
+    
+    /**
+     * Deletes a price by a given id.
+     *
+     * @param $params
+     * @return \Shopware\CustomModels\UserPrice\Price
+     */
+    public function delete($params)
+    {
+        $this->checkPrivilege('delete');
+        
+        if (!$id = $params['id']) {
+            throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
+        }
+        $model = $this->getManager()->find(PriceModel::class, $params['id']);
+        if (!$model) {
+            throw new \Doctrine\ORM\EntityNotFoundException("UserPrice by id $id not found");
+        }
+
+        $this->getManager()->remove($model);
+
+        $this->getManager()->flush();
+
+        return $model;
     }
 }

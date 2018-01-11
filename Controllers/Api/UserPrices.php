@@ -62,4 +62,16 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
         $this->View()->assign(['success' => true, 'data' => $data]);
         $this->Response()->setHeader('Location', $location);
     }
+    
+    /**
+     * Delete article
+     *
+     * DELETE /api/articles/{id}
+     */
+    public function deleteAction()
+    {
+        $id = $this->Request()->getParam('id');
+        $this->resource->delete($id);
+        $this->View()->assign(['success' => true]);
+    }
 }
