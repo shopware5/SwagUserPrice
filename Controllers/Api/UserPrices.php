@@ -64,6 +64,27 @@ class Shopware_Controllers_Api_UserPrices extends Shopware_Controllers_Api_Rest
     }
     
     /**
+     * Update article
+     *
+     * PUT /api/articles/{id}
+     */
+    public function putAction()
+    {
+        $id = $this->Request()->getParam('id');
+        $params = $this->Request()->getPost();
+
+        $userprice = $this->resource->update($id, $params);
+
+        $location = $this->apiBaseUrl . 'userprices/' . $userprice->getId();
+        $data = [
+            'id' => $userprice->getId(),
+            'location' => $location,
+        ];
+
+        $this->View()->assign(['success' => true, 'data' => $data]);
+    }
+    
+    /**
      * Delete article
      *
      * DELETE /api/articles/{id}

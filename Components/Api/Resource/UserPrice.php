@@ -4,12 +4,13 @@ namespace Shopware\Components\Api\Resource;
 
 use Shopware\Components\DependencyInjection\Container;
 use Shopware\Components\Api\Exception as ApiException;
+use Shopware\Components\Api\BatchInterface;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Detail;
 use Shopware\CustomModels\UserPrice\Price as PriceModel;
 use Shopware\CustomModels\UserPrice\Group;
 
-class UserPrice extends Resource
+class UserPrice extends Resource implements BatchInterface
 {
 
     /**
@@ -118,6 +119,58 @@ class UserPrice extends Resource
         return $userprice;
     }
     
+    
+    /**
+     * @param array $params
+     *
+     * @return \Shopware\CustomModels\UserPrice\Price
+     */
+    public function update($id, array $params)
+    {        
+        $this->checkPrivilege('update');
+        
+        if (empty($id)) {
+            throw new InvalidArgumentException('Id is missing!');
+        }
+        
+        $priceGroupId = $params['priceGroupId'];
+        $articleId = $params['articleId'];
+        $articleDetailId = $params['articleDetailsId'];
+        
+        $userprice = $this->getManager()->find(PriceModel::class, $id);
+        
+        if (isset($params['price'])) {
+            $userprice->setPrice($params['price']);
+        }
+        if (isset($params['from'])) {
+            $userprice->setFrom($params['from']);
+        }
+        if (isset($params['to'])) {
+            $userprice->setTo($params['to']);
+        }
+        
+        if ($priceGroupId) {
+            $priceGroup = $this->getManager()->find(Group::class, $priceGroupId);
+            $userprice->setPriceGroup($priceGroup);
+        }
+        if ($articleId) {
+            $article = $this->getManager()->find(Article::class, $articleId);
+            $userprice->setArticle($article);
+        }
+        if ($articleDetailId) {
+            $detail = $this->getManager()->find(Detail::class, $articleDetailId);
+            $userprice->setDetail($detail);
+        }
+        
+        $userprice->fromArray($params);
+        
+        //$this->getManager()->persist($userprice);
+        $this->flush();
+
+        return $userprice;
+    }
+    
+    
         /**
      * @param array|null $data
      *
@@ -161,5 +214,32 @@ class UserPrice extends Resource
         $this->getManager()->flush();
 
         return $model;
+    }
+    
+
+    /**
+     * Returns the primary ID of any data set.
+     *
+     * {@inheritdoc}
+     */
+    public function getIdByData($data)
+    {
+        $id = null;
+
+        if (isset($data['id'])) {
+            $id = $data['id'];
+        }
+
+        if (!$id) {
+            return false;
+        }
+
+        $model = $this->getManager()->find('Shopware\CustomModels\UserPrice\Price', $id);
+
+        if ($model) {
+            return $id;
+        }
+
+        return false;
     }
 }
