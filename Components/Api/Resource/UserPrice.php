@@ -197,14 +197,14 @@ class UserPrice extends Resource implements BatchInterface
      * @param $params
      * @return \Shopware\CustomModels\UserPrice\Price
      */
-    public function delete($params)
+    public function delete($id)
     {
         $this->checkPrivilege('delete');
         
-        if (!$id = $params['id']) {
+        if (empty($id)) {
             throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
         }
-        $model = $this->getManager()->find(PriceModel::class, $params['id']);
+        $model = $this->getManager()->find(PriceModel::class, $id);
         if (!$model) {
             throw new \Doctrine\ORM\EntityNotFoundException("UserPrice by id $id not found");
         }
