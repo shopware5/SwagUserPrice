@@ -3,6 +3,7 @@
 namespace Shopware\Components\Api\Resource;
 
 use Shopware\Components\Api\Exception as ApiException;
+use Shopware\Components\Api\BatchInterface;
 use Shopware\CustomModels\UserPrice\Group as GroupModel;
 
 class UserPriceGroup extends Resource implements BatchInterface
