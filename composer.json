@@ -1,0 +1,9 @@
+{
+  "name": "shopwareLabs/swag-user-price",
+  "type": "shopware-plugin",
+  "description": "Customer specific prices in Shopware",
+  "license": "MIT",
+  "extra": {
+    "installer-name": "SwagUserPrice"
+  }
+}
