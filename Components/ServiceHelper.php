@@ -61,7 +61,7 @@ class ServiceHelper
      */
     public function getPrices($number)
     {
-        return $this->getPricesQueryBuilder($number)->execute()->fetchAll();
+        return $this->getPricesQueryBuilder($number)->orderBy('prices.from', 'ASC')->execute()->fetchAll();
     }
 
     /**
