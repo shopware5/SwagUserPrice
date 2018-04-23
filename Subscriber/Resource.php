@@ -9,6 +9,8 @@
 namespace Shopware\SwagUserPrice\Subscriber;
 
 use Enlight\Event\SubscriberInterface;
+use Shopware\Components\DependencyInjection\Container;
+use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 use Shopware\SwagUserPrice\Components;
 
 /**
@@ -17,11 +19,24 @@ use Shopware\SwagUserPrice\Components;
  * This subscriber registers the custom-resources, which are used in this plugin.
  *
  * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
+ *
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Resource implements SubscriberInterface
 {
+    /**
+     * @var Container
+     */
+    private $container;
+
+    /**
+     * @param Container $container
+     */
+    public function __construct(Container $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * Method to subscribe all needed events.
      *
@@ -32,8 +47,17 @@ class Resource implements SubscriberInterface
         return [
             'Enlight_Bootstrap_InitResource_swaguserprice.userprice' => 'onGetUserPriceComponent',
             'Enlight_Bootstrap_InitResource_swaguserprice.accessvalidator' => 'onGetAccessValidator',
-            'Enlight_Bootstrap_InitResource_swaguserprice.servicehelper' => 'onGetServiceHelper'
+            'Enlight_Bootstrap_InitResource_swaguserprice.servicehelper' => 'onGetServiceHelper',
+            'Enlight_Bootstrap_InitResource_swaguserprice.dependency_provider' => 'onGetDependencyProvider',
         ];
+    }
+
+    /**
+     * @return DependencyProvider
+     */
+    public function onGetDependencyProvider()
+    {
+        return new DependencyProvider($this->container);
     }
 
     /**
