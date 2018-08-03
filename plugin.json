@@ -8,10 +8,11 @@
     "link": "http://store.shopware.com",
     "author": "shopware AG",
 
-    "currentVersion": "2.2.2",
+    "currentVersion": "2.3.0",
 
     "changelog": {
         "de": {
+            "2.3.0": "PT-9181 - 5.5 Kompatibilität;",
             "2.2.2": "PT-9044 - Sortierung der Staffelpreise korrigiert; PT-9097 - Caching verbessert;",
             "2.2.1": "PT-9041 - Composer Typ korrigiert;",
             "2.2.0": "PT-8810 - 5.4 Kompatibilität;",
@@ -24,6 +25,7 @@
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.3.0": "PT-9181 - 5.5 compatibility;",
             "2.2.2": "PT-9044 - Fix sorting of block prices; PT-9097 - Improve caching;",
             "2.2.1": "PT-9041 - Fix composer type;",
             "2.2.0": "PT-8810 - Added 5.4 compatibility;",
