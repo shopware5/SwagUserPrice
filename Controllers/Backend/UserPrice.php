@@ -5,13 +5,12 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
-use Shopware\Models\Attribute\Customer as CustomerAttribute;
-use Shopware\Models\Customer\Customer;
 use Shopware\CustomModels\UserPrice\Group;
+use Shopware\CustomModels\UserPrice\Price;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Detail;
-use Shopware\CustomModels\UserPrice\Price;
+use Shopware\Models\Attribute\Customer as CustomerAttribute;
+use Shopware\Models\Customer\Customer;
 
 /**
  * Plugin backend-controller class.
@@ -19,25 +18,23 @@ use Shopware\CustomModels\UserPrice\Price;
  * The Shopware_Controllers_Backend_UserPrice class is the backend controller class.
  *
  * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
+ *
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backend_ExtJs
 {
     /**
-     * @var $userPriceRepository \Shopware\CustomModels\UserPrice\Repository
+     * @var \Shopware\CustomModels\UserPrice\Repository
      */
     protected $userPriceRepository;
 
     /**
-     * @var $entityManager Shopware\Components\Model\ModelManager
+     * @var Shopware\Components\Model\ModelManager
      */
     protected $entityManager;
 
     /**
      * Disable template engine for most actions
-     *
-     * @return void
      */
     public function preDispatch()
     {
@@ -65,32 +62,6 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
         $this->addAclPermission('updatePrice', 'editPrices', 'Insufficient Permissions');
         $this->addAclPermission('deletePrice', 'editPrices', 'Insufficient Permissions');
-    }
-
-    /**
-     * @return Shopware\Components\Model\ModelManager
-     */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->get('models');
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * Returns the repository.
-     *
-     * @return Shopware\CustomModels\UserPrice\Repository
-     */
-    private function getRepository()
-    {
-        if ($this->userPriceRepository === null) {
-            $this->userPriceRepository = $this->getEntityManager()->getRepository(Group::class);
-        }
-
-        return $this->userPriceRepository;
     }
 
     /**
@@ -221,10 +192,37 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
+     * @return Shopware\Components\Model\ModelManager
+     */
+    private function getEntityManager()
+    {
+        if ($this->entityManager === null) {
+            $this->entityManager = $this->get('models');
+        }
+
+        return $this->entityManager;
+    }
+
+    /**
+     * Returns the repository.
+     *
+     * @return Shopware\CustomModels\UserPrice\Repository
+     */
+    private function getRepository()
+    {
+        if ($this->userPriceRepository === null) {
+            $this->userPriceRepository = $this->getEntityManager()->getRepository(Group::class);
+        }
+
+        return $this->userPriceRepository;
+    }
+
+    /**
      * Reads the groups and its total-count.
      * It supports searching- and paging-functions.
      *
      * @param $params
+     *
      * @return array
      */
     private function getGroups($params)
@@ -261,6 +259,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Otherwise the group with the given id will be edited.
      *
      * @param $params
+     *
      * @return array
      */
     private function handleEdit($params)
@@ -300,6 +299,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
      *
      * @param $params
+     *
      * @return array
      */
     private function handleDeletion($params)
@@ -321,7 +321,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
                 //We also need to delete the attribute-entries
                 $attrModels = $this->getEntityManager()->getRepository(CustomerAttribute::class)->findBy([
-                    'swagPricegroup' => $record['id']
+                    'swagPricegroup' => $record['id'],
                 ]);
 
                 foreach ($attrModels as $attr) {
@@ -331,7 +331,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
                 //We also need to delete the assigned prices
                 $priceModels = $this->getEntityManager()->getRepository(Price::class)->findBy([
-                    'priceGroupId' => $record['id']
+                    'priceGroupId' => $record['id'],
                 ]);
 
                 foreach ($priceModels as $price) {
@@ -360,6 +360,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * It supports searching- and paging-functions.
      *
      * @param $params
+     *
      * @return array
      */
     private function getCustomers($params)
@@ -368,10 +369,10 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $search = '';
             $groupId = null;
             foreach ($this->Request()->getParam('filter') as $filter) {
-                if ($filter['property'] == 'priceGroup') {
+                if ($filter['property'] === 'priceGroup') {
                     $groupId = $filter['value'];
                 } else {
-                    if ($filter['property'] == 'searchValue') {
+                    if ($filter['property'] === 'searchValue') {
                         $search = $filter['value'];
                     }
                 }
@@ -388,7 +389,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             return [
                 'success' => true,
                 'total' => $this->getEntityManager()->getQueryCount($query),
-                'data' => $query->getArrayResult()
+                'data' => $query->getArrayResult(),
             ];
         } catch (Exception $e) {
             return ['success' => false, 'msg' => $e->getMessage()];
@@ -399,6 +400,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Adds a customer to a group.
      *
      * @param $params
+     *
      * @return array
      */
     private function addCustomer($params)
@@ -432,6 +434,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Removes a customer from a given group.
      *
      * @param $params
+     *
      * @return array
      */
     private function removeCustomer($params)
@@ -470,6 +473,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * It supports searching- and paging-functions.
      *
      * @param $params
+     *
      * @return array
      */
     private function getArticles($params)
@@ -581,7 +585,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
                 $data[] = [
                     'from' => $from,
-                    'to' => $namespace->get('prices/any', 'Arbitrary')
+                    'to' => $namespace->get('prices/any', 'Arbitrary'),
                 ];
             }
 
@@ -595,6 +599,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Updates the price for a specific article in a specific group.
      *
      * @param $params
+     *
      * @return array
      */
     private function updatePrice($params)
@@ -668,6 +673,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Deletes a price by a given id.
      *
      * @param $params
+     *
      * @return array
      */
     private function deletePrice($params)
@@ -696,6 +702,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Checks if an array is multi-dimensional.
      *
      * @param $array
+     *
      * @return bool
      */
     private function isMultiDimensional($array)
@@ -710,6 +717,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * If the price is then set to null, the user might want to remove this price.
      *
      * @param array $params
+     *
      * @return bool
      */
     private function shouldRemovePrice(array $params)
