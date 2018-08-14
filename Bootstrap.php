@@ -8,6 +8,10 @@
 use Shopware\SwagUserPrice\Bootstrap\Setup;
 use Shopware\SwagUserPrice\Bundle\SearchBundleDBAL\PriceHelper;
 use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
+use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
+use Shopware\SwagUserPrice\Components\AccessValidator;
+use Shopware\SwagUserPrice\Components\ServiceHelper;
+use Shopware\SwagUserPrice\Components\UserPrice;
 use Shopware\SwagUserPrice\Subscriber;
 
 /**
@@ -204,6 +208,39 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
 
         $userPriceService = new Core\GraduatedUserPricesService($coreService, $validator, $helper);
         Shopware()->Container()->set('shopware_storefront.graduated_prices_service', $userPriceService);
+    }
+
+
+    /**
+     * @return DependencyProvider
+     */
+    public function onGetDependencyProvider()
+    {
+        return new DependencyProvider($this->get('service_container'));
+    }
+
+    /**
+     * @return UserPrice
+     */
+    public function onGetUserPriceComponent()
+    {
+        return new UserPrice();
+    }
+
+    /**
+     * @return AccessValidator
+     */
+    public function onGetAccessValidator()
+    {
+        return new AccessValidator();
+    }
+
+    /**
+     * @return ServiceHelper
+     */
+    public function onGetServiceHelper()
+    {
+        return new ServiceHelper();
     }
 
     /**

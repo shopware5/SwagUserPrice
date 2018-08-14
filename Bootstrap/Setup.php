@@ -113,6 +113,10 @@ class Setup
             'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
             'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService',
+            'Enlight_Bootstrap_InitResource_swaguserprice.userprice' => 'onGetUserPriceComponent',
+            'Enlight_Bootstrap_InitResource_swaguserprice.accessvalidator' => 'onGetAccessValidator',
+            'Enlight_Bootstrap_InitResource_swaguserprice.servicehelper' => 'onGetServiceHelper',
+            'Enlight_Bootstrap_InitResource_swaguserprice.dependency_provider' => 'onGetDependencyProvider',
         ];
 
         foreach ($events as $event => $listener) {
