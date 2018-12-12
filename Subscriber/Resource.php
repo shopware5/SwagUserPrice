@@ -46,8 +46,6 @@ class Resource implements SubscriberInterface
     {
         return [
             'Enlight_Bootstrap_InitResource_swaguserprice.userprice' => 'onGetUserPriceComponent',
-            'Enlight_Bootstrap_InitResource_swaguserprice.accessvalidator' => 'onGetAccessValidator',
-            'Enlight_Bootstrap_InitResource_swaguserprice.servicehelper' => 'onGetServiceHelper',
             'Enlight_Bootstrap_InitResource_swaguserprice.dependency_provider' => 'onGetDependencyProvider',
         ];
     }
@@ -66,21 +64,5 @@ class Resource implements SubscriberInterface
     public function onGetUserPriceComponent()
     {
         return new Components\UserPrice();
-    }
-
-    /**
-     * @return Components\AccessValidator
-     */
-    public function onGetAccessValidator()
-    {
-        return new Components\AccessValidator();
-    }
-
-    /**
-     * @return Components\ServiceHelper
-     */
-    public function onGetServiceHelper()
-    {
-        return new Components\ServiceHelper();
     }
 }

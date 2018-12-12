@@ -9,6 +9,7 @@ use Shopware\SwagUserPrice\Bootstrap\Setup;
 use Shopware\SwagUserPrice\Bundle\SearchBundleDBAL\PriceHelper;
 use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 use Shopware\SwagUserPrice\Subscriber;
+use Shopware\SwagUserPrice\Components;
 
 /**
  * Plugin bootstrap class.
@@ -227,6 +228,22 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
         foreach ($subscribers as $subscriber) {
             $this->get('events')->addSubscriber($subscriber);
         }
+    }
+
+    /**
+     * @return Components\AccessValidator
+     */
+    public function onGetAccessValidator()
+    {
+        return new Components\AccessValidator();
+    }
+
+    /**
+     * @return Components\ServiceHelper
+     */
+    public function onGetServiceHelper()
+    {
+        return new Components\ServiceHelper();
     }
 
     /**
