@@ -96,9 +96,14 @@ class Hooks implements SubscriberInterface
     public function onFrontendLogin()
     {
         if ($this->cachePluginActive()) {
-            /** @var CachePluginBootstrap $cache */
-            $cache = $this->bootstrap->get('plugins')->Core()->HttpCache();
-            $cache->setNoCacheTag('price');
+            $session = $this->bootstrap->get('swaguserprice.dependency_provider')->getSession();
+            $userId = (int)$session->get('sUserId', 0);
+            $result = $this->getCustomerPriceGroupId($userId);
+            if ($result !== 0) {
+                /** @var CachePluginBootstrap $cache */
+                $cache = $this->bootstrap->get('plugins')->Core()->HttpCache();
+                $cache->setNoCacheTag('price');
+            }
         }
     }
 
@@ -117,5 +122,21 @@ class Hooks implements SubscriberInterface
         }
 
         return false;
+    }
+
+    /**
+     * @param int $userId
+     *
+     * @return int
+     */
+    private function getCustomerPriceGroupId($userId)
+    {
+        return (int) $this->bootstrap->get('dbal_connection')->createQueryBuilder()
+            ->select('swag_pricegroup')
+            ->from('s_user_attributes')
+            ->where('userID = :userId')
+            ->setParameter('userId', $userId)
+            ->execute()
+            ->fetch(\PDO::FETCH_COLUMN);
     }
 }
