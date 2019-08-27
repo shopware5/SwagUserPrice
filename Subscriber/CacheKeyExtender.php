@@ -47,23 +47,23 @@ class CacheKeyExtender implements SubscriberInterface
     /**
      * @return string
      */
-    public function onCreateCacheHash()
+    public function onCreateCacheHash(\Enlight_Event_EventArgs $args)
     {
-        $priceGroup = 0;
+        $originalHash = $args->getReturn();
 
         if (!$this->dependencyProvider->hasShop()) {
-            return json_encode(['swag_user_price_group' => $priceGroup]);
+            return $originalHash;
         }
 
         $session = $this->dependencyProvider->getSession();
         $userId = (int)$session->get('sUserId', 0);
-        $result = $this->getCustomerPriceGroupId($userId);
+        $priceGroup = $this->getCustomerPriceGroupId($userId);
 
-        if ($result !== 0) {
-            $priceGroup = $result;
+        if ($priceGroup === 0) {
+            return $originalHash;
         }
 
-        return json_encode(['swag_user_price_group' => $priceGroup]);
+        return json_encode(['original_hash' => $originalHash, 'swag_user_price_group' => $priceGroup]);
     }
 
     /**
