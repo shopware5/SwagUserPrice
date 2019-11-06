@@ -88,8 +88,8 @@ class AccessValidator
             ->innerJoin(
                 'prices',
                 's_plugin_pricegroups',
-                'groups',
-                'groups.id = prices.pricegroup'
+                'pricegroups',
+                'pricegroups.id = prices.pricegroup'
             )->innerJoin(
                 'prices',
                 's_user_attributes',
@@ -102,7 +102,7 @@ class AccessValidator
                 'user.id = attributes.userID'
             )->where('user.id = :id')
             ->andWhere('prices.articledetailsID = :detailId')
-            ->andWhere('groups.active = 1')
+            ->andWhere('pricegroups.active = 1')
             ->setParameters(
                 [
                     'id' => $userId,
