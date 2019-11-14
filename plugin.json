@@ -8,10 +8,11 @@
     "link": "http://store.shopware.com",
     "author": "shopware AG",
 
-    "currentVersion": "2.3.1",
+    "currentVersion": "2.3.2",
 
     "changelog": {
         "de": {
+            "2.3.2": "PT-10803 - Kompatibilität mit MySQL 8 verbessert;",
             "2.3.1": "PT-10528 - Optimiert das Generieren des Cache Hashes;",
             "2.3.0": "PT-9181 - 5.5 Kompatibilität;",
             "2.2.2": "PT-9044 - Sortierung der Staffelpreise korrigiert; PT-9097 - Caching verbessert;",
@@ -26,6 +27,7 @@
             "1.0.3": "Korrigiert falsche Kodierung; PT-2388: Korrigiert Nutzung von SSL im Backend; PT-2552: Superglobale REQUEST Variable ersetzt; PT-2614 Korrektur: Cache-Kompatibilität"
         },
         "en": {
+            "2.3.2": "PT-10803 - Improved compatibility with MySQL 8;",
             "2.3.1": "PT-10528 - Optimize cache hash generation;",
             "2.3.0": "PT-9181 - 5.5 compatibility;",
             "2.2.2": "PT-9044 - Fix sorting of block prices; PT-9097 - Improve caching;",
