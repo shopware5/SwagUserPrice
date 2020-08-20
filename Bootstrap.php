@@ -5,7 +5,6 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-
 use Shopware\SwagUserPrice\Bootstrap\Setup;
 use Shopware\SwagUserPrice\Bundle\SearchBundleDBAL\PriceHelper;
 use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
@@ -72,8 +71,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function install()
     {
-        if (!$this->assertMinimumVersion('5.2.0')) {
-            throw new RuntimeException('This plugin requires Shopware 5.2.0 or a later version');
+        if (!$this->assertMinimumVersion('5.5.0')) {
+            throw new RuntimeException('This plugin requires Shopware 5.5.0 or a later version');
         }
 
         $this->setupService->install();
@@ -92,8 +91,8 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function update($oldVersion)
     {
-        if (!$this->assertMinimumVersion('5.2.0')) {
-            throw new RuntimeException('This plugin requires Shopware 5.2.0 or a later version');
+        if (!$this->assertMinimumVersion('5.5.0')) {
+            throw new RuntimeException('This plugin requires Shopware 5.5.0 or a later version');
         }
 
         return $this->setupService->update($oldVersion);
@@ -216,17 +215,24 @@ class Shopware_Plugins_Backend_SwagUserPrice_Bootstrap extends Shopware_Componen
      */
     public function onStartDispatch()
     {
+        $this->get('events')->addSubscriber(
+            new Subscriber\Resource($this->get('service_container'))
+        );
+
         $subscribers = [
             new Subscriber\ControllerPath($this->Path()),
             new Subscriber\Hooks($this),
-            new Subscriber\Resource(),
+            new Subscriber\CacheKeyExtender(
+                $this->get('dbal_connection'),
+                $this->get('swaguserprice.dependency_provider')
+            ),
         ];
 
         foreach ($subscribers as $subscriber) {
             $this->get('events')->addSubscriber($subscriber);
         }
     }
-    
+
     public function onGetUserPricesApiController()
     {
         return $this->Path() . 'Controllers/Api/UserPrices.php';

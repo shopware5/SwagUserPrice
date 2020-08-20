@@ -19,7 +19,7 @@ use Shopware\Models\Customer\Customer;
  * It reads all necessary information from the custom-tables and returns the query/query-builder.
  *
  * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
+ *
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Repository extends ModelRepository
@@ -28,9 +28,10 @@ class Repository extends ModelRepository
      * Returns the query to read all groups.
      *
      * @param string $filter
-     * @param int $start
-     * @param int $limit
-     * @param null $sort
+     * @param int    $start
+     * @param int    $limit
+     * @param null   $sort
+     *
      * @return \Doctrine\ORM\Query
      */
     public function getGroupsQuery($filter = '', $start = 0, $limit = 20, $sort = null)
@@ -49,6 +50,7 @@ class Repository extends ModelRepository
      *
      * @param $filter
      * @param $sort
+     *
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getGroupsQueryBuilder($filter, $sort)
@@ -60,7 +62,7 @@ class Repository extends ModelRepository
                 'priceGroup.id as id',
                 'priceGroup.name as name',
                 'priceGroup.gross as gross',
-                'priceGroup.active as active'
+                'priceGroup.active as active',
             ]
         )->from(
             $this->getEntityName(),
@@ -83,10 +85,11 @@ class Repository extends ModelRepository
      * Returns the query to read all customers.
      *
      * @param string $filter
-     * @param int $start
-     * @param int $limit
-     * @param null $sort
-     * @param null $groupId
+     * @param int    $start
+     * @param int    $limit
+     * @param null   $sort
+     * @param null   $groupId
+     *
      * @return \Doctrine\ORM\Query
      */
     public function getCustomersQuery($filter = '', $start = 0, $limit = 20, $sort = null, $groupId = null)
@@ -113,6 +116,7 @@ class Repository extends ModelRepository
      *
      * @param $filter
      * @param $sort
+     *
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getCustomersQueryBuilder($filter, $sort)
@@ -125,14 +129,14 @@ class Repository extends ModelRepository
                 'customer.number as number',
                 'customer.groupKey as groupKey',
                 'billing.company as company',
-                'billing.firstName as firstName',
-                'billing.lastName as lastName'
+                'billing.firstname as firstName',
+                'billing.lastname as lastName',
             ]
         )->from(
             Customer::class,
             'customer'
         )->join(
-            'customer.billing',
+            'customer.defaultBillingAddress',
             'billing'
         )
         ->leftJoin(
@@ -142,13 +146,13 @@ class Repository extends ModelRepository
 
         if (!empty($filter)) {
             $builder->andWhere('customer.number LIKE ?1')
-                ->orWhere('billing.firstName LIKE ?2')
-                ->orWhere('billing.lastName LIKE ?2')
+                ->orWhere('billing.firstname LIKE ?2')
+                ->orWhere('billing.lastname LIKE ?2')
                 ->orWhere('customer.email LIKE ?2')
                 ->orWhere('customer.groupKey LIKE ?2')
                 ->orWhere('billing.company LIKE ?2')
                 ->orWhere('billing.city LIKE ?2')
-                ->orWhere('billing.zipCode LIKE ?1')
+                ->orWhere('billing.zipcode LIKE ?1')
                 ->setParameter(
                     1,
                     $filter . '%'
@@ -162,7 +166,6 @@ class Repository extends ModelRepository
         }
         $builder->addOrderBy('customer.number', 'ASC');
 
-
         return $builder;
     }
 
@@ -170,11 +173,12 @@ class Repository extends ModelRepository
      * Returns the query to read all articles and its custom user-prices, if there are any.
      *
      * @param string $filter
-     * @param int $start
-     * @param int $limit
-     * @param null $sort
-     * @param bool $main
-     * @param null $groupId
+     * @param int    $start
+     * @param int    $limit
+     * @param null   $sort
+     * @param bool   $main
+     * @param null   $groupId
+     *
      * @return mixed
      */
     public function getArticlesQuery(
@@ -200,6 +204,7 @@ class Repository extends ModelRepository
      * @param $sort
      * @param $main
      * @param $groupId
+     *
      * @return mixed
      */
     public function getArticlesQueryBuilder($filter, $start, $limit, $sort, $main, $groupId)
@@ -215,7 +220,7 @@ class Repository extends ModelRepository
                 'detail.ordernumber as number',
                 'aPrices.price as defaultPrice',
                 'prices.price as current',
-                'tax.tax as tax'
+                'tax.tax as tax',
             ]
         )->groupBy('detail.id');
 
@@ -254,8 +259,9 @@ class Repository extends ModelRepository
      * Returns the query to read the total count of articles with prices assigned.
      *
      * @param string $filter
-     * @param bool $main
-     * @param null $groupId
+     * @param bool   $main
+     * @param null   $groupId
+     *
      * @return mixed
      */
     public function getArticlesCountQuery($filter = '', $main = false, $groupId = null)
@@ -271,6 +277,7 @@ class Repository extends ModelRepository
      * @param $filter
      * @param $main
      * @param $groupId
+     *
      * @return mixed
      */
     public function getArticlesCountQueryBuilder($filter, $main, $groupId)
@@ -304,6 +311,7 @@ class Repository extends ModelRepository
      *
      * @param QueryBuilder $builder
      * @param $groupId
+     *
      * @return QueryBuilder
      */
     public function buildGetArticleQuery(QueryBuilder $builder, $groupId)
@@ -330,7 +338,6 @@ class Repository extends ModelRepository
             'prices.articledetailsID = detail.id AND prices.pricegroup = :group'
         );
 
-
         $builder->setParameter('group', $groupId);
 
         return $builder;
@@ -341,6 +348,7 @@ class Repository extends ModelRepository
      *
      * @param null $detailId
      * @param null $groupId
+     *
      * @return \Doctrine\ORM\Query
      */
     public function getPricesQuery($detailId = null, $groupId = null)
@@ -355,6 +363,7 @@ class Repository extends ModelRepository
      *
      * @param $detailId
      * @param $groupId
+     *
      * @return \Doctrine\ORM\QueryBuilder
      */
     public function getPricesQueryBuilder($detailId, $groupId)
@@ -369,7 +378,7 @@ class Repository extends ModelRepository
                 'prices.to',
                 'prices.price',
                 'prices.articleId',
-                'prices.articleDetailsId'
+                'prices.articleDetailsId',
             ]
         )->from(
             Price::class,
