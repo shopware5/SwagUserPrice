@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/menu.xsd">
+
+    <entries>
+        <entry>
+            <name>Customer-specific prices</name>
+            <label lang="en">Customer-specific prices</label>
+            <label lang="de">Kunden-Spezifische Preise</label>
+            <controller>UserPrice</controller>
+            <action>index</action>
+            <class>sprite-user--list</class>
+            <parent identifiedBy="label">Kunden</parent>
+        </entry>
+    </entries>
+</menu>

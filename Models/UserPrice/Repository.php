@@ -6,9 +6,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\CustomModels\UserPrice;
+namespace SwagUserPrice\Models\UserPrice;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Customer\Customer;
 
@@ -45,15 +47,7 @@ class Repository extends ModelRepository
         return $builder->getQuery();
     }
 
-    /**
-     * Returns the query-builder to read all groups from s_plugin_pricegroups.
-     *
-     * @param $filter
-     * @param $sort
-     *
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public function getGroupsQueryBuilder($filter, $sort)
+    public function getGroupsQueryBuilder(?string $filter, ?array $sort): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
@@ -69,31 +63,25 @@ class Repository extends ModelRepository
             'priceGroup'
         );
 
-        if (!empty($filter)) {
-            $builder->where('priceGroup.name LIKE ?1')->setParameter(1, '%' . $filter . '%');
+        if ($filter !== null) {
+            $builder->where('priceGroup.name LIKE :filter')
+                ->setParameter('filter', '%' . $filter . '%');
         }
-        if ($sort == null) {
-            $builder->addOrderBy('priceGroup.id', 'ASC');
-        } else {
+
+        if ($sort !== null) {
             $builder->addOrderBy($sort);
         }
 
         return $builder;
     }
 
-    /**
-     * Returns the query to read all customers.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     * @param null   $groupId
-     *
-     * @return \Doctrine\ORM\Query
-     */
-    public function getCustomersQuery($filter = '', $start = 0, $limit = 20, $sort = null, $groupId = null)
-    {
+    public function getCustomersQuery(
+        ?string $filter = '',
+        ?int $start = 0,
+        ?int $limit = 20,
+        ?array $sort = null,
+        ?int $groupId = null
+    ): Query {
         $builder = $this->getCustomersQueryBuilder($filter, $sort);
 
         if ($limit !== null) {
@@ -113,13 +101,8 @@ class Repository extends ModelRepository
     /**
      * Returns the query-builder to read all customers.
      * This information is saved in the s_user_attributes-table.
-     *
-     * @param $filter
-     * @param $sort
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getCustomersQueryBuilder($filter, $sort)
+    public function getCustomersQueryBuilder(?string $filter, ?array $sort): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
@@ -139,10 +122,10 @@ class Repository extends ModelRepository
             'customer.defaultBillingAddress',
             'billing'
         )
-        ->leftJoin(
-            'customer.attribute',
-            'attribute'
-        );
+            ->leftJoin(
+                'customer.attribute',
+                'attribute'
+            );
 
         if (!empty($filter)) {
             $builder->andWhere('customer.number LIKE ?1')
@@ -161,9 +144,10 @@ class Repository extends ModelRepository
                     '%' . $filter . '%'
                 );
         }
-        if ($sort != null) {
+        if ($sort !== null) {
             $builder->addOrderBy($sort);
         }
+
         $builder->addOrderBy('customer.number', 'ASC');
 
         return $builder;
@@ -310,7 +294,7 @@ class Repository extends ModelRepository
      * This is needed multiple times.
      *
      * @param QueryBuilder $builder
-     * @param $groupId
+     * @param              $groupId
      *
      * @return QueryBuilder
      */
@@ -384,10 +368,10 @@ class Repository extends ModelRepository
             Price::class,
             'prices'
         )->where('prices.priceGroupId = ?1')
-        ->andWhere('prices.articleDetailsId = ?2')
-        ->setParameter(1, $groupId)
-        ->setParameter(2, $detailId)
-        ->orderBy('prices.from', 'ASC');
+            ->andWhere('prices.articleDetailsId = ?2')
+            ->setParameter(1, $groupId)
+            ->setParameter(2, $detailId)
+            ->orderBy('prices.from', 'ASC');
 
         return $builder;
     }

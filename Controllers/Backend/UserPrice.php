@@ -5,12 +5,15 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-use Shopware\CustomModels\UserPrice\Group;
-use Shopware\CustomModels\UserPrice\Price;
+
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Detail;
 use Shopware\Models\Attribute\Customer as CustomerAttribute;
 use Shopware\Models\Customer\Customer;
+use SwagUserPrice\Models\UserPrice\Group;
+use SwagUserPrice\Models\UserPrice\Price;
+use SwagUserPrice\Models\UserPrice\Repository;
 
 /**
  * Plugin backend-controller class.
@@ -191,10 +194,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
         );
     }
 
-    /**
-     * @return Shopware\Components\Model\ModelManager
-     */
-    private function getEntityManager()
+    private function getEntityManager(): ModelManager
     {
         if ($this->entityManager === null) {
             $this->entityManager = $this->get('models');
@@ -203,12 +203,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
         return $this->entityManager;
     }
 
-    /**
-     * Returns the repository.
-     *
-     * @return Shopware\CustomModels\UserPrice\Repository
-     */
-    private function getRepository()
+    private function getRepository(): Repository
     {
         if ($this->userPriceRepository === null) {
             $this->userPriceRepository = $this->getEntityManager()->getRepository(Group::class);
@@ -228,7 +223,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     private function getGroups($params)
     {
         try {
-            $filterValue = null;
+            $filterValue = '';
             //filter from the search-field
             if ($filter = $this->Request()->get('filter')) {
                 $filterValue = $filter[0]['value'];
@@ -272,7 +267,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
             if (empty($id)) {
-                $model = new Shopware\CustomModels\UserPrice\Group();
+                $model = new Group();
                 $msg = $namespace->get('growlMessage/create/message', 'The group was succesfully created');
             } else {
                 $model = $em->find(Group::class, $id);
@@ -624,7 +619,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             }
 
             if (!$id) {
-                $model = new \Shopware\CustomModels\UserPrice\Price();
+                $model = new Price();
             } else {
                 $model = $this->getEntityManager()->find(Price::class, $id);
             }

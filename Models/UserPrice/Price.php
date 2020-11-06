@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\CustomModels\UserPrice;
+namespace SwagUserPrice\Models\UserPrice;
 
 use Shopware\Components\Model\LazyFetchModelEntity;
 use Doctrine\ORM\Mapping as ORM;
@@ -71,7 +71,7 @@ class Price extends LazyFetchModelEntity
     /**
      * @var Group $priceGroup
      *
-     * @ORM\ManyToOne(targetEntity="\Shopware\CustomModels\UserPrice\Group")
+     * @ORM\ManyToOne(targetEntity="\SwagUserPrice\Models\UserPrice\Group")
      * @ORM\JoinColumn(name="pricegroup", referencedColumnName="id")
      */
     protected $priceGroup;

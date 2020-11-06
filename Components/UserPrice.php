@@ -6,9 +6,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Components;
+namespace SwagUserPrice\Components;
 
-use Shopware\CustomModels\UserPrice\Group;
+use SwagUserPrice\Models\UserPrice\Group;
 
 class UserPrice
 {

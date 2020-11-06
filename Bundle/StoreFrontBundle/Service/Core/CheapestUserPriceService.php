@@ -6,12 +6,17 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
+namespace SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 
+use Shopware\Bundle\StoreFrontBundle\Service\CheapestPriceServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\CheapestPriceService;
 use Shopware\Bundle\StoreFrontBundle\Struct;
 use Shopware\Bundle\StoreFrontBundle\Service;
-use Shopware\SwagUserPrice\Components;
+use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
+use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
+use SwagUserPrice\Components\AccessValidator;
+use SwagUserPrice\Components\ServiceHelper;
 
 /**
  * Plugin CheapestUserPriceService class.
@@ -23,28 +28,27 @@ use Shopware\SwagUserPrice\Components;
  * @package Shopware\Plugin\SwagUserPrice
  * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
-class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
+class CheapestUserPriceService implements CheapestPriceServiceInterface
 {
-    /** @var CheapestPriceService */
+    /**
+     * @var CheapestPriceService
+     */
     private $service;
 
-    /** @var Components\AccessValidator */
+    /**
+     * @var AccessValidator
+     */
     private $validator;
 
-    /** @var Components\ServiceHelper */
+    /**
+     * @var ServiceHelper
+     */
     private $helper;
 
-    /**
-     * Constructor to set the variables, that we will need here.
-     *
-     * @param Service\CheapestPriceServiceInterface $service
-     * @param Components\AccessValidator $validator
-     * @param Components\ServiceHelper $helper
-     */
     public function __construct(
-        Service\CheapestPriceServiceInterface $service,
-        Components\AccessValidator $validator,
-        Components\ServiceHelper $helper
+        CheapestPriceServiceInterface $service,
+        AccessValidator $validator,
+        ServiceHelper $helper
     ) {
         $this->service = $service;
         $this->validator = $validator;
@@ -54,7 +58,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
+    public function get(ListProduct $product, ProductContextInterface $context)
     {
         $cheapestPrices = $this->getList([$product], $context);
 
@@ -64,7 +68,7 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function getList($products, Struct\ProductContextInterface $context)
+    public function getList($products, ProductContextInterface $context)
     {
         $products = $this->service->getList($products, $context);
 
@@ -81,9 +85,9 @@ class CheapestUserPriceService implements Service\CheapestPriceServiceInterface
     /**
      * Builds a custom rule-struct.
      *
-     * @param $rule Struct\Product\PriceRule
+     * @param $rule PriceRule
      * @param $number
-     * @return Struct\Product\PriceRule
+     * @return PriceRule
      */
     private function getCustomRule($rule, $number)
     {

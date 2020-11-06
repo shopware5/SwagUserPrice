@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Components;
+namespace SwagUserPrice\Components;
 
 /**
  * Plugin AccessValidator class.

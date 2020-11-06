@@ -6,7 +6,9 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service;
+namespace SwagUserPrice\Bundle\StoreFrontBundle\Service;
+
+use Shopware_Plugins_Core_HttpCache_Bootstrap as HttpCache;
 
 interface DependencyProviderInterface
 {
@@ -19,4 +21,6 @@ interface DependencyProviderInterface
      * @return \Enlight_Components_Session_Namespace
      */
     public function getSession();
+
+    public function getHttpCache(): HttpCache;
 }

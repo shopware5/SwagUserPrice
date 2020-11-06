@@ -6,11 +6,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Subscriber;
+namespace SwagUserPrice\Subscriber;
 
 use Doctrine\DBAL\Connection;
 use Enlight\Event\SubscriberInterface;
-use Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProviderInterface;
+use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProviderInterface;
 
 class CacheKeyExtender implements SubscriberInterface
 {

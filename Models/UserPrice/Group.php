@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\CustomModels\UserPrice;
+namespace SwagUserPrice\Models\UserPrice;
 
 use Shopware\Components\Model\LazyFetchModelEntity;
 use Doctrine\ORM\Mapping as ORM;
@@ -14,7 +14,7 @@ use Shopware\Models\Customer\Customer;
 
 /**
  * @ORM\Table(name="s_plugin_pricegroups")
- * @ORM\Entity(repositoryClass="Shopware\CustomModels\UserPrice\Repository")
+ * @ORM\Entity(repositoryClass="SwagUserPrice\Models\UserPrice\Repository")
  */
 class Group extends LazyFetchModelEntity
 {
@@ -71,7 +71,7 @@ class Group extends LazyFetchModelEntity
      *
      * @var Price[] $prices
      *
-     * @ORM\OneToMany(targetEntity="Shopware\CustomModels\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
+     * @ORM\OneToMany(targetEntity="SwagUserPrice\Models\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
      */
     protected $prices;
 

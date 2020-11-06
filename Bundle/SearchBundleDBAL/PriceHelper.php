@@ -6,7 +6,7 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\SearchBundleDBAL;
+namespace SwagUserPrice\Bundle\SearchBundleDBAL;
 
 use Doctrine\DBAL\Connection;
 use Shopware\Bundle\SearchBundleDBAL\PriceHelper as CorePriceHelper;
