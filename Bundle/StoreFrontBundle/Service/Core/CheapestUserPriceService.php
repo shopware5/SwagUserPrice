@@ -10,8 +10,6 @@ namespace SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 
 use Shopware\Bundle\StoreFrontBundle\Service\CheapestPriceServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Service\Core\CheapestPriceService;
-use Shopware\Bundle\StoreFrontBundle\Struct;
-use Shopware\Bundle\StoreFrontBundle\Service;
 use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
@@ -23,10 +21,6 @@ use SwagUserPrice\Components\ServiceHelper;
  *
  * This class is an extension to the default CheapestPriceService.
  * We need this to inject the plugin-prices to the detail- and listing-page.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class CheapestUserPriceService implements CheapestPriceServiceInterface
 {
@@ -84,12 +78,8 @@ class CheapestUserPriceService implements CheapestPriceServiceInterface
 
     /**
      * Builds a custom rule-struct.
-     *
-     * @param $rule PriceRule
-     * @param $number
-     * @return PriceRule
      */
-    private function getCustomRule($rule, $number)
+    private function getCustomRule(PriceRule $rule, string $number): PriceRule
     {
         $price = $this->helper->getPrice($number);
 

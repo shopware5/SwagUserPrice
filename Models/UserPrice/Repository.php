@@ -19,24 +19,13 @@ use Shopware\Models\Customer\Customer;
  *
  * This is the repository for the custom-models.
  * It reads all necessary information from the custom-tables and returns the query/query-builder.
- *
- * @category Shopware
- *
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Repository extends ModelRepository
 {
     /**
      * Returns the query to read all groups.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     *
-     * @return \Doctrine\ORM\Query
      */
-    public function getGroupsQuery($filter = '', $start = 0, $limit = 20, $sort = null)
+    public function getGroupsQuery(?string $filter = '', ?int $start = 0, ?int $limit = 20, ?array $sort = null): Query
     {
         $builder = $this->getGroupsQueryBuilder($filter, $sort);
 
@@ -155,25 +144,16 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read all articles and its custom user-prices, if there are any.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     * @param bool   $main
-     * @param null   $groupId
-     *
-     * @return mixed
      */
     public function getArticlesQuery(
-        $filter = '',
-        $start = 0,
-        $limit = 20,
-        $sort = null,
-        $main = false,
-        $groupId = null
+        ?string $filter = '',
+        ?int $start = 0,
+        ?int $limit = 20,
+        ?array $sort = null,
+        ?bool $main = false,
+        ?int $groupId = null
     ) {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getArticlesQueryBuilder($filter, $start, $limit, $sort, $main, $groupId);
 
         return $builder->execute();
@@ -181,19 +161,10 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read all articles and its custom user-prices, if there are any.
-     *
-     * @param $filter
-     * @param $start
-     * @param $limit
-     * @param $sort
-     * @param $main
-     * @param $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesQueryBuilder($filter, $start, $limit, $sort, $main, $groupId)
+    public function getArticlesQueryBuilder(string $filter, int $start, int $limit, ?array $sort, bool $main, ?int $groupId): QueryBuilder
     {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
         $builder->select(
@@ -241,14 +212,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read the total count of articles with prices assigned.
-     *
-     * @param string $filter
-     * @param bool   $main
-     * @param null   $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesCountQuery($filter = '', $main = false, $groupId = null)
+    public function getArticlesCountQuery(?string $filter = '', ?bool $main = false, ?int $groupId = null)
     {
         $builder = $this->getArticlesCountQueryBuilder($filter, $main, $groupId);
 
@@ -257,16 +222,10 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read the total count of articles with prices assigned.
-     *
-     * @param $filter
-     * @param $main
-     * @param $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesCountQueryBuilder($filter, $main, $groupId)
+    public function getArticlesCountQueryBuilder(string $filter, ?bool $main, ?int $groupId): QueryBuilder
     {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
         if ($main) {
@@ -292,13 +251,8 @@ class Repository extends ModelRepository
     /**
      * Builds the query to read the articles having custom user-prices.
      * This is needed multiple times.
-     *
-     * @param QueryBuilder $builder
-     * @param              $groupId
-     *
-     * @return QueryBuilder
      */
-    public function buildGetArticleQuery(QueryBuilder $builder, $groupId)
+    public function buildGetArticleQuery(QueryBuilder $builder, int $groupId): QueryBuilder
     {
         $builder->from('s_articles', 'article')->join(
             'article',
@@ -329,13 +283,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read the custom user-prices being assigned to an article and a group.
-     *
-     * @param null $detailId
-     * @param null $groupId
-     *
-     * @return \Doctrine\ORM\Query
      */
-    public function getPricesQuery($detailId = null, $groupId = null)
+    public function getPricesQuery(?int $detailId = null, ?int $groupId = null): Query
     {
         $query = $this->getPricesQueryBuilder($detailId, $groupId);
 
@@ -344,13 +293,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read the custom user-prices being assigned to an article and a group.
-     *
-     * @param $detailId
-     * @param $groupId
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getPricesQueryBuilder($detailId, $groupId)
+    public function getPricesQueryBuilder(int $detailId, int $groupId): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 

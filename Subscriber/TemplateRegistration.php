@@ -24,9 +24,6 @@ class TemplateRegistration implements SubscriberInterface
      */
     private $templateManager;
 
-    /**
-     * @param string $pluginPath
-     */
     public function __construct(string $pluginPath, TemplateManager $templateManager)
     {
         $this->pluginPath = $pluginPath;

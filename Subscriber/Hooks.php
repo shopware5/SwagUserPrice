@@ -8,11 +8,11 @@
 
 namespace SwagUserPrice\Subscriber;
 
+use Doctrine\DBAL\Connection;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs as EventArgs;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Plugin\Plugin;
-use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseAdapter;
 use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 use SwagUserPrice\Components\AccessValidator;
 use SwagUserPrice\Components\ServiceHelper;
@@ -20,7 +20,7 @@ use SwagUserPrice\Components\ServiceHelper;
 class Hooks implements SubscriberInterface
 {
     /**
-     * @var DatabaseAdapter
+     * @var Connection
      */
     private $database;
 
@@ -45,7 +45,7 @@ class Hooks implements SubscriberInterface
     private $modelManager;
 
     public function __construct(
-        DatabaseAdapter $database,
+        Connection $database,
         AccessValidator $accessValidator,
         ServiceHelper $serviceHelper,
         DependencyProvider $dependencyProvider,
@@ -74,10 +74,6 @@ class Hooks implements SubscriberInterface
     /**
      * Fetches the current return of the method,
      * manipulates the price and returns the result
-     *
-     * @param $args
-     *
-     * @return array
      */
     public function onUpdatePrice(EventArgs $args): array
     {
@@ -117,8 +113,6 @@ class Hooks implements SubscriberInterface
 
     /**
      * Check if HttpCache plugin is installed and activate
-     *
-     * @return boolean
      */
     private function cachePluginActive(): bool
     {

@@ -8,11 +8,10 @@
 
 namespace SwagUserPrice\Bootstrap;
 
-use Shopware\Bundle\AttributeBundle\Service\CrudService;
+use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseAdapter;
 use Shopware\Bundle\AttributeBundle\Service\CrudServiceInterface;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Menu\Menu;
-use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseAdapter;
 use Shopware_Components_Acl as Acl_Manager;
 
 class Setup
@@ -52,7 +51,7 @@ class Setup
     /**
      * Create plugin tables, attributes, add plugin events and acl permissions
      */
-    private function setup()
+    private function setup(): void
     {
         $this->createTables();
         $this->addAttribute();
@@ -63,7 +62,7 @@ class Setup
      * Setup install method.
      * Creates/installs everything being needed by the plugin, e.g. the database-tables, menu-entries, attributes.
      */
-    public function install()
+    public function install(): void
     {
         $this->setup();
     }
@@ -72,7 +71,7 @@ class Setup
      * Setup uninstall method.
      * Removes the attributes and the created tables of the plugin.
      */
-    public function uninstall()
+    public function uninstall(): void
     {
         $this->removeAttribute();
         $this->removeTables();
@@ -80,12 +79,8 @@ class Setup
 
     /**
      * The update method handles the migration of the old data.
-     *
-     * @param $oldVersion
-     *
-     * @return bool
      */
-    public function update($oldVersion)
+    public function update($oldVersion): bool
     {
         $this->setup();
 
@@ -104,7 +99,7 @@ class Setup
     /**
      * Creates all tables, that we need for the plugin.
      */
-    private function createTables()
+    private function createTables(): void
     {
         $this->databaseAdapter->query(
             '
@@ -139,7 +134,7 @@ class Setup
     /**
      * Creates the attributes we need for the plugin.
      */
-    private function addAttribute()
+    private function addAttribute(): void
     {
         $this->crudService->update(
             's_user_attributes',
@@ -153,7 +148,7 @@ class Setup
     /**
      * Creates the acl-rules for the plugin.
      */
-    private function createAcl()
+    private function createAcl(): void
     {
         $pluginName = 'userprice';
         $this->acl->deleteResource($pluginName);
@@ -188,7 +183,7 @@ class Setup
      *
      * @throws \ErrorException
      */
-    private function importOldData()
+    private function importOldData(): void
     {
         /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
         $db = $this->databaseAdapter;
@@ -274,7 +269,7 @@ class Setup
     /**
      * Helper method to remove the old menu-entry.
      */
-    private function removeMenuEntry()
+    private function removeMenuEntry(): void
     {
         $menuItem = $this->getEntityManager()->getRepository(Menu::class)->findOneBy(
             [
@@ -293,21 +288,22 @@ class Setup
     /**
      * helper method to add indexes
      */
-    private function addIndexToPriceTable()
+    private function addIndexToPriceTable(): void
     {
         $sql = 'ALTER TABLE `s_plugin_pricegroups_prices`
 	            ADD KEY `articleID` (`articleID`),
 	            ADD KEY `articledetailsID` (`articledetailsID`)';
+
         $this->databaseAdapter->query($sql);
     }
 
-    private function removeTables()
+    private function removeTables(): void
     {
         $this->databaseAdapter->query('DROP TABLE IF EXISTS s_plugin_pricegroups');
         $this->databaseAdapter->query('DROP TABLE IF EXISTS s_plugin_pricegroups_prices');
     }
 
-    private function removeAttribute()
+    private function removeAttribute(): void
     {
         $this->crudService->delete(
             's_user_attributes',

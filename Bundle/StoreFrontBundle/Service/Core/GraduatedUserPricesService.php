@@ -72,13 +72,8 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 
     /**
      * Builds a custom price-rule to implement the plugins prices.
-     *
-     * @param PriceRule $coreRule
-     * @param                          $number
-     *
-     * @return array
      */
-    private function getCustomRules(PriceRule $coreRule, $number)
+    private function getCustomRules(PriceRule $coreRule, string $number): array
     {
         $prices = $this->helper->getPrices($number);
 

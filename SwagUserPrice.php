@@ -20,7 +20,6 @@ class SwagUserPrice extends Plugin
 {
     public function install(InstallContext $installContext)
     {
-        Shopware()->Container()->get('dbal_connection')->beginTransaction();
         $this->getSetup()->install();
     }
 
@@ -33,8 +32,6 @@ class SwagUserPrice extends Plugin
 
     public function uninstall(UninstallContext $uninstallContext)
     {
-        Shopware()->Container()->get('dbal_connection')->beginTransaction();
-
         $this->getSetup()->uninstall();
 
         $uninstallContext->scheduleClearCache(UpdateContext::CACHE_LIST_ALL);

@@ -6,33 +6,28 @@
  * file that was distributed with this source code.
  */
 
+use Doctrine\DBAL\Driver\Statement;
+use Doctrine\ORM\EntityNotFoundException;
+use Shopware\Components\Api\Exception\ParameterMissingException;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Article\Article;
 use Shopware\Models\Article\Detail;
 use Shopware\Models\Attribute\Customer as CustomerAttribute;
 use Shopware\Models\Customer\Customer;
+use SwagUserPrice\Components\UserPrice;
 use SwagUserPrice\Models\UserPrice\Group;
 use SwagUserPrice\Models\UserPrice\Price;
 use SwagUserPrice\Models\UserPrice\Repository;
 
-/**
- * Plugin backend-controller class.
- *
- * The Shopware_Controllers_Backend_UserPrice class is the backend controller class.
- *
- * @category Shopware
- *
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
- */
 class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backend_ExtJs
 {
     /**
-     * @var \Shopware\CustomModels\UserPrice\Repository
+     * @var Repository
      */
     protected $userPriceRepository;
 
     /**
-     * @var Shopware\Components\Model\ModelManager
+     * @var ModelManager
      */
     protected $entityManager;
 
@@ -50,7 +45,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * This initializes the acl-rules.
      * We need to configure which acl-rules should be considered for the different
      */
-    public function initAcl()
+    public function initAcl(): void
     {
         $this->addAclPermission('getGroups', 'read', 'Insufficient Permissions');
         $this->addAclPermission('getCustomers', 'read', 'Insufficient Permissions');
@@ -71,7 +66,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * This is the event listener method for the user-price backend-module.
      * It returns all creates groups.
      */
-    public function getGroupsAction()
+    public function getGroupsAction(): void
     {
         $this->View()->assign(
             $this->getGroups(
@@ -85,7 +80,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * It is used for both creating and editing.
      * If an id is set in the post-parameters, the user wants to edit the group, otherwise a new group will be created.
      */
-    public function editGroupAction()
+    public function editGroupAction(): void
     {
         $this->View()->assign(
             $this->handleEdit(
@@ -99,7 +94,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * It deletes the group itself and additionally resets the customer-attributes, so the assigned customers are reset.
      * Even the assigned prices are deleted again.
      */
-    public function deleteGroupAction()
+    public function deleteGroupAction(): void
     {
         $this->View()->assign(
             $this->handleDeletion(
@@ -114,7 +109,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * The first request loads all customers, that are not currently assigned to any group yet.
      * The second request only loads the customers, which are assigned to a specific group already.
      */
-    public function getCustomersAction()
+    public function getCustomersAction(): void
     {
         $this->View()->assign(
             $this->getCustomers(
@@ -126,7 +121,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * This event listener method is called when the user adds a customer to a group.
      */
-    public function addCustomerAction()
+    public function addCustomerAction(): void
     {
         $this->View()->assign(
             $this->addCustomer(
@@ -138,7 +133,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * This event listener method is called when the user removes a customer from a group.
      */
-    public function removeCustomerAction()
+    public function removeCustomerAction(): void
     {
         $this->View()->assign(
             $this->removeCustomer(
@@ -151,7 +146,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * This event listener method is needed to load all articles.
      * Additionally you can filter the articles to only show main-products.
      */
-    public function getArticlesAction()
+    public function getArticlesAction(): void
     {
         $this->View()->assign(
             $this->getArticles(
@@ -163,7 +158,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * This event listener method returns all prices being assigned to an article and a group.
      */
-    public function getPricesAction()
+    public function getPricesAction(): void
     {
         $this->View()->assign(
             $this->getPrices()
@@ -173,7 +168,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * This event listener method is called to edit the configured prices for an article in a specific group.
      */
-    public function updatePriceAction()
+    public function updatePriceAction(): void
     {
         $this->View()->assign(
             $this->updatePrice(
@@ -185,7 +180,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * This event listener method is called to delete the last price-row of an article in a specific group.
      */
-    public function deletePriceAction()
+    public function deletePriceAction(): void
     {
         $this->View()->assign(
             $this->deletePrice(
@@ -215,12 +210,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * Reads the groups and its total-count.
      * It supports searching- and paging-functions.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function getGroups($params)
+    private function getGroups(?array $params): array
     {
         try {
             $filterValue = '';
@@ -252,18 +243,14 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Edits a group.
      * This is either creating a new group if no id is set in the parameters.
      * Otherwise the group with the given id will be edited.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function handleEdit($params)
+    private function handleEdit(?array $params): array
     {
         try {
             $em = $this->getEntityManager();
             $id = $params['id'];
 
-            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
             if (empty($id)) {
@@ -292,17 +279,13 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Deletes a group.
      * This will not only delete the group itself, but also remove all assigned values.
      * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function handleDeletion($params)
+    private function handleDeletion(?array $params): array
     {
         try {
             $records = $params;
 
-            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
             //The array structure of $params depends on the amount of records being deleted.
@@ -353,12 +336,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * 2nd - only selected customers, which are currently assigned to the group whose id is in the parameter.
      *
      * It supports searching- and paging-functions.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function getCustomers($params)
+    private function getCustomers(array $params): array
     {
         try {
             $search = '';
@@ -393,12 +372,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Adds a customer to a group.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function addCustomer($params)
+    private function addCustomer(array $params): array
     {
         try {
             $customerIds = json_decode($params['customerIds']);
@@ -427,12 +402,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Removes a customer from a given group.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function removeCustomer($params)
+    private function removeCustomer(array $params): array
     {
         try {
             $customerIds = json_decode($params['customerIds']);
@@ -441,7 +412,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $customer = $this->getEntityManager()->find(Customer::class, $customerId);
 
                 if (!$customer) {
-                    throw new \Doctrine\ORM\EntityNotFoundException('Could not find customer with ID ' . $customerId);
+                    throw new EntityNotFoundException('Could not find customer with ID ' . $customerId);
                 }
 
                 $attrModel = $customer->getAttribute();
@@ -466,12 +437,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * This can also be configured to only show main-articles.
      *
      * It supports searching- and paging-functions.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function getArticles($params)
+    private function getArticles(array $params): array
     {
         try {
             $search = '';
@@ -492,7 +459,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 }
             }
 
-            /** @var Doctrine\DBAL\Driver\Statement $stmt */
+            /** @var Statement $stmt */
             $stmt = $this->getRepository()->getArticlesQuery(
                 $search,
                 $params['start'],
@@ -502,11 +469,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $groupId
             );
 
-            /** @var Shopware\SwagUserPrice\Components\UserPrice $comp */
+            /** @var UserPrice $comp */
             $comp = $this->get('swaguserprice.userprice');
             $articles = $comp->formatArticlePrices($stmt->fetchAll(), $groupId);
 
-            /** @var Doctrine\DBAL\Driver\Statement $countStmt */
+            /** @var Statement $countStmt */
             $countStmt = $this->getRepository()->getArticlesCountQuery($search, $main, $groupId);
 
             return ['success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn()];
@@ -518,13 +485,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * Reads all prices being set for a specific article and a specific group.
      * This way you can configure prices for each group and for each article in the groups then.
-     *
-     * @return array
      */
-    private function getPrices()
+    private function getPrices(): array
     {
         try {
-            /** @var $namespace Enlight_Components_Snippet_Namespace */
+            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/view/prices');
 
             $detailId = null;
@@ -540,7 +505,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             }
 
             if ($groupId === null || $detailId === null) {
-                throw new \Shopware\Components\Api\Exception\ParameterMissingException('Detail or group id missing');
+                throw new ParameterMissingException('Detail or group id missing');
             }
 
             $article = $this->getEntityManager()->find(Detail::class, $detailId)->getArticle();
@@ -592,12 +557,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Updates the price for a specific article in a specific group.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function updatePrice($params)
+    private function updatePrice(array $params): array
     {
         try {
             $id = $params['id'];
@@ -666,21 +627,17 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Deletes a price by a given id.
-     *
-     * @param $params
-     *
-     * @return array
      */
-    private function deletePrice($params)
+    private function deletePrice(array $params): array
     {
         try {
             if (!$id = $params['id']) {
-                throw new \Shopware\Components\Api\Exception\ParameterMissingException('Identifier id missing');
+                throw new ParameterMissingException('Identifier id missing');
             }
             $model = $this->getEntityManager()->find(Price::class, $params['id']);
 
             if (!$model) {
-                throw new \Doctrine\ORM\EntityNotFoundException('No entity with id ' . $id . ' found.');
+                throw new EntityNotFoundException('No entity with id ' . $id . ' found.');
             }
 
             $this->getEntityManager()->remove($model);
@@ -695,12 +652,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Checks if an array is multi-dimensional.
-     *
-     * @param $array
-     *
-     * @return bool
      */
-    private function isMultiDimensional($array)
+    private function isMultiDimensional(array $array): bool
     {
         return count($array) != count($array, COUNT_RECURSIVE);
     }
@@ -710,12 +663,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * There may only be a single price defined in order to remove the whole user-price on this article.
      * Therefore we check for both "from = 1", so it's the first price, as well as "to = beliebig", so it's the last price.
      * If the price is then set to null, the user might want to remove this price.
-     *
-     * @param array $params
-     *
-     * @return bool
      */
-    private function shouldRemovePrice(array $params)
+    private function shouldRemovePrice(array $params): bool
     {
         return $params['to'] === 'beliebig' && $params['from'] === 1 && $params['price'] === null;
     }

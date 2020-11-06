@@ -30,8 +30,8 @@ default:
         - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.shopware.com/shopware/5/product/shopware.git shopware --depth=1 -b ${CHECKOUT_SHOPWARE_BRANCH}
         - unzip -q plugin.zip -d shopware/custom/plugins/SwagUserPrice
         - cd shopware
-        - ./psh.phar init --SW_HOST="localhost"
-        - cp -r custom/plugins/SwagUserPrice/Tests/config_gitlab.php config.php
+        - cp .env.dist .env
+        - make init
         - php bin/console sw:plugin:refresh
         - php bin/console sw:plugin:list
         - php bin/console sw:plugin:install --activate SwagUserPrice
@@ -56,7 +56,7 @@ Code Coverage:
     stage: PHPUnit
     needs: [PHP analyze]
     script:
-        - composer req --dev phpunit/phpunit:~8.0 --update-with-all-dependencies
+        - composer req --dev phpunit/phpunit:~9.1 --update-with-all-dependencies
         - cd custom/plugins/SwagUserPrice
         - php -d pcov.enabled=1 -d pcov.directory=$CI_PROJECT_DIR
             ../../../vendor/bin/phpunit
@@ -75,39 +75,25 @@ Code Coverage:
         reports:
             junit: shopware/custom/plugins/SwagUserPrice/build/artifacts/phpunit.junit.xml
 
+
 .SW 5.7 default:
     stage: PHPUnit
     needs: [PHP analyze]
     variables:
         CHECKOUT_SHOPWARE_BRANCH: "5.7"
+    services:
+        -   name: mysql:5.7
+            alias: mysql
     script:
-        - zip -rq plugin.zip .
-        - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.shopware.com/shopware/5/product/shopware.git shopware --depth=1 -b ${CHECKOUT_SHOPWARE_BRANCH}
-        - unzip -q plugin.zip -d shopware/custom/plugins/SwagUserPrice
-        - cd shopware
-        - cp .env.dist .env
-        - make init
-        - php bin/console sw:plugin:refresh
-        - php bin/console sw:plugin:list
-        - php bin/console sw:plugin:install --activate SwagUserPrice
-        - php bin/console sw:cache:clear
-        - /entrypoint supervisord &>/dev/null &
         - cd custom/plugins/SwagUserPrice
         - php ../../../vendor/bin/phpunit
             --configuration phpunit.xml.dist
             --colors=never
-    services:
-        -   name: mysql:5.7
-            alias: mysql
 
 SW 5.7 PHP 7.3:
     extends: .SW 5.7 default
     image: shopware/5-continuous:7.3
-    before_script: []
 
 SW 5.7 PHP 8.0:
     extends: .SW 5.7 default
-    image: gitlab.shopware.com:5005/shopware/5/product/shopware:8.0
-    before_script:
-        - apk add --no-cache zip unzip
-        - apk add --no-cache make
+    image: gitlab.shopware.com:5005/shopware/5/product/image/continuous:8.0

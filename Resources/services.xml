@@ -5,9 +5,15 @@
     <services>
         <defaults public="true"/>
 
-        <service id="swaguserprice.userprice" class="SwagUserPrice\Components\UserPrice"></service>
+        <service id="swaguserprice.userprice" class="SwagUserPrice\Components\UserPrice">
+            <argument type="service" id="models"/>
+        </service>
 
-        <service id="swaguserprice.accessvalidator" class="SwagUserPrice\Components\AccessValidator"></service>
+        <service id="swaguserprice.accessvalidator" class="SwagUserPrice\Components\AccessValidator">
+            <argument type="service" id="session"/>
+            <argument type="service" id="models"/>
+            <argument type="service" id="shop" on-invalid="null"/>
+        </service>
 
         <service id="swaguserprice.servicehelper" class="SwagUserPrice\Components\ServiceHelper">
             <argument type="service" id="models"/>
@@ -22,7 +28,7 @@
 
         <!-- Subscriber -->
         <service id="swaguserprice.hooks" class="SwagUserPrice\Subscriber\Hooks">
-            <argument type="service" id="db"/>
+            <argument type="service" id="dbal_connection"/>
             <argument type="service" id="swaguserprice.accessvalidator"/>
             <argument type="service" id="swaguserprice.servicehelper"/>
             <argument type="service" id="swaguserprice.dependency_provider"/>

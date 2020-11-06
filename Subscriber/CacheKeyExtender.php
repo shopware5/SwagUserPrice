@@ -24,10 +24,6 @@ class CacheKeyExtender implements SubscriberInterface
      */
     private $dependencyProvider;
 
-    /**
-     * @param Connection                  $connection
-     * @param DependencyProviderInterface $dependencyProvider
-     */
     public function __construct(Connection $connection, DependencyProviderInterface $dependencyProvider)
     {
         $this->connection = $connection;
@@ -44,10 +40,7 @@ class CacheKeyExtender implements SubscriberInterface
         ];
     }
 
-    /**
-     * @return string
-     */
-    public function onCreateCacheHash(\Enlight_Event_EventArgs $args)
+    public function onCreateCacheHash(\Enlight_Event_EventArgs $args): string
     {
         $originalHash = $args->getReturn();
 
@@ -56,7 +49,7 @@ class CacheKeyExtender implements SubscriberInterface
         }
 
         $session = $this->dependencyProvider->getSession();
-        $userId = (int)$session->get('sUserId', 0);
+        $userId = (int) $session->get('sUserId', 0);
         $priceGroup = $this->getCustomerPriceGroupId($userId);
 
         if ($priceGroup === 0) {
@@ -66,12 +59,7 @@ class CacheKeyExtender implements SubscriberInterface
         return json_encode(['original_hash' => $originalHash, 'swag_user_price_group' => $priceGroup]);
     }
 
-    /**
-     * @param int $userId
-     *
-     * @return int
-     */
-    private function getCustomerPriceGroupId($userId)
+    private function getCustomerPriceGroupId(int $userId): int
     {
         return (int) $this->connection->createQueryBuilder()
             ->select('swag_pricegroup')

@@ -8,8 +8,8 @@
 
 namespace SwagUserPrice\Models\UserPrice;
 
-use Shopware\Components\Model\LazyFetchModelEntity;
 use Doctrine\ORM\Mapping as ORM;
+use Shopware\Components\Model\LazyFetchModelEntity;
 use Shopware\Models\Customer\Customer;
 
 /**
@@ -19,10 +19,28 @@ use Shopware\Models\Customer\Customer;
 class Group extends LazyFetchModelEntity
 {
     /**
+     * INVERSE SIDE
+     *
+     * @var Customer[]
+     *
+     * @ORM\OneToMany(targetEntity="Shopware\Models\Customer\Customer", mappedBy="priceGroup")
+     */
+    protected $customers;
+
+    /**
+     * INVERSE SIDE
+     *
+     * @var Price[]
+     *
+     * @ORM\OneToMany(targetEntity="SwagUserPrice\Models\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
+     */
+    protected $prices;
+
+    /**
      * The id property is an identifier property which means
      * doctrine associations can be defined over this field.
      *
-     * @var integer $id
+     * @var int
      *
      * @ORM\Id
      * @ORM\Column(name="id", type="integer", nullable=false)
@@ -33,7 +51,7 @@ class Group extends LazyFetchModelEntity
     /**
      * Contains the customer price group name value.
      *
-     * @var string $name
+     * @var string
      *
      * @ORM\Column(name="name", type="string", length=255, nullable=false)
      */
@@ -42,7 +60,7 @@ class Group extends LazyFetchModelEntity
     /**
      * Flag which indicates a net price.
      *
-     * @var integer $gross
+     * @var int
      *
      * @ORM\Column(name="gross", type="integer", nullable=false)
      */
@@ -51,29 +69,11 @@ class Group extends LazyFetchModelEntity
     /**
      * Flag which indicates if a price group is active or not.
      *
-     * @var integer $taxInput
+     * @var int
      *
      * @ORM\Column(name="active", type="integer", nullable=false)
      */
     private $active;
-
-    /**
-     * INVERSE SIDE
-     *
-     * @var Customer[] $customers
-     *
-     * @ORM\OneToMany(targetEntity="Shopware\Models\Customer\Customer", mappedBy="priceGroup")
-     */
-    protected $customers;
-
-    /**
-     * INVERSE SIDE
-     *
-     * @var Price[] $prices
-     *
-     * @ORM\OneToMany(targetEntity="SwagUserPrice\Models\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
-     */
-    protected $prices;
 
     /**
      * @return int
@@ -93,6 +93,7 @@ class Group extends LazyFetchModelEntity
 
     /**
      * @param int $active
+     *
      * @return $this
      */
     public function setActive($active)
@@ -112,6 +113,7 @@ class Group extends LazyFetchModelEntity
 
     /**
      * @param string $name
+     *
      * @return $this
      */
     public function setName($name)
@@ -131,6 +133,7 @@ class Group extends LazyFetchModelEntity
 
     /**
      * @param int $gross
+     *
      * @return $this
      */
     public function setGross($gross)

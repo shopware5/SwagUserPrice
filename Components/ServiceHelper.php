@@ -10,10 +10,15 @@ namespace SwagUserPrice\Components;
 
 use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Config as Config;
+use Symfony\Component\HttpFoundation\Session\Session;
 
+/**
+ * Plugin ServiceHelper class.
+ *
+ * This class includes some helper-method to help the services find the data they need.
+ */
 class ServiceHelper
 {
     /**
@@ -43,10 +48,8 @@ class ServiceHelper
 
     /**
      * Get the prices for a product.
-     *
-     * @return mixed
      */
-    public function getPrices(string $number)
+    public function getPrices(string $number): ?array
     {
         $result = $this->getPricesQueryBuilder($number)
             ->orderBy('prices.from', 'ASC')
@@ -63,25 +66,31 @@ class ServiceHelper
     /**
      * Get a single price for a product.
      */
-    public function getPrice(string $number)
+    public function getPrice(string $number): ?array
     {
         $builder = $this->getPricesQueryBuilder($number);
         if ($this->config->get('useLastGraduationForCheapestPrice')) {
             $builder->addOrderBy('prices.id', 'DESC');
         }
 
-        return $builder->setMaxResults(1)
+        $result = $builder->setMaxResults(1)
             ->execute()
             ->fetch();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     /**
      * Get the price for a specified quantity.
      * Will be only used in the checkout-process.
      */
-    public function getPriceForQuantity(string $number, int $quantity)
+    public function getPriceForQuantity(string $number, int $quantity): ?array
     {
-        return $this->getPricesQueryBuilder($number)
+        $result = $this->getPricesQueryBuilder($number)
             ->andWhere('prices.from <= :quantity')
             ->andWhere('CAST(prices.to as DECIMAL) >= :quantity OR CAST(prices.to as DECIMAL) = 0')
             ->orderBy('prices.from', 'DESC')
@@ -89,6 +98,12 @@ class ServiceHelper
             ->setParameter('quantity', $quantity)
             ->execute()
             ->fetch();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     public function buildRule(array $price): PriceRule
