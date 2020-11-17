@@ -6,46 +6,53 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bootstrap;
+namespace SwagUserPrice\Bootstrap;
 
-/*
- * Plugin bootstrap setup class.
- *
- * This class handles most of the bootstrap-logic.
- * It creates the needed tables, adds the custom-attributes, creates the menu-entry and creates the acl-rules.
- * Additionally it handles the update-method and the migration of older database-values.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
- */
-use Shopware\Bundle\AttributeBundle\Service\CrudService;
+use Enlight_Components_Db_Adapter_Pdo_Mysql as DatabaseAdapter;
+use Shopware\Bundle\AttributeBundle\Service\CrudServiceInterface;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Menu\Menu;
+use Shopware_Components_Acl as Acl_Manager;
 
 class Setup
 {
     /**
-     * @var \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap
+     * @var ModelManager
      */
-    private $bootstrap;
-
-    /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager;
+    private $modelManager;
 
     /**
-     * @param \Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap
+     * @var DatabaseAdapter
      */
-    public function __construct(\Shopware_Plugins_Backend_SwagUserPrice_Bootstrap $bootstrap)
-    {
-        $this->bootstrap = $bootstrap;
+    private $databaseAdapter;
+
+    /**
+     * @var CrudServiceInterface
+     */
+    private $crudService;
+
+    /**
+     * @var Acl_Manager
+     */
+    private $acl;
+
+    public function __construct(
+        ModelManager $modelManager,
+        DatabaseAdapter $databaseAdapter,
+        CrudServiceInterface $crudService,
+        Acl_Manager $acl
+    ) {
+        $this->modelManager = $modelManager;
+        $this->databaseAdapter = $databaseAdapter;
+        $this->crudService = $crudService;
+        $this->acl = $acl;
     }
 
     /**
      * Create plugin tables, attributes, add plugin events and acl permissions
      */
-    private function setup()
+    private function setup(): void
     {
-        $this->createEvents();
         $this->createTables();
         $this->addAttribute();
         $this->createAcl();
@@ -55,17 +62,16 @@ class Setup
      * Setup install method.
      * Creates/installs everything being needed by the plugin, e.g. the database-tables, menu-entries, attributes.
      */
-    public function install()
+    public function install(): void
     {
         $this->setup();
-        $this->createMenu();
     }
 
     /**
      * Setup uninstall method.
      * Removes the attributes and the created tables of the plugin.
      */
-    public function uninstall()
+    public function uninstall(): void
     {
         $this->removeAttribute();
         $this->removeTables();
@@ -73,12 +79,8 @@ class Setup
 
     /**
      * The update method handles the migration of the old data.
-     *
-     * @param $oldVersion
-     *
-     * @return bool
      */
-    public function update($oldVersion)
+    public function update($oldVersion): bool
     {
         $this->setup();
 
@@ -95,37 +97,11 @@ class Setup
     }
 
     /**
-     * @return \Shopware\Components\Model\ModelManager
-     */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->bootstrap->get('models');
-        }
-
-        return $this->entityManager;
-    }
-
-    private function createEvents()
-    {
-        $events = [
-            'Enlight_Controller_Front_StartDispatch' => 'onStartDispatch',
-            'Enlight_Bootstrap_AfterInitResource_shopware_searchdbal.search_price_helper_dbal' => 'registerPriceHelper',
-            'Enlight_Bootstrap_AfterInitResource_shopware_storefront.cheapest_price_service' => 'onGetCheapestPriceService',
-            'Enlight_Bootstrap_AfterInitResource_shopware_storefront.graduated_prices_service' => 'onGetGraduatedPricesService',
-        ];
-
-        foreach ($events as $event => $listener) {
-            $this->bootstrap->subscribeEvent($event, $listener);
-        }
-    }
-
-    /**
      * Creates all tables, that we need for the plugin.
      */
-    private function createTables()
+    private function createTables(): void
     {
-        $this->bootstrap->get('db')->query(
+        $this->databaseAdapter->query(
             '
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups` (
 			`id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -137,7 +113,7 @@ class Setup
         '
         );
 
-        $this->bootstrap->get('db')->query(
+        $this->databaseAdapter->query(
             "
             CREATE TABLE IF NOT EXISTS `s_plugin_pricegroups_prices` (
               `id` INT(11) UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -158,47 +134,25 @@ class Setup
     /**
      * Creates the attributes we need for the plugin.
      */
-    private function addAttribute()
+    private function addAttribute(): void
     {
-        /** @var CrudService $service */
-        $service = $this->bootstrap->get('shopware_attribute.crud_service');
-
-        $service->update(
+        $this->crudService->update(
             's_user_attributes',
             'swag_pricegroup',
             'integer'
         );
 
-        $this->getEntityManager()->generateAttributeModels(['s_user_attributes']);
-    }
-
-    /**
-     * Creates the menu-entry.
-     */
-    private function createMenu()
-    {
-        $this->bootstrap->createMenuItem(
-            [
-                'label' => 'Customer-specific prices',
-                'controller' => 'UserPrice',
-                'class' => 'sprite-user--list',
-                'action' => 'Index',
-                'active' => 1,
-                'parent' => $this->bootstrap->Menu()->findOneBy(['label' => 'Kunden']),
-            ]
-        );
+        $this->modelManager->generateAttributeModels(['s_user_attributes']);
     }
 
     /**
      * Creates the acl-rules for the plugin.
      */
-    private function createAcl()
+    private function createAcl(): void
     {
-        /** @var \Shopware_Components_Acl $acl */
-        $acl = $this->bootstrap->get('acl');
         $pluginName = 'userprice';
-        $acl->deleteResource($pluginName);
-        $acl->createResource(
+        $this->acl->deleteResource($pluginName);
+        $this->acl->createResource(
             $pluginName,
             [
                 'read',
@@ -207,8 +161,21 @@ class Setup
                 'editPrices',
             ],
             'User Prices',
-            $this->bootstrap->getId()
+            $this->getPluginId()
         );
+    }
+
+    private function getPluginId(): int
+    {
+        $sql = "SELECT id FROM s_core_plugins WHERE name = 'SwagUserPrice'";
+
+        $id = $this->databaseAdapter->fetchOne($sql);
+
+        if ($id === false || $id === null) {
+            throw new \RuntimeException('Plugin id not found');
+        }
+
+        return (int) $id;
     }
 
     /**
@@ -216,10 +183,10 @@ class Setup
      *
      * @throws \ErrorException
      */
-    private function importOldData()
+    private function importOldData(): void
     {
         /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
-        $db = $this->bootstrap->get('db');
+        $db = $this->databaseAdapter;
         try {
             $sql = "SELECT *, groups.id AS groupId, prices.id AS priceId
                     FROM s_core_customerpricegroups groups
@@ -302,7 +269,7 @@ class Setup
     /**
      * Helper method to remove the old menu-entry.
      */
-    private function removeMenuEntry()
+    private function removeMenuEntry(): void
     {
         $menuItem = $this->getEntityManager()->getRepository(Menu::class)->findOneBy(
             [
@@ -314,37 +281,35 @@ class Setup
             return;
         }
 
-        $this->getEntityManager()->remove($menuItem);
-        $this->getEntityManager()->flush();
+        $this->modelManager->remove($menuItem);
+        $this->modelManager->flush();
     }
 
     /**
      * helper method to add indexes
      */
-    private function addIndexToPriceTable()
+    private function addIndexToPriceTable(): void
     {
         $sql = 'ALTER TABLE `s_plugin_pricegroups_prices`
 	            ADD KEY `articleID` (`articleID`),
 	            ADD KEY `articledetailsID` (`articledetailsID`)';
-        $this->bootstrap->get('db')->query($sql);
+
+        $this->databaseAdapter->query($sql);
     }
 
-    private function removeTables()
+    private function removeTables(): void
     {
-        $this->bootstrap->get('db')->query('DROP TABLE IF EXISTS s_plugin_pricegroups');
-        $this->bootstrap->get('db')->query('DROP TABLE IF EXISTS s_plugin_pricegroups_prices');
+        $this->databaseAdapter->query('DROP TABLE IF EXISTS s_plugin_pricegroups');
+        $this->databaseAdapter->query('DROP TABLE IF EXISTS s_plugin_pricegroups_prices');
     }
 
-    private function removeAttribute()
+    private function removeAttribute(): void
     {
-        /** @var CrudService $service */
-        $service = $this->bootstrap->get('shopware_attribute.crud_service');
-
-        $service->delete(
+        $this->crudService->delete(
             's_user_attributes',
             'swag_pricegroup'
         );
 
-        $this->getEntityManager()->generateAttributeModels(['s_user_attributes']);
+        $this->modelManager->generateAttributeModels(['s_user_attributes']);
     }
 }

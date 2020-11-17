@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<plugin xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/5.6/engine/Shopware/Components/Plugin/schema/plugin.xsd">
+
+    <label lang="de">Kundenspezifische Preise</label>
+    <label lang="en">Customer-specific prices</label>
+    <version>3.0.0</version>
+    <copyright>(c) by shopware AG</copyright>
+    <license>MIT</license>
+    <link>http://store.shopware.com</link>
+    <author>shopware AG</author>
+    <compatibility minVersion="5.7.0" maxVersion="5.99.99"/>
+
+    <changelog version="3.0.0">
+        <changes lang="de">PT-12129 - Shopware 5.7 und PHP8 Kompatibilität;</changes>
+        <changes lang="en">PT-12129 - Shopware 5.7 and PHP8 compatibility;</changes>
+    </changelog>
+
+    <changelog version="2.3.2">
+        <changes lang="de">PT-10803 - Kompatibilität mit MySQL 8 verbessert;</changes>
+        <changes lang="en">PT-10803 - Improved compatibility with MySQL 8;</changes>
+    </changelog>
+
+    <changelog version="2.3.1">
+        <changes lang="de">PT-10528 - Optimiert das Generieren des Cache Hashes;</changes>
+        <changes lang="en">PT-10528 - Optimize cache hash generation;</changes>
+    </changelog>
+
+    <changelog version="2.3.0">
+        <changes lang="de">PT-9181 - 5.5 Kompatibilität;</changes>
+        <changes lang="en">PT-9181 - 5.5 compatibility;</changes>
+    </changelog>
+
+    <changelog version="2.2.2">
+        <changes lang="de">PT-9044 - Sortierung der Staffelpreise korrigiert; PT-9097 - Caching verbessert;</changes>
+        <changes lang="en">PT-9044 - Fix sorting of block prices; PT-9097 - Improve caching;</changes>
+    </changelog>
+
+    <changelog version="2.2.1">
+        <changes lang="de">PT-9041 - Composer Typ korrigiert;</changes>
+        <changes lang="en">PT-9041 - Fix composer type;</changes>
+    </changelog>
+
+    <changelog version="2.2.0">
+        <changes lang="de">PT-8810 - 5.4 Kompatibilität;</changes>
+        <changes lang="en">PT-8810 - Added 5.4 compatibility;</changes>
+    </changelog>
+
+    <changelog version="2.1.2">
+        <changes lang="de">PT-7650 - 5.3 Kompatibilität und SecureUninstall Prozess hinzugefügt;</changes>
+        <changes lang="en">PT-7650 - Added 5.3 compatibility and secure uninstall process;</changes>
+    </changelog>
+
+    <changelog version="2.1.1">
+        <changes lang="de">
+            PT-5098 - Die Preise können wieder resettet werden;
+            PT-5103 - Performance im Listing wurde verbessert;
+            PT-5309 - Kunden-Paging Bug beseitigt;
+            PT-6315 - Gruppen aktivieren und deaktivieren geht wieder;
+        </changes>
+        <changes lang="en">
+            PT-5098 - Prices can be reset;
+            PT-5103 - Performance of the listing has been improved;
+            PT-5309 - Fix customer paging bug;
+            PT-6315 - groups can set active and inactive again;
+        </changes>
+    </changelog>
+
+    <changelog version="2.1.0">
+        <changes lang="de">PT-6068 - Feature: Shopware 5.2 Kompatibilität;</changes>
+        <changes lang="en">PT-6068 - Feature: Shopware 5.2 Kompatibilität;</changes>
+    </changelog>
+
+    <changelog version="2.0.2">
+        <changes lang="de">PT-3565 - Bugfix: HTTP-Cache Kompatibilität;</changes>
+        <changes lang="en">PT-3565 - Bugfix: HTTP cache compatibility;</changes>
+    </changelog>
+
+    <changelog version="2.0.1">
+        <changes lang="de">
+            PT-3565 - Bugfix: Preisfilter Performance Verbesserungen;
+            PT-3831 - Bugfix: Shopware 5.1 Kompatibilität;
+        </changes>
+        <changes lang="en">
+            PT-3565 - Bugfix: Price filter performance improvements;
+            PT-3831 - Bugfix: Shopware 5.1 compatibility;
+        </changes>
+    </changelog>
+
+    <changelog version="2.0.0">
+        <changes lang="de">PT-3076 - Feature: Shopware 5 Kompatibilität;</changes>
+        <changes lang="en">PT-3076 - Feature: Shopware 5 compatibility;</changes>
+    </changelog>
+
+    <changelog version="1.0.3">
+        <changes lang="de">
+            Korrigiert falsche Kodierung;
+            PT-2388: Korrigiert Nutzung von SSL im Backend;
+            PT-2552: Superglobale REQUEST Variable ersetzt;
+            PT-2614 Korrektur: Cache-Kompatibilität
+        </changes>
+        <changes lang="en">
+            Fixed wrong encoding;
+            PT-2388: Fixed ssl usage in the backend;
+            PT-2552: Replaced superglobal REQUEST variable;
+            PT-2614 fix article price with active HTTP cache
+        </changes>
+    </changelog>
+
+</plugin>

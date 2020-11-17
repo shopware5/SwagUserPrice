@@ -6,112 +6,126 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Components;
+namespace SwagUserPrice\Components;
 
-use Shopware\Bundle\StoreFrontBundle\Struct;
+use Doctrine\DBAL\Query\QueryBuilder;
+use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Components\Model\ModelManager;
+use Shopware_Components_Config as Config;
+use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Plugin ServiceHelper class.
  *
  * This class includes some helper-method to help the services find the data they need.
- *
- * E.g. it includes methods to find a price for one ore more products.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class ServiceHelper
 {
-    /** @var $application \Shopware */
-    private $application;
-
-    /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager;
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
 
     /**
-     * @return \Shopware
+     * @var Config
      */
-    private function getApplication()
-    {
-        if ($this->application === null) {
-            $this->application = Shopware();
-        }
-
-        return $this->application;
-    }
+    private $config;
 
     /**
-     * @return \Shopware\Components\Model\ModelManager
+     * @var Session
      */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->getApplication()->Container()->get('models');
-        }
+    private $session;
 
-        return $this->entityManager;
+    public function __construct(
+        ModelManager $modelManager,
+        Config $config,
+        Session $session
+    ) {
+        $this->modelManager = $modelManager;
+        $this->config = $config;
+        $this->session = $session;
     }
 
     /**
      * Get the prices for a product.
-     *
-     * @param $number
-     * @return mixed
      */
-    public function getPrices($number)
+    public function getPrices(string $number): ?array
     {
-        return $this->getPricesQueryBuilder($number)->orderBy('prices.from', 'ASC')->execute()->fetchAll();
+        $result = $this->getPricesQueryBuilder($number)
+            ->orderBy('prices.from', 'ASC')
+            ->execute()
+            ->fetchAll();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     /**
      * Get a single price for a product.
-     *
-     * @param $number
-     * @return array
      */
-    public function getPrice($number)
+    public function getPrice(string $number): ?array
     {
         $builder = $this->getPricesQueryBuilder($number);
-        if ($this->getApplication()->Container()->get('config')->get('useLastGraduationForCheapestPrice')) {
+        if ($this->config->get('useLastGraduationForCheapestPrice')) {
             $builder->addOrderBy('prices.id', 'DESC');
         }
-        return $builder->setMaxResults(1)->execute()->fetch();
+
+        $result = $builder->setMaxResults(1)
+            ->execute()
+            ->fetch();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 
     /**
      * Get the price for a specified quantity.
      * Will be only used in the checkout-process.
-     *
-     * @param $number
-     * @param $quantity
-     * @return mixed
      */
-    public function getPriceForQuantity($number, $quantity)
+    public function getPriceForQuantity(string $number, int $quantity): ?array
     {
-        return $this->getPricesQueryBuilder($number)
+        $result = $this->getPricesQueryBuilder($number)
             ->andWhere('prices.from <= :quantity')
             ->andWhere('CAST(prices.to as DECIMAL) >= :quantity OR CAST(prices.to as DECIMAL) = 0')
             ->orderBy('prices.from', 'DESC')
             ->setMaxResults(1)
             ->setParameter('quantity', $quantity)
-            ->execute()->fetch();
+            ->execute()
+            ->fetch();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
+    }
+
+    public function buildRule(array $price): PriceRule
+    {
+        $priceRuleStruct = new PriceRule();
+        $priceRuleStruct->setPrice((float) $price['price']);
+        $priceRuleStruct->setFrom((int) $price['from']);
+        $priceRuleStruct->setTo((int) $price['to'] > 0 ? (int) $price['to'] : null);
+        $priceRuleStruct->setPseudoPrice((float) 0);
+
+        return $priceRuleStruct;
     }
 
     /**
      * Builds the query to read all the prices for a product-number.
      * It returns the basic-query without any special filters, limits or offsets.
-     *
-     * @param $number
-     * @return \Doctrine\DBAL\Query\QueryBuilder
-     * @throws \Exception
      */
-    private function getPricesQueryBuilder($number)
+    private function getPricesQueryBuilder(string $number): QueryBuilder
     {
-        $session = $this->getApplication()->Container()->get('session');
-        $userId = $session->offsetGet('sUserId');
+        $userId = $this->session->offsetGet('sUserId');
 
-        $builder = $this->getEntityManager()->getDBALQueryBuilder();
+        $builder = $this->modelManager->getDBALQueryBuilder();
         $builder->select('prices.*')
             ->from('s_plugin_pricegroups_prices', 'prices')
             ->innerJoin(
@@ -130,44 +144,29 @@ class ServiceHelper
             ->setParameters(
                 [
                     'id' => $userId,
-                    'detailId' => $this->getDetailIdByNumber($number)
+                    'detailId' => $this->getDetailIdByNumber($number),
                 ]
             );
 
         return $builder;
     }
 
-    /**
-     * Build a price-rule.
-     *
-     * @param $price
-     * @return Struct\Product\PriceRule
-     */
-    public function buildRule($price)
+    private function getDetailIdByNumber(string $number): ?int
     {
-        $priceRuleStruct = new Struct\Product\PriceRule();
-        $priceRuleStruct->setPrice((float) $price['price']);
-        $priceRuleStruct->setFrom((int) $price['from']);
-        $priceRuleStruct->setTo((int) $price['to'] > 0 ? (int) $price['to'] : null);
-        $priceRuleStruct->setPseudoPrice((float) 0);
-
-        return $priceRuleStruct;
-    }
-
-    /**
-     * Get the detail-id of a product by using the number.
-     *
-     * @param $number
-     * @return mixed
-     */
-    private function getDetailIdByNumber($number)
-    {
-        return $this->getEntityManager()->getDBALQueryBuilder()->select('detail.id')
+        $result = $this->modelManager->getDBALQueryBuilder()
+            ->select('detail.id')
             ->from(
                 's_articles_details',
                 'detail'
             )->where('detail.ordernumber = :number')
             ->setParameter('number', $number)
-            ->execute()->fetchColumn();
+            ->execute()
+            ->fetchColumn();
+
+        if ($result === false) {
+            return null;
+        }
+
+        return $result;
     }
 }

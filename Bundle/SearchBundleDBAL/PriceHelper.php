@@ -6,24 +6,22 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\SearchBundleDBAL;
+namespace SwagUserPrice\Bundle\SearchBundleDBAL;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
+use Enlight_Components_Session_Namespace;
 use Shopware\Bundle\SearchBundleDBAL\PriceHelper as CorePriceHelper;
 use Shopware\Bundle\SearchBundleDBAL\PriceHelperInterface;
 use Shopware\Bundle\SearchBundleDBAL\QueryBuilder;
-use Shopware\Bundle\StoreFrontBundle\Struct;
+use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
+use Shopware\Bundle\StoreFrontBundle\Struct\ShopContextInterface;
+use Shopware_Components_Config;
 
 /**
  * Plugin price helper.
  *
  * This class is an extension to the default PriceHelper.
- * It adds the prices from this plugin to the query.
- * This will be called when the user filters for the price in the listing.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class PriceHelper implements PriceHelperInterface
 {
@@ -33,7 +31,7 @@ class PriceHelper implements PriceHelperInterface
     private $coreHelper;
 
     /**
-     * @var \Shopware_Components_Config
+     * @var Shopware_Components_Config
      */
     private $config;
 
@@ -43,21 +41,15 @@ class PriceHelper implements PriceHelperInterface
     private $connection;
 
     /**
-     * @var \Enlight_Components_Session_Namespace
+     * @var Enlight_Components_Session_Namespace
      */
     private $session;
 
-    /**
-     * @param PriceHelperInterface $coreHelper
-     * @param \Shopware_Components_Config $config
-     * @param Connection $connection
-     * @param \Enlight_Components_Session_Namespace $session
-     */
     public function __construct(
         PriceHelperInterface $coreHelper,
-        \Shopware_Components_Config $config,
+        Shopware_Components_Config $config,
         Connection $connection,
-        \Enlight_Components_Session_Namespace $session
+        Enlight_Components_Session_Namespace $session
     ) {
         $this->coreHelper = $coreHelper;
         $this->config = $config;
@@ -66,9 +58,9 @@ class PriceHelper implements PriceHelperInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
-    public function getSelection(Struct\ProductContextInterface $context)
+    public function getSelection(ProductContextInterface $context)
     {
         return $this->coreHelper->getSelection($context);
     }
@@ -79,7 +71,7 @@ class PriceHelper implements PriceHelperInterface
      *
      * {@inheritdoc}
      */
-    public function joinPrices(QueryBuilder $query, Struct\ShopContextInterface $context)
+    public function joinPrices(QueryBuilder $query, ShopContextInterface $context)
     {
         if ($query->hasState(CorePriceHelper::STATE_INCLUDES_CHEAPEST_PRICE)) {
             return;
@@ -113,7 +105,7 @@ class PriceHelper implements PriceHelperInterface
      *
      * {@inheritdoc}
      */
-    public function joinDefaultPrices(QueryBuilder $query, Struct\ShopContextInterface $context)
+    public function joinDefaultPrices(QueryBuilder $query, ShopContextInterface $context)
     {
         if ($query->hasState(CorePriceHelper::STATE_INCLUDES_DEFAULT_PRICE)) {
             return;
@@ -131,7 +123,7 @@ class PriceHelper implements PriceHelperInterface
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function joinAvailableVariant(QueryBuilder $query)
     {
@@ -142,15 +134,10 @@ class PriceHelper implements PriceHelperInterface
      * Builds the query to join all the needed prices.
      * Default-price for the default customer-group, customer-price for the current customer-group and
      * the own user-prices from this plugin.
-     *
-     * @param QueryBuilder $query
-     * @param $name
-     * @param $group
-     * @return QueryBuilder
      */
-    public function buildQuery(QueryBuilder $query, $name, $group)
+    public function buildQuery(QueryBuilder $query, string $name, array $group): QueryBuilder
     {
-        list($groupName, $groupValue) = $group;
+        [$groupName, $groupValue] = $group;
         $subQueryName = $name . 's';
 
         $graduationUser = 'userPrices.from = 1';
@@ -177,10 +164,8 @@ class PriceHelper implements PriceHelperInterface
     /**
      * Builds the user-subquery.
      * It basically returns the id of the currently logged-in user.
-     *
-     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    private function buildUserQuery()
+    private function buildUserQuery(): DbalQueryBuilder
     {
         $userQuery = $this->connection->createQueryBuilder();
         $userQuery->select('priceGroups.id')->from('s_plugin_pricegroups', 'priceGroups')->innerJoin(
@@ -196,14 +181,8 @@ class PriceHelper implements PriceHelperInterface
     /**
      * Builds the general-subquery to manipulate the table-joins.
      * We are joining a table via subquery to fake the "default"- and "customer"-prices.
-     *
-     * @param $subQueryName
-     * @param $graduationUser
-     * @param $graduation
-     * @param $groupName
-     * @return \Doctrine\DBAL\Query\QueryBuilder
      */
-    private function buildSubQuery($subQueryName, $graduationUser, $graduation, $groupName)
+    private function buildSubQuery(string $subQueryName, string $graduationUser, string $graduation, string $groupName): DbalQueryBuilder
     {
         $subQuery = $this->connection->createQueryBuilder();
 

@@ -6,67 +6,30 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Components;
+namespace SwagUserPrice\Components;
 
-use Shopware\CustomModels\UserPrice\Group;
+use Doctrine\ORM\EntityRepository;
+use Shopware\Components\Model\ModelManager;
+use SwagUserPrice\Models\UserPrice\Group;
 
 class UserPrice
 {
-    /** @var $application \Shopware */
-    private $application;
-
-    /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager;
-
-    /** @var $repo \Shopware\CustomModels\UserPrice\Repository */
-    private $repo;
-
     /**
-     * @return \Shopware
+     * @var ModelManager
      */
-    private function getApplication()
+    private $modelManager;
+
+    public function __construct(ModelManager $modelManager)
     {
-        if ($this->application === null) {
-            $this->application = Shopware();
-        }
-
-        return $this->application;
-    }
-
-    /**
-     * @return \Shopware\Components\Model\ModelManager
-     */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->getApplication()->Container()->get('models');
-        }
-
-        return $this->entityManager;
-    }
-
-    /**
-     * @return \Shopware\CustomModels\UserPrice\Repository
-     */
-    private function getRepository()
-    {
-        if ($this->repo === null) {
-            $this->repo = $this->getEntityManager()->getRepository(Group::class);
-        }
-
-        return $this->repo;
+        $this->modelManager = $modelManager;
     }
 
     /**
      * Formats the prices for an article in the backend.
-     *
-     * @param $articles
-     * @param $groupId
-     * @return mixed
      */
-    public function formatArticlePrices($articles, $groupId)
+    public function formatArticlePrices(?array $articles, int $groupId): ?array
     {
-        /** @var \Shopware\CustomModels\UserPrice\Group $model */
+        /** @var Group $model */
         $model = $this->getRepository()->find($groupId);
 
         if (!$model->getGross()) {
@@ -79,5 +42,10 @@ class UserPrice
         }
 
         return $articles;
+    }
+
+    private function getRepository(): EntityRepository
+    {
+        return $this->modelManager->getRepository(Group::class);
     }
 }

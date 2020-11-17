@@ -6,9 +6,11 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\CustomModels\UserPrice;
+namespace SwagUserPrice\Models\UserPrice;
 
 use Doctrine\DBAL\Query\QueryBuilder;
+use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder as OrmQueryBuilder;
 use Shopware\Components\Model\ModelRepository;
 use Shopware\Models\Customer\Customer;
 
@@ -17,24 +19,13 @@ use Shopware\Models\Customer\Customer;
  *
  * This is the repository for the custom-models.
  * It reads all necessary information from the custom-tables and returns the query/query-builder.
- *
- * @category Shopware
- *
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class Repository extends ModelRepository
 {
     /**
      * Returns the query to read all groups.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     *
-     * @return \Doctrine\ORM\Query
      */
-    public function getGroupsQuery($filter = '', $start = 0, $limit = 20, $sort = null)
+    public function getGroupsQuery(?string $filter = '', ?int $start = 0, ?int $limit = 20, ?array $sort = null): Query
     {
         $builder = $this->getGroupsQueryBuilder($filter, $sort);
 
@@ -45,15 +36,7 @@ class Repository extends ModelRepository
         return $builder->getQuery();
     }
 
-    /**
-     * Returns the query-builder to read all groups from s_plugin_pricegroups.
-     *
-     * @param $filter
-     * @param $sort
-     *
-     * @return \Doctrine\ORM\QueryBuilder
-     */
-    public function getGroupsQueryBuilder($filter, $sort)
+    public function getGroupsQueryBuilder(?string $filter, ?array $sort): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
@@ -69,31 +52,25 @@ class Repository extends ModelRepository
             'priceGroup'
         );
 
-        if (!empty($filter)) {
-            $builder->where('priceGroup.name LIKE ?1')->setParameter(1, '%' . $filter . '%');
+        if ($filter !== null) {
+            $builder->where('priceGroup.name LIKE :filter')
+                ->setParameter('filter', '%' . $filter . '%');
         }
-        if ($sort == null) {
-            $builder->addOrderBy('priceGroup.id', 'ASC');
-        } else {
+
+        if ($sort !== null) {
             $builder->addOrderBy($sort);
         }
 
         return $builder;
     }
 
-    /**
-     * Returns the query to read all customers.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     * @param null   $groupId
-     *
-     * @return \Doctrine\ORM\Query
-     */
-    public function getCustomersQuery($filter = '', $start = 0, $limit = 20, $sort = null, $groupId = null)
-    {
+    public function getCustomersQuery(
+        ?string $filter = '',
+        ?int $start = 0,
+        ?int $limit = 20,
+        ?array $sort = null,
+        ?int $groupId = null
+    ): Query {
         $builder = $this->getCustomersQueryBuilder($filter, $sort);
 
         if ($limit !== null) {
@@ -113,13 +90,8 @@ class Repository extends ModelRepository
     /**
      * Returns the query-builder to read all customers.
      * This information is saved in the s_user_attributes-table.
-     *
-     * @param $filter
-     * @param $sort
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getCustomersQueryBuilder($filter, $sort)
+    public function getCustomersQueryBuilder(?string $filter, ?array $sort): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
@@ -139,10 +111,10 @@ class Repository extends ModelRepository
             'customer.defaultBillingAddress',
             'billing'
         )
-        ->leftJoin(
-            'customer.attribute',
-            'attribute'
-        );
+            ->leftJoin(
+                'customer.attribute',
+                'attribute'
+            );
 
         if (!empty($filter)) {
             $builder->andWhere('customer.number LIKE ?1')
@@ -161,9 +133,10 @@ class Repository extends ModelRepository
                     '%' . $filter . '%'
                 );
         }
-        if ($sort != null) {
+        if ($sort !== null) {
             $builder->addOrderBy($sort);
         }
+
         $builder->addOrderBy('customer.number', 'ASC');
 
         return $builder;
@@ -171,25 +144,16 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read all articles and its custom user-prices, if there are any.
-     *
-     * @param string $filter
-     * @param int    $start
-     * @param int    $limit
-     * @param null   $sort
-     * @param bool   $main
-     * @param null   $groupId
-     *
-     * @return mixed
      */
     public function getArticlesQuery(
-        $filter = '',
-        $start = 0,
-        $limit = 20,
-        $sort = null,
-        $main = false,
-        $groupId = null
+        ?string $filter = '',
+        ?int $start = 0,
+        ?int $limit = 20,
+        ?array $sort = null,
+        ?bool $main = false,
+        ?int $groupId = null
     ) {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getArticlesQueryBuilder($filter, $start, $limit, $sort, $main, $groupId);
 
         return $builder->execute();
@@ -197,19 +161,10 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read all articles and its custom user-prices, if there are any.
-     *
-     * @param $filter
-     * @param $start
-     * @param $limit
-     * @param $sort
-     * @param $main
-     * @param $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesQueryBuilder($filter, $start, $limit, $sort, $main, $groupId)
+    public function getArticlesQueryBuilder(string $filter, int $start, int $limit, ?array $sort, bool $main, ?int $groupId): QueryBuilder
     {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
         $builder->select(
@@ -257,14 +212,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read the total count of articles with prices assigned.
-     *
-     * @param string $filter
-     * @param bool   $main
-     * @param null   $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesCountQuery($filter = '', $main = false, $groupId = null)
+    public function getArticlesCountQuery(?string $filter = '', ?bool $main = false, ?int $groupId = null)
     {
         $builder = $this->getArticlesCountQueryBuilder($filter, $main, $groupId);
 
@@ -273,16 +222,10 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read the total count of articles with prices assigned.
-     *
-     * @param $filter
-     * @param $main
-     * @param $groupId
-     *
-     * @return mixed
      */
-    public function getArticlesCountQueryBuilder($filter, $main, $groupId)
+    public function getArticlesCountQueryBuilder(string $filter, ?bool $main, ?int $groupId): QueryBuilder
     {
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
+        /** @var QueryBuilder $builder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
         if ($main) {
@@ -308,13 +251,8 @@ class Repository extends ModelRepository
     /**
      * Builds the query to read the articles having custom user-prices.
      * This is needed multiple times.
-     *
-     * @param QueryBuilder $builder
-     * @param $groupId
-     *
-     * @return QueryBuilder
      */
-    public function buildGetArticleQuery(QueryBuilder $builder, $groupId)
+    public function buildGetArticleQuery(QueryBuilder $builder, int $groupId): QueryBuilder
     {
         $builder->from('s_articles', 'article')->join(
             'article',
@@ -345,13 +283,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query to read the custom user-prices being assigned to an article and a group.
-     *
-     * @param null $detailId
-     * @param null $groupId
-     *
-     * @return \Doctrine\ORM\Query
      */
-    public function getPricesQuery($detailId = null, $groupId = null)
+    public function getPricesQuery(?int $detailId = null, ?int $groupId = null): Query
     {
         $query = $this->getPricesQueryBuilder($detailId, $groupId);
 
@@ -360,13 +293,8 @@ class Repository extends ModelRepository
 
     /**
      * Returns the query-builder to read the custom user-prices being assigned to an article and a group.
-     *
-     * @param $detailId
-     * @param $groupId
-     *
-     * @return \Doctrine\ORM\QueryBuilder
      */
-    public function getPricesQueryBuilder($detailId, $groupId)
+    public function getPricesQueryBuilder(int $detailId, int $groupId): OrmQueryBuilder
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
@@ -384,10 +312,10 @@ class Repository extends ModelRepository
             Price::class,
             'prices'
         )->where('prices.priceGroupId = ?1')
-        ->andWhere('prices.articleDetailsId = ?2')
-        ->setParameter(1, $groupId)
-        ->setParameter(2, $detailId)
-        ->orderBy('prices.from', 'ASC');
+            ->andWhere('prices.articleDetailsId = ?2')
+            ->setParameter(1, $groupId)
+            ->setParameter(2, $detailId)
+            ->orderBy('prices.from', 'ASC');
 
         return $builder;
     }

@@ -6,41 +6,56 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Subscriber;
+namespace SwagUserPrice\Subscriber;
 
+use Doctrine\DBAL\Connection;
 use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs as EventArgs;
+use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Plugin\Plugin;
-use Shopware\SwagUserPrice\Components;
-use Shopware_Plugins_Backend_SwagUserPrice_Bootstrap as Bootstrap;
-use Shopware_Plugins_Core_HttpCache_Bootstrap as CachePluginBootstrap;
+use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
+use SwagUserPrice\Components\AccessValidator;
+use SwagUserPrice\Components\ServiceHelper;
 
-/**
- * Plugin subscriber class.
- *
- * This subscriber registers a hook to the price-calculation for the checkout-process.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
- */
 class Hooks implements SubscriberInterface
 {
     /**
-     * Instance of Shopware_Plugins_Backend_SwagUserPrice_Bootstrap
-     *
-     * @var Bootstrap
+     * @var Connection
      */
-    protected $bootstrap;
+    private $database;
 
     /**
-     * Constructor of the subscriber. Sets the instance of the bootstrap.
-     *
-     * @param Bootstrap $bootstrap
+     * @var AccessValidator
      */
-    public function __construct(Bootstrap $bootstrap)
-    {
-        $this->bootstrap = $bootstrap;
+    private $accessValidator;
+
+    /**
+     * @var ServiceHelper
+     */
+    private $serviceHelper;
+
+    /**
+     * @var DependencyProvider
+     */
+    private $dependencyProvider;
+
+    /**
+     * @var ModelManager
+     */
+    private $modelManager;
+
+    public function __construct(
+        Connection $database,
+        AccessValidator $accessValidator,
+        ServiceHelper $serviceHelper,
+        DependencyProvider $dependencyProvider,
+        ModelManager $modelManager
+    ) {
+        $this->database = $database;
+        $this->accessValidator = $accessValidator;
+        $this->serviceHelper = $serviceHelper;
+        $this->dependencyProvider = $dependencyProvider;
+        $this->modelManager = $modelManager;
     }
 
     /**
@@ -52,33 +67,28 @@ class Hooks implements SubscriberInterface
     {
         return [
             'Shopware_Modules_Basket_getPriceForUpdateArticle_FilterPrice' => 'onUpdatePrice',
-            'sAdmin::sLogin::after' => 'onFrontendLogin'
+            'sAdmin::sLogin::after' => 'onFrontendLogin',
         ];
     }
 
     /**
      * Fetches the current return of the method,
      * manipulates the price and returns the result
-     *
-     * @param $args
-     * @return array
      */
-    public function onUpdatePrice(EventArgs $args)
+    public function onUpdatePrice(EventArgs $args): array
     {
         $return = $args->getReturn();
         $id = $args->get('id');
 
         $sql = 'SELECT ordernumber FROM `s_order_basket` WHERE `id` = ?';
 
-        $orderNumber = $this->bootstrap->get('db')->fetchOne($sql, [$id]);
+        $orderNumber = $this->database->fetchOne($sql, [$id]);
 
-        if (!$this->bootstrap->get('swaguserprice.accessvalidator')->validateProduct($orderNumber)) {
+        if (!$this->accessValidator->validateProduct($orderNumber)) {
             return $return;
         }
 
-        /** @var Components\ServiceHelper $serviceHelper */
-        $serviceHelper = $this->bootstrap->get('swaguserprice.servicehelper');
-        $price = $serviceHelper->getPriceForQuantity($orderNumber, $args->get('quantity'));
+        $price = $this->serviceHelper->getPriceForQuantity($orderNumber, $args->get('quantity'));
 
         if (!$price) {
             return $return;
@@ -93,24 +103,21 @@ class Hooks implements SubscriberInterface
      * On user login when httpcache plugin is active
      * set no cache tag for product prices
      */
-    public function onFrontendLogin()
+    public function onFrontendLogin(): void
     {
         if ($this->cachePluginActive()) {
-            /** @var CachePluginBootstrap $cache */
-            $cache = $this->bootstrap->get('plugins')->Core()->HttpCache();
+            $cache = $this->dependencyProvider->getHttpCache();
             $cache->setNoCacheTag('price');
         }
     }
 
     /**
      * Check if HttpCache plugin is installed and activate
-     *
-     * @return boolean
      */
-    private function cachePluginActive()
+    private function cachePluginActive(): bool
     {
         /** @var Plugin $cachePlugin */
-        $cachePlugin = $this->bootstrap->get('models')->getRepository(Plugin::class)
+        $cachePlugin = $this->modelManager->getRepository(Plugin::class)
             ->findOneBy(['name' => 'HttpCache']);
         if ($cachePlugin->getActive()) {
             return true;

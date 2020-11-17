@@ -6,48 +6,41 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Components;
+namespace SwagUserPrice\Components;
+
+use Doctrine\DBAL\Query\QueryBuilder;
+use Enlight_Components_Session_Namespace as Session;
+use Shopware\Components\Model\ModelManager;
+use Shopware\Models\Shop\Shop;
 
 /**
  * Plugin AccessValidator class.
  *
  * This class handles the validation of products.
  * It checks if a product actually has configured user-prices.
- *
- * @category Shopware
- * @package Shopware\Plugin\SwagUserPrice
- * @copyright Copyright (c) shopware AG (http://www.shopware.de)
  */
 class AccessValidator
 {
-    /** @var $application \Shopware */
-    private $application;
-
-    /** @var $entityManager \Shopware\Components\Model\ModelManager */
-    private $entityManager;
+    /**
+     * @var Session
+     */
+    private $session;
 
     /**
-     * @return \Shopware
+     * @var ModelManager
      */
-    private function getApplication()
-    {
-        if ($this->application === null) {
-            $this->application = Shopware();
-        }
-
-        return $this->application;
-    }
+    private $modelManager;
 
     /**
-     * @return \Shopware\Components\Model\ModelManager
+     * @var Shop|null
      */
-    private function getEntityManager()
-    {
-        if ($this->entityManager === null) {
-            $this->entityManager = $this->getApplication()->Container()->get('models');
-        }
+    private $shop;
 
-        return $this->entityManager;
+    public function __construct(Session $session, ModelManager $modelManager, ?Shop $shop = null)
+    {
+        $this->session = $session;
+        $this->modelManager = $modelManager;
+        $this->shop = $shop;
     }
 
     /**
@@ -55,23 +48,20 @@ class AccessValidator
      * If a product owns custom user-prices, this will return true.
      * In case there is no logged in user or the current article has no custom user-prices, it returns false.
      *
-     * @param $number
-     * @return bool
      * @throws \Exception
      */
-    public function validateProduct($number)
+    public function validateProduct($number): bool
     {
-        if (!$this->getApplication()->Container()->has('shop')) {
+        if ($this->shop === null) {
             return false;
         }
 
-        $session = $this->getApplication()->Container()->get('session');
-        if (!$session->offsetExists('sUserId') || !$session->offsetGet('sUserId')) {
+        if (!$this->session->offsetExists('sUserId') || !$this->session->offsetGet('sUserId')) {
             return false;
         }
 
-        $userId = $session->offsetGet('sUserId');
-        $detailId = $this->getEntityManager()->getDBALQueryBuilder()
+        $userId = $this->session->offsetGet('sUserId');
+        $detailId = $this->modelManager->getDBALQueryBuilder()
             ->select('detail.id')
             ->from(
                 's_articles_details',
@@ -80,8 +70,8 @@ class AccessValidator
             ->setParameter('number', $number)
             ->execute()->fetchColumn();
 
-        /** @var $builder \Doctrine\DBAL\Query\QueryBuilder */
-        $builder = $this->getEntityManager()->getDBALQueryBuilder();
+        /** @var QueryBuilder $builder */
+        $builder = $this->modelManager->getDBALQueryBuilder();
 
         $stmt = $builder->select('COUNT(prices.id)')
             ->from('s_plugin_pricegroups_prices', 'prices')
@@ -106,7 +96,7 @@ class AccessValidator
             ->setParameters(
                 [
                     'id' => $userId,
-                    'detailId' => $detailId
+                    'detailId' => $detailId,
                 ]
             )->execute();
 

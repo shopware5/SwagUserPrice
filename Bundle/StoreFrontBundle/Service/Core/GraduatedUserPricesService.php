@@ -6,32 +6,36 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
+namespace SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 
 use Shopware\Bundle\StoreFrontBundle\Service\GraduatedPricesServiceInterface;
-use Shopware\Bundle\StoreFrontBundle\Struct;
-use Shopware\SwagUserPrice\Components;
+use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
+use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
+use SwagUserPrice\Components\AccessValidator;
+use SwagUserPrice\Components\ServiceHelper;
 
 class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 {
-    /** @var GraduatedPricesServiceInterface */
+    /**
+     * @var GraduatedPricesServiceInterface
+     */
     private $service;
 
-    /** @var Components\AccessValidator */
+    /**
+     * @var AccessValidator
+     */
     private $validator;
 
-    /** @var Components\ServiceHelper */
+    /**
+     * @var ServiceHelper
+     */
     private $helper;
 
-    /**
-     * @param GraduatedPricesServiceInterface $service
-     * @param Components\AccessValidator $validator
-     * @param Components\ServiceHelper $helper
-     */
     public function __construct(
         GraduatedPricesServiceInterface $service,
-        Components\AccessValidator $validator,
-        Components\ServiceHelper $helper
+        AccessValidator $validator,
+        ServiceHelper $helper
     ) {
         $this->service = $service;
         $this->validator = $validator;
@@ -41,7 +45,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function get(Struct\ListProduct $product, Struct\ProductContextInterface $context)
+    public function get(ListProduct $product, ProductContextInterface $context)
     {
         $graduatedPrices = $this->getList([$product], $context);
 
@@ -51,7 +55,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
     /**
      * {@inheritdoc}
      */
-    public function getList($products, Struct\ProductContextInterface $context)
+    public function getList($products, ProductContextInterface $context)
     {
         $products = $this->service->getList($products, $context);
 
@@ -59,6 +63,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
             if (!$this->validator->validateProduct($number)) {
                 continue;
             }
+
             $rules = $this->getCustomRules($rules[0], $number);
         }
 
@@ -67,12 +72,8 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 
     /**
      * Builds a custom price-rule to implement the plugins prices.
-     *
-     * @param Struct\Product\PriceRule $coreRule
-     * @param $number
-     * @return array
      */
-    private function getCustomRules(Struct\Product\PriceRule $coreRule, $number)
+    private function getCustomRules(PriceRule $coreRule, string $number): array
     {
         $prices = $this->helper->getPrices($number);
 

@@ -6,17 +6,16 @@
  * file that was distributed with this source code.
  */
 
-namespace Shopware\SwagUserPrice\Bundle\StoreFrontBundle\Service;
+namespace SwagUserPrice\Bundle\StoreFrontBundle\Service;
+
+use Enlight_Components_Session_Namespace;
+use Shopware_Plugins_Core_HttpCache_Bootstrap as HttpCache;
 
 interface DependencyProviderInterface
 {
-    /**
-     * @return bool
-     */
-    public function hasShop();
+    public function hasShop(): bool;
 
-    /**
-     * @return \Enlight_Components_Session_Namespace
-     */
-    public function getSession();
+    public function getSession(): Enlight_Components_Session_Namespace;
+
+    public function getHttpCache(): HttpCache;
 }
