@@ -162,7 +162,7 @@ class Repository extends ModelRepository
     /**
      * Returns the query-builder to read all articles and its custom user-prices, if there are any.
      */
-    public function getArticlesQueryBuilder(string $filter, int $start, int $limit, ?array $sort, bool $main, ?int $groupId): QueryBuilder
+    public function getArticlesQueryBuilder(string $filter, int $start, int $limit, ?array $sort, ?bool $main, ?int $groupId): QueryBuilder
     {
         /** @var QueryBuilder $builder */
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
