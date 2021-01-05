@@ -11,6 +11,11 @@
     <author>shopware AG</author>
     <compatibility minVersion="5.7.0" maxVersion="5.99.99"/>
 
+    <changelog version="REPLACE_GLOBAL_WITH_NEXT_VERSION">
+        <changes lang="de">PT-12221 - Korrigiert die Anzeige des individuellen Kundenpreises;</changes>
+        <changes lang="en">PT-12221 - Fixes displaying of the individual customer price;</changes>
+    </changelog>
+
     <changelog version="3.0.0">
         <changes lang="de">PT-12129 - Shopware 5.7 und PHP8 Kompatibilität;</changes>
         <changes lang="en">PT-12129 - Shopware 5.7 and PHP8 compatibility;</changes>

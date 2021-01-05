@@ -11,7 +11,6 @@ namespace SwagUserPrice\Components;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Enlight_Components_Session_Namespace as Session;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Shop\Shop;
 
 /**
  * Plugin AccessValidator class.
@@ -31,16 +30,10 @@ class AccessValidator
      */
     private $modelManager;
 
-    /**
-     * @var Shop|null
-     */
-    private $shop;
-
-    public function __construct(Session $session, ModelManager $modelManager, ?Shop $shop = null)
+    public function __construct(Session $session, ModelManager $modelManager)
     {
         $this->session = $session;
         $this->modelManager = $modelManager;
-        $this->shop = $shop;
     }
 
     /**
@@ -52,15 +45,12 @@ class AccessValidator
      */
     public function validateProduct($number): bool
     {
-        if ($this->shop === null) {
-            return false;
-        }
-
         if (!$this->session->offsetExists('sUserId') || !$this->session->offsetGet('sUserId')) {
             return false;
         }
 
         $userId = $this->session->offsetGet('sUserId');
+
         $detailId = $this->modelManager->getDBALQueryBuilder()
             ->select('detail.id')
             ->from(
