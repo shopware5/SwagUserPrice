@@ -113,4 +113,7 @@
         </changes>
     </changelog>
 
+    <description lang="en">Using this plugin you are now able to offer special discounts on certain items and for certain customers. This is completely independent and separate from customer groups and their graduaded prices and offers another way of appreciating your custom.</description>
+    <description lang="de">Mit dem Plugin hast Du die Möglichkeit Deinen Stammkunden einen gewissen Rabatt auf definierte Artikel zu gewähren. Diese Einstellung greift ganz unabhängig der zugeordneten Kundengruppe und deren Staffeln.</description>
+
 </plugin>
