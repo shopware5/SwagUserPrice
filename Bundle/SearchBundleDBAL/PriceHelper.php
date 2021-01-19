@@ -10,13 +10,13 @@ namespace SwagUserPrice\Bundle\SearchBundleDBAL;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder as DbalQueryBuilder;
-use Enlight_Components_Session_Namespace;
 use Shopware\Bundle\SearchBundleDBAL\PriceHelper as CorePriceHelper;
 use Shopware\Bundle\SearchBundleDBAL\PriceHelperInterface;
 use Shopware\Bundle\SearchBundleDBAL\QueryBuilder;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use Shopware\Bundle\StoreFrontBundle\Struct\ShopContextInterface;
 use Shopware_Components_Config;
+use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 
 /**
  * Plugin price helper.
@@ -41,20 +41,20 @@ class PriceHelper implements PriceHelperInterface
     private $connection;
 
     /**
-     * @var Enlight_Components_Session_Namespace
+     * @var DependencyProvider
      */
-    private $session;
+    private $dependencyProvider;
 
     public function __construct(
         PriceHelperInterface $coreHelper,
         Shopware_Components_Config $config,
         Connection $connection,
-        Enlight_Components_Session_Namespace $session
+        DependencyProvider $dependencyProvider
     ) {
         $this->coreHelper = $coreHelper;
         $this->config = $config;
         $this->connection = $connection;
-        $this->session = $session;
+        $this->dependencyProvider = $dependencyProvider;
     }
 
     /**
@@ -156,7 +156,10 @@ class PriceHelper implements PriceHelperInterface
             'availableVariant.id = ' . $name . '.articledetailsID'
         );
 
-        $query->setParameter($groupName, $groupValue)->setParameter(':userId', $this->session->get('sUserId'));
+        $query->setParameter($groupName, $groupValue)->setParameter(
+            ':userId',
+            $this->dependencyProvider->getSession()->get('sUserId')
+        );
 
         return $query;
     }

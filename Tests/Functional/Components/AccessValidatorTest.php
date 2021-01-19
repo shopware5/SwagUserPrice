@@ -53,7 +53,7 @@ class AccessValidatorTest extends TestCase
     private function getValidator(): AccessValidator
     {
         return new AccessValidator(
-            Shopware()->Container()->get('session'),
+            Shopware()->Container()->get('swaguserprice.dependency_provider'),
             Shopware()->Container()->get('models')
         );
     }
