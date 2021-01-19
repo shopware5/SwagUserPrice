@@ -12,6 +12,7 @@ use Doctrine\DBAL\Query\QueryBuilder;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Config as Config;
+use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
@@ -34,16 +35,16 @@ class ServiceHelper
     /**
      * @var Session
      */
-    private $session;
+    private $dependencyProvider;
 
     public function __construct(
         ModelManager $modelManager,
         Config $config,
-        Session $session
+        DependencyProvider $dependencyProvider
     ) {
         $this->modelManager = $modelManager;
         $this->config = $config;
-        $this->session = $session;
+        $this->dependencyProvider = $dependencyProvider;
     }
 
     /**
@@ -123,7 +124,10 @@ class ServiceHelper
      */
     private function getPricesQueryBuilder(string $number): QueryBuilder
     {
-        $userId = $this->session->offsetGet('sUserId');
+        $userId = 0;
+        if ($this->dependencyProvider->has('session')) {
+            $userId = $this->dependencyProvider->getSession()->offsetGet('sUserId');
+        }
 
         $builder = $this->modelManager->getDBALQueryBuilder();
         $builder->select('prices.*')

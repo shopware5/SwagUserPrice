@@ -11,6 +11,15 @@
     <author>shopware AG</author>
     <compatibility minVersion="5.7.0" maxVersion="5.99.99"/>
 
+    <changelog version="REPLACE_GLOBAL_WITH_NEXT_VERSION(4.0.0)">
+        <changes lang="de">
+            PT-12228 - Behebt fehlerhaftes Verhalten im Shopware-Backend;
+        </changes>
+        <changes lang="en">
+            PT-12228 - Fixes incorrect behaviour in the Shopware backend;
+        </changes>
+    </changelog>
+
     <changelog version="3.0.0">
         <changes lang="de">
             PT-12129 - Shopware 5.7 und PHP8 Kompatibilität;
@@ -113,7 +122,13 @@
         </changes>
     </changelog>
 
-    <description lang="en">Using this plugin you are now able to offer special discounts on certain items and for certain customers. This is completely independent and separate from customer groups and their graduaded prices and offers another way of appreciating your custom.</description>
-    <description lang="de">Mit dem Plugin hast Du die Möglichkeit Deinen Stammkunden einen gewissen Rabatt auf definierte Artikel zu gewähren. Diese Einstellung greift ganz unabhängig der zugeordneten Kundengruppe und deren Staffeln.</description>
+    <description lang="en">Using this plugin you are now able to offer special discounts on certain items and for
+        certain customers. This is completely independent and separate from customer groups and their graduaded prices
+        and offers another way of appreciating your custom.
+    </description>
+    <description lang="de">Mit dem Plugin hast Du die Möglichkeit Deinen Stammkunden einen gewissen Rabatt auf
+        definierte Artikel zu gewähren. Diese Einstellung greift ganz unabhängig der zugeordneten Kundengruppe und deren
+        Staffeln.
+    </description>
 
 </plugin>

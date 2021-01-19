@@ -24,6 +24,11 @@ class DependencyProvider implements DependencyProviderInterface
         $this->container = $container;
     }
 
+    public function has(string $serviceId): bool
+    {
+        return $this->container->has($serviceId);
+    }
+
     /**
      * {@inheritdoc}
      */

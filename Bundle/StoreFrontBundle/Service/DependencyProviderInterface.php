@@ -13,6 +13,8 @@ use Shopware_Plugins_Core_HttpCache_Bootstrap as HttpCache;
 
 interface DependencyProviderInterface
 {
+    public function has(string $serviceId): bool;
+
     public function hasShop(): bool;
 
     public function getSession(): Enlight_Components_Session_Namespace;
