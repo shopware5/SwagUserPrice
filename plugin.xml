@@ -4,14 +4,14 @@
 
     <label lang="de">Kundenspezifische Preise</label>
     <label lang="en">Customer-specific prices</label>
-    <version>3.0.0</version>
+    <version>4.0.0</version>
     <copyright>(c) by shopware AG</copyright>
     <license>MIT</license>
     <link>http://store.shopware.com</link>
     <author>shopware AG</author>
     <compatibility minVersion="5.7.0" maxVersion="5.99.99"/>
 
-    <changelog version="REPLACE_GLOBAL_WITH_NEXT_VERSION(4.0.0)">
+    <changelog version="4.0.0">
         <changes lang="de">
             PT-12228 - Behebt fehlerhaftes Verhalten im Shopware-Backend;
         </changes>
