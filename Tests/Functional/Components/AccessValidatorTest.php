@@ -16,7 +16,7 @@ class AccessValidatorTest extends TestCase
 {
     use DatabaseTransactionBehaviour;
 
-    public function test_validateProduct_noUserId_shouldReturnFalse()
+    public function testValidateProductNoUserIdShouldReturnFalse()
     {
         $validator = $this->getValidator();
 
@@ -25,7 +25,7 @@ class AccessValidatorTest extends TestCase
         static::assertFalse($result);
     }
 
-    public function test_validateProduct_noPriceIsset_shouldReturnFalse()
+    public function testValidateProductNoPriceIssetShouldReturnFalse()
     {
         $validator = $this->getValidator();
 
@@ -36,7 +36,7 @@ class AccessValidatorTest extends TestCase
         static::assertFalse($result);
     }
 
-    public function test_validateProduct_shouldReturnTrue()
+    public function testValidateProductShouldReturnTrue()
     {
         $validator = $this->getValidator();
 

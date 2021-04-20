@@ -19,7 +19,7 @@ class GraduatedUserPriceServiceTest extends TestCase
 {
     use DatabaseTransactionBehaviour;
 
-    public function test_get()
+    public function testGet()
     {
         $contextService = Shopware()->Container()->get('shopware_storefront.context_service');
         $context = $contextService->createProductContext(1, 1, 'EK');
