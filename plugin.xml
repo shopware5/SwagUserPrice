@@ -4,12 +4,21 @@
 
     <label lang="de">Kundenspezifische Preise</label>
     <label lang="en">Customer-specific prices</label>
-    <version>4.0.0</version>
+    <version>4.0.1</version>
     <copyright>(c) by shopware AG</copyright>
     <license>MIT</license>
     <link>http://store.shopware.com</link>
     <author>shopware AG</author>
-    <compatibility minVersion="5.7.0" maxVersion="5.99.99"/>
+    <compatibility minVersion="5.6.9" maxVersion="5.99.99"/>
+
+    <changelog version="4.0.1">
+        <changes lang="de">
+            PT-12328 - Shopware 5.6.9 Kompatibilität;
+        </changes>
+        <changes lang="en">
+            PT-12328 - Shopware 5.6.9 compatibility;
+        </changes>
+    </changelog>
 
     <changelog version="4.0.0">
         <changes lang="de">

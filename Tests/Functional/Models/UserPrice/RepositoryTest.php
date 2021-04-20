@@ -13,7 +13,7 @@ use SwagUserPrice\Models\UserPrice\Group;
 
 class RepositoryTest extends TestCase
 {
-    public function test_getArticlesQueryBuilder_with_null_params()
+    public function testGetArticlesQueryBuilderWithNullParams()
     {
         $repository = $this->getRepository();
 
