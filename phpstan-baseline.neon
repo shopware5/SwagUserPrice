@@ -156,8 +156,8 @@ parameters:
 			path: Controllers/Backend/UserPrice.php
 
 		-
-			message: "#^Cannot call method getNamespace\\(\\) on Shopware_Components_Snippet_Manager\\|null\\.$#"
-			count: 3
+			message: "#^Cannot call method getGross\\(\\) on object\\|null\\.$#"
+			count: 1
 			path: Controllers/Backend/UserPrice.php
 
 		-
@@ -167,11 +167,6 @@ parameters:
 
 		-
 			message: "#^Cannot call method getTax\\(\\) on Shopware\\\\Models\\\\Tax\\\\Tax\\|null\\.$#"
-			count: 2
-			path: Controllers/Backend/UserPrice.php
-
-		-
-			message: "#^Cannot call method notify\\(\\) on Enlight_Event_EventManager\\|null\\.$#"
 			count: 2
 			path: Controllers/Backend/UserPrice.php
 
@@ -247,6 +242,11 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:remove\\(\\) expects object, SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:remove\\(\\) expects object, object\\|null given\\.$#"
 			count: 1
 			path: Controllers/Backend/UserPrice.php
 
@@ -362,11 +362,6 @@ parameters:
 
 		-
 			message: "#^Cannot call method registerResources\\(\\) on object\\|null\\.$#"
-			count: 1
-			path: Tests/Bootstrap.php
-
-		-
-			message: "#^Cannot call method setRequest\\(\\) on Enlight_Controller_Front\\|null\\.$#"
 			count: 1
 			path: Tests/Bootstrap.php
 

@@ -4,6 +4,7 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
  */
 
 /**
@@ -22,7 +23,7 @@ class SwagUserPriceTestKernel extends Kernel
         $kernel->boot();
 
         $container = $kernel->getContainer();
-        $container->get('plugins')->Core()->ErrorHandler()->registerErrorHandler(E_ALL | E_STRICT);
+        $container->get('plugins')->Core()->ErrorHandler()->registerErrorHandler(\E_ALL | \E_STRICT);
 
         /** @var \Shopware\Models\Shop\Repository $repository */
         $repository = $container->get('models')->getRepository(Shop::class);
