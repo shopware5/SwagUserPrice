@@ -1,5 +1,5 @@
 {
-    "name": "shopwareLabs/swag-user-price",
+    "name": "shopware-labs/swag-user-price",
     "type": "shopware-backend-plugin",
     "description": "Customer specific prices in Shopware",
     "license": "MIT",
