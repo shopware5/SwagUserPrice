@@ -1,0 +1,437 @@
+parameters:
+	ignoreErrors:
+		-
+			message: "#^Argument of an invalid type array\\|false supplied for foreach, only iterables are supported\\.$#"
+			count: 2
+			path: Bootstrap/Setup.php
+
+		-
+			message: "#^Call to an undefined method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:getEntityManager\\(\\)\\.$#"
+			count: 1
+			path: Bootstrap/Setup.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:update\\(\\) has parameter \\$oldVersion with no typehint specified\\.$#"
+			count: 1
+			path: Bootstrap/Setup.php
+
+		-
+			message: "#^Parameter \\#3 \\$menuItemName of method Shopware_Components_Acl\\:\\:createResource\\(\\) expects null, string given\\.$#"
+			count: 1
+			path: Bootstrap/Setup.php
+
+		-
+			message: "#^Parameter \\#4 \\$pluginID of method Shopware_Components_Acl\\:\\:createResource\\(\\) expects null, int given\\.$#"
+			count: 1
+			path: Bootstrap/Setup.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinAvailableVariant\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Bundle/SearchBundleDBAL/PriceHelper.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinDefaultPrices\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Bundle/SearchBundleDBAL/PriceHelper.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinPrices\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Bundle/SearchBundleDBAL/PriceHelper.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestUserPriceService\\:\\:get\\(\\) should return Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\Product\\\\PriceRule but returns Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\Product\\\\PriceRule\\|null\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
+
+		-
+			message: "#^Parameter \\#1 \\$price of method SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:buildRule\\(\\) expects array, array\\|null given\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
+
+		-
+			message: "#^Property SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestUserPriceService\\:\\:\\$service \\(Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestPriceService\\) does not accept Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\CheapestPriceServiceInterface\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
+
+		-
+			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
+
+		-
+			message: "#^Parameter \\#1 \\$array_arg of function end expects array\\|object, array\\|null given\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
+
+		-
+			message: "#^Cannot call method Core\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/DependencyProvider.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider\\:\\:getSession\\(\\) should return Enlight_Components_Session_Namespace but returns object\\|null\\.$#"
+			count: 1
+			path: Bundle/StoreFrontBundle/Service/DependencyProvider.php
+
+		-
+			message: "#^Call to an undefined method Enlight_Components_Session_Namespace\\:\\:getSession\\(\\)\\.$#"
+			count: 1
+			path: Components/AccessValidator.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:validateProduct\\(\\) has parameter \\$number with no typehint specified\\.$#"
+			count: 1
+			path: Components/AccessValidator.php
+
+		-
+			message: "#^Property SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:\\$dependencyProvider \\(Enlight_Components_Session_Namespace\\) does not accept SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider\\.$#"
+			count: 1
+			path: Components/AccessValidator.php
+
+		-
+			message: "#^Call to an undefined method Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\Session\\:\\:getSession\\(\\)\\.$#"
+			count: 1
+			path: Components/ServiceHelper.php
+
+		-
+			message: "#^Cannot call method fetch\\(\\) on Doctrine\\\\DBAL\\\\Driver\\\\ResultStatement\\|int\\.$#"
+			count: 2
+			path: Components/ServiceHelper.php
+
+		-
+			message: "#^Cannot call method fetchAll\\(\\) on Doctrine\\\\DBAL\\\\Driver\\\\ResultStatement\\|int\\.$#"
+			count: 1
+			path: Components/ServiceHelper.php
+
+		-
+			message: "#^Property SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:\\$dependencyProvider \\(Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\Session\\) does not accept SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider\\.$#"
+			count: 1
+			path: Components/ServiceHelper.php
+
+		-
+			message: "#^Strict comparison using \\=\\=\\= between array and false will always evaluate to false\\.$#"
+			count: 1
+			path: Components/ServiceHelper.php
+
+		-
+			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: Components/UserPrice.php
+
+		-
+			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Call to method setCustomer\\(\\) on an unknown class Shopware\\\\Models\\\\Attribute\\\\Customer\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Call to method setSwagPricegroup\\(\\) on an unknown class Shopware\\\\Models\\\\Attribute\\\\Customer\\.$#"
+			count: 3
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method fromArray\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Group\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method fromArray\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method getArticle\\(\\) on Shopware\\\\Models\\\\Article\\\\Detail\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method getGross\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Group\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method getGross\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method getTax\\(\\) on Shopware\\\\Models\\\\Article\\\\Article\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method getTax\\(\\) on Shopware\\\\Models\\\\Tax\\\\Tax\\|null\\.$#"
+			count: 2
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method setArticle\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method setDetail\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Cannot call method setPriceGroup\\(\\) on SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Class Shopware\\\\Models\\\\Attribute\\\\Customer not found\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Instantiated class Shopware\\\\Models\\\\Attribute\\\\Customer not found\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Method Shopware_Controllers_Backend_UserPrice\\:\\:preDispatch\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Negated boolean expression is always false\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Offset 'id' does not exist on array\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Offset 'limit' does not exist on array\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Offset 'query' does not exist on array\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Offset 'start' does not exist on array\\|null\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$array of method Shopware_Controllers_Backend_UserPrice\\:\\:isMultiDimensional\\(\\) expects array, array\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:persist\\(\\) expects object, SwagUserPrice\\\\Models\\\\UserPrice\\\\Group\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:persist\\(\\) expects object, SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:remove\\(\\) expects object, SwagUserPrice\\\\Models\\\\UserPrice\\\\Price\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entity of method Doctrine\\\\ORM\\\\EntityManager\\:\\:remove\\(\\) expects object, object\\|null given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$entityName of method Doctrine\\\\ORM\\\\EntityManager\\:\\:getRepository\\(\\) expects class\\-string\\<Shopware\\\\Models\\\\Attribute\\\\Customer\\>, string given\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Property Shopware_Controllers_Backend_UserPrice\\:\\:\\$userPriceRepository \\(SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\) does not accept Doctrine\\\\ORM\\\\EntityRepository\\<SwagUserPrice\\\\Models\\\\UserPrice\\\\Group\\>\\.$#"
+			count: 1
+			path: Controllers/Backend/UserPrice.php
+
+		-
+			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityManager\\:\\:getDBALQueryBuilder\\(\\)\\.$#"
+			count: 2
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#1 \\$detailId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getPricesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#1 \\$filter of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQueryBuilder\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#1 \\$filter of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects string, string\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#1 \\$sort of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:addOrderBy\\(\\) expects Doctrine\\\\ORM\\\\Query\\\\Expr\\\\OrderBy\\|string, array given\\.$#"
+			count: 2
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#2 \\$groupId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:buildGetArticleQuery\\(\\) expects int, int\\|null given\\.$#"
+			count: 2
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#2 \\$groupId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getPricesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#2 \\$start of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Parameter \\#3 \\$limit of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
+			count: 1
+			path: Models/UserPrice/Repository.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Subscriber\\\\CacheKeyExtender\\:\\:onCreateCacheHash\\(\\) should return string but returns string\\|false\\.$#"
+			count: 1
+			path: Subscriber/CacheKeyExtender.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\SwagUserPrice\\:\\:getSetup\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: SwagUserPrice.php
+
+		-
+			message: "#^Parameter \\#1 \\$modelManager of class SwagUserPrice\\\\Bootstrap\\\\Setup constructor expects Shopware\\\\Components\\\\Model\\\\ModelManager, object\\|null given\\.$#"
+			count: 1
+			path: SwagUserPrice.php
+
+		-
+			message: "#^Parameter \\#2 \\$databaseAdapter of class SwagUserPrice\\\\Bootstrap\\\\Setup constructor expects Enlight_Components_Db_Adapter_Pdo_Mysql, object\\|null given\\.$#"
+			count: 1
+			path: SwagUserPrice.php
+
+		-
+			message: "#^Parameter \\#3 \\$crudService of class SwagUserPrice\\\\Bootstrap\\\\Setup constructor expects Shopware\\\\Bundle\\\\AttributeBundle\\\\Service\\\\CrudServiceInterface, object\\|null given\\.$#"
+			count: 1
+			path: SwagUserPrice.php
+
+		-
+			message: "#^Parameter \\#4 \\$acl of class SwagUserPrice\\\\Bootstrap\\\\Setup constructor expects Shopware_Components_Acl, object\\|null given\\.$#"
+			count: 1
+			path: SwagUserPrice.php
+
+		-
+			message: "#^Cannot call method Core\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Bootstrap.php
+
+		-
+			message: "#^Cannot call method fetchColumn\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Bootstrap.php
+
+		-
+			message: "#^Cannot call method getRepository\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Bootstrap.php
+
+		-
+			message: "#^Cannot call method registerResources\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Bootstrap.php
+
+		-
+			message: "#^Method SwagUserPriceTestKernel\\:\\:start\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Bootstrap.php
+
+		-
+			message: "#^Cannot call method createProductContext\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Functional/Bundle/StoreFrontBundle/Service/Core/GraduatedUserPriceServiceTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPriceServiceTest\\:\\:getService\\(\\) should return Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\GraduatedPricesServiceInterface but returns object\\|null\\.$#"
+			count: 1
+			path: Tests/Functional/Bundle/StoreFrontBundle/Service/Core/GraduatedUserPriceServiceTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPriceServiceTest\\:\\:testGet\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Bundle/StoreFrontBundle/Service/Core/GraduatedUserPriceServiceTest.php
+
+		-
+			message: "#^Cannot call method exec\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Cannot call method offsetSet\\(\\) on object\\|null\\.$#"
+			count: 2
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Components\\\\AccessValidatorTest\\:\\:testValidateProductNoPriceIssetShouldReturnFalse\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Components\\\\AccessValidatorTest\\:\\:testValidateProductNoUserIdShouldReturnFalse\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Components\\\\AccessValidatorTest\\:\\:testValidateProductShouldReturnTrue\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$dependencyProvider of class SwagUserPrice\\\\Components\\\\AccessValidator constructor expects SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider, object\\|null given\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Parameter \\#2 \\$modelManager of class SwagUserPrice\\\\Components\\\\AccessValidator constructor expects Shopware\\\\Components\\\\Model\\\\ModelManager, object\\|null given\\.$#"
+			count: 1
+			path: Tests/Functional/Components/AccessValidatorTest.php
+
+		-
+			message: "#^Cannot call method getRepository\\(\\) on object\\|null\\.$#"
+			count: 1
+			path: Tests/Functional/Models/UserPrice/RepositoryTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Models\\\\UserPrice\\\\RepositoryTest\\:\\:getRepository\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Models/UserPrice/RepositoryTest.php
+
+		-
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Models\\\\UserPrice\\\\RepositoryTest\\:\\:testGetArticlesQueryBuilderWithNullParams\\(\\) has no return typehint specified\\.$#"
+			count: 1
+			path: Tests/Functional/Models/UserPrice/RepositoryTest.php
+

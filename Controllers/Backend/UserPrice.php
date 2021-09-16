@@ -4,6 +4,7 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
  */
 
 use Doctrine\DBAL\Driver\Statement;
@@ -36,7 +37,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      */
     public function preDispatch()
     {
-        if (!in_array($this->Request()->getActionName(), ['index', 'load'])) {
+        if (!\in_array($this->Request()->getActionName(), ['index', 'load'])) {
             $this->Front()->Plugins()->Json()->setRenderer(true);
         }
     }
@@ -655,7 +656,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      */
     private function isMultiDimensional(array $array): bool
     {
-        return count($array) != count($array, COUNT_RECURSIVE);
+        return \count($array) != \count($array, \COUNT_RECURSIVE);
     }
 
     /**

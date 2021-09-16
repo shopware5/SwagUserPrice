@@ -4,6 +4,7 @@
  *
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
+ *
  */
 
 namespace SwagUserPrice\Models\UserPrice;
@@ -185,7 +186,8 @@ class Repository extends ModelRepository
 
         if (!empty($filter)) {
             $builder->andWhere('article.name LIKE :filter')
-                ->orWhere('detail.ordernumber LIKE :filter'
+                ->orWhere(
+                    'detail.ordernumber LIKE :filter'
                 )->setParameter(
                     'filter',
                     '%' . $filter . '%'
