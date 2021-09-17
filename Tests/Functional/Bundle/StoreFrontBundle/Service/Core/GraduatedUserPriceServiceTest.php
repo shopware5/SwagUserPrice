@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -20,7 +21,7 @@ class GraduatedUserPriceServiceTest extends TestCase
 {
     use DatabaseTransactionBehaviour;
 
-    public function testGet()
+    public function testGet(): void
     {
         $contextService = Shopware()->Container()->get('shopware_storefront.context_service');
         $context = $contextService->createProductContext(1, 1, 'EK');

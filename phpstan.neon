@@ -3,8 +3,10 @@ includes:
 
 parameters:
     level: 8
-    checkMissingIterableValueType: false
-    checkGenericClassInNonGenericObjectType: false
+    symfony:
+        constant_hassers: false
+        container_xml_path: '../../../var/cache/production____REVISION___/container.xml'
+        console_application_loader: ../../../tests/phpstan-console-application.php
     excludes_analyse:
         - .githooks
         - vendor

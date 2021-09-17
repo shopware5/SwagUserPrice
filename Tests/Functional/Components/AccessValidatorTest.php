@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -17,16 +18,14 @@ class AccessValidatorTest extends TestCase
 {
     use DatabaseTransactionBehaviour;
 
-    public function testValidateProductNoUserIdShouldReturnFalse()
+    public function testValidateProductNoUserIdShouldReturnFalse(): void
     {
-        $validator = $this->getValidator();
-
-        $result = $validator->validateProduct('SW10178');
+        $result = $this->getValidator()->validateProduct('SW10178');
 
         static::assertFalse($result);
     }
 
-    public function testValidateProductNoPriceIssetShouldReturnFalse()
+    public function testValidateProductNoPriceIssetShouldReturnFalse(): void
     {
         $validator = $this->getValidator();
 
@@ -37,7 +36,7 @@ class AccessValidatorTest extends TestCase
         static::assertFalse($result);
     }
 
-    public function testValidateProductShouldReturnTrue()
+    public function testValidateProductShouldReturnTrue(): void
     {
         $validator = $this->getValidator();
 
