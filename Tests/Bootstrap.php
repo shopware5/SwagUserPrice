@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -17,7 +18,7 @@ use Shopware\Models\Shop\Shop;
 
 class SwagUserPriceTestKernel extends Kernel
 {
-    public static function start()
+    public static function start(): void
     {
         $kernel = new self((string) getenv('SHOPWARE_ENV') ?: 'testing', true);
         $kernel->boot();
@@ -25,9 +26,7 @@ class SwagUserPriceTestKernel extends Kernel
         $container = $kernel->getContainer();
         $container->get('plugins')->Core()->ErrorHandler()->registerErrorHandler(\E_ALL | \E_STRICT);
 
-        /** @var \Shopware\Models\Shop\Repository $repository */
-        $repository = $container->get('models')->getRepository(Shop::class);
-        $shop = $repository->getActiveDefault();
+        $shop = $container->get('models')->getRepository(Shop::class)->getActiveDefault();
 
         $shopRegistrationService = $container->get('shopware.components.shop_registration_service');
         $shopRegistrationService->registerResources($shop);
@@ -35,22 +34,17 @@ class SwagUserPriceTestKernel extends Kernel
         $_SERVER['HTTP_HOST'] = $shop->getHost();
 
         if (!self::assertPlugin('SwagUserPrice')) {
-            throw new \Exception('Plugin SwagUserPrice is not installed or activated.');
+            throw new Exception('Plugin SwagUserPrice is not installed or activated.');
         }
 
         /*
          * \sBasket::sInsertPremium expects a request object and is called by sGetBasket
          * which we use a lot here
          */
-        Shopware()->Front()->setRequest(new \Enlight_Controller_Request_RequestTestCase());
+        Shopware()->Front()->setRequest(new Enlight_Controller_Request_RequestTestCase());
     }
 
-    /**
-     * @param string $name
-     *
-     * @return bool
-     */
-    private static function assertPlugin($name)
+    private static function assertPlugin(string $name): bool
     {
         $sql = 'SELECT 1 FROM s_core_plugins WHERE name = ? AND active = 1';
 

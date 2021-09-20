@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -14,13 +15,11 @@ use SwagUserPrice\Models\UserPrice\Group;
 
 class RepositoryTest extends TestCase
 {
-    public function testGetArticlesQueryBuilderWithNullParams()
+    public function testGetArticlesQueryBuilderWithNullParams(): void
     {
         $repository = $this->getRepository();
 
-        $query = $repository->getArticlesQuery('ibiza', 0, 25, null, null, 1);
-
-        $result = $query->fetchAll();
+        $result = $repository->getArticlesQuery('ibiza', 0, 25, null, null, 1)->fetchAll();
 
         static::assertCount(1, $result);
 

@@ -38,7 +38,7 @@ fix-cs: ## Run the code style fixer
 	./../../../vendor/bin/php-cs-fixer fix
 
 fix-cs-dry: ## Run the code style fixer in dry mode
-	./../../../vendor/bin/php-cs-fixer fix --dry-run -v
+	./../../../vendor/bin/php-cs-fixer fix --dry-run -vvv
 
 phpstan: ## Run PHPStan
 	./../../../vendor/bin/phpstan analyse .
@@ -49,4 +49,3 @@ phpstan-generate-baseline: ## Run PHPStan and generate a baseline file
 .refresh-plugin-list:
 	@echo "Refresh the plugin list"
 	./../../../bin/console sw:plugin:refresh
-
