@@ -20,6 +20,8 @@ use Shopware\Models\Customer\Customer;
  *
  * This is the repository for the custom-models.
  * It reads all necessary information from the custom-tables and returns the query/query-builder.
+ *
+ * @extends ModelRepository<Group>
  */
 class Repository extends ModelRepository
 {

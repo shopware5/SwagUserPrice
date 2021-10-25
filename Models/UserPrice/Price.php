@@ -11,10 +11,12 @@ namespace SwagUserPrice\Models\UserPrice;
 
 use Doctrine\ORM\Mapping as ORM;
 use Shopware\Components\Model\LazyFetchModelEntity;
+use Shopware\Models\Article\Article as Product;
+use Shopware\Models\Article\Detail as ProductVariant;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="s_plugin_pricegroups_prices", indexes={@ORM\Index(name="articleDetailsId", columns={"articleDetailsId"})})
+ * @ORM\Table(name="s_plugin_pricegroups_prices", indexes={@ORM\Index(name="articleDetailsId", columns={"articleDetailsID"})})
  */
 class Price extends LazyFetchModelEntity
 {
@@ -22,26 +24,26 @@ class Price extends LazyFetchModelEntity
      * @var Group
      *
      * @ORM\ManyToOne(targetEntity="\SwagUserPrice\Models\UserPrice\Group")
-     * @ORM\JoinColumn(name="pricegroup", referencedColumnName="id")
+     * @ORM\JoinColumn(name="pricegroup", referencedColumnName="id", nullable=false)
      */
     protected $priceGroup;
 
     /**
      * OWNING SIDE
      *
-     * @var \Shopware\Models\Article\Article
+     * @var Product
      *
      * @ORM\OneToOne(targetEntity="Shopware\Models\Article\Article")
-     * @ORM\JoinColumn(name="articleId", referencedColumnName="id")
+     * @ORM\JoinColumn(name="articleID", referencedColumnName="id", nullable=false)
      */
     protected $article;
 
     /**
      * OWNING SIDE
      *
-     * @var \Shopware\Models\Article\Detail
+     * @var ProductVariant
      * @ORM\ManyToOne(targetEntity="Shopware\Models\Article\Detail")
-     * @ORM\JoinColumn(name="articledetailsID", referencedColumnName="id")
+     * @ORM\JoinColumn(name="articledetailsID", referencedColumnName="id", nullable=false)
      */
     protected $detail;
 
@@ -78,7 +80,7 @@ class Price extends LazyFetchModelEntity
     /**
      * @var int
      *
-     * @ORM\Column(length=30, nullable=false)
+     * @ORM\Column(name="articleID", type="integer", nullable=false)
      */
     private $articleId;
 
@@ -90,9 +92,9 @@ class Price extends LazyFetchModelEntity
     private $articleDetailsId;
 
     /**
-     * @var float
+     * @var float|null
      *
-     * @ORM\Column(type="float", nullable=false)
+     * @ORM\Column(name="price", type="float", nullable=true)
      */
     private $price;
 
@@ -145,7 +147,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getPrice()
     {
@@ -153,7 +155,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @param float $price
+     * @param float|null $price
      *
      * @return $this
      */
@@ -185,7 +187,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @return \Shopware\Models\Article\Article
+     * @return Product
      */
     public function getArticle()
     {
@@ -193,7 +195,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @param \Shopware\Models\Article\Article $article
+     * @param Product $article
      *
      * @return $this
      */
@@ -205,7 +207,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @return \Shopware\Models\Article\Detail
+     * @return ProductVariant
      */
     public function getDetail()
     {
@@ -213,7 +215,7 @@ class Price extends LazyFetchModelEntity
     }
 
     /**
-     * @param \Shopware\Models\Article\Detail $detail
+     * @param ProductVariant $detail
      *
      * @return $this
      */
