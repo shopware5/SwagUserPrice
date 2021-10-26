@@ -9,20 +9,21 @@
 
 namespace SwagUserPrice\Models\UserPrice;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use Shopware\Components\Model\LazyFetchModelEntity;
 use Shopware\Models\Customer\Customer;
 
 /**
  * @ORM\Table(name="s_plugin_pricegroups")
- * @ORM\Entity(repositoryClass="SwagUserPrice\Models\UserPrice\Repository")
+ * @ORM\Entity(repositoryClass="Repository")
  */
 class Group extends LazyFetchModelEntity
 {
     /**
      * INVERSE SIDE
      *
-     * @var Customer[]
+     * @var ArrayCollection<array-key, Customer>
      *
      * @ORM\OneToMany(targetEntity="Shopware\Models\Customer\Customer", mappedBy="priceGroup")
      */
@@ -31,7 +32,7 @@ class Group extends LazyFetchModelEntity
     /**
      * INVERSE SIDE
      *
-     * @var Price[]
+     * @var ArrayCollection<array-key, Price>
      *
      * @ORM\OneToMany(targetEntity="SwagUserPrice\Models\UserPrice\Price", mappedBy="priceGroup", cascade={"persist"})
      */
@@ -145,7 +146,7 @@ class Group extends LazyFetchModelEntity
     }
 
     /**
-     * @return Price[]
+     * @return ArrayCollection<array-key, Price>
      */
     public function getPrices()
     {

@@ -7,15 +7,14 @@
  *
  */
 
-use Doctrine\DBAL\Driver\Statement;
 use Doctrine\ORM\EntityNotFoundException;
 use Shopware\Components\Api\Exception\ParameterMissingException;
 use Shopware\Components\Model\ModelManager;
-use Shopware\Models\Article\Article;
-use Shopware\Models\Article\Detail;
+use Shopware\Models\Article\Article as Product;
+use Shopware\Models\Article\Detail as ProductVariant;
 use Shopware\Models\Attribute\Customer as CustomerAttribute;
 use Shopware\Models\Customer\Customer;
-use SwagUserPrice\Components\UserPrice;
+use Shopware\Models\Tax\Tax;
 use SwagUserPrice\Models\UserPrice\Group;
 use SwagUserPrice\Models\UserPrice\Price;
 use SwagUserPrice\Models\UserPrice\Repository;
@@ -23,17 +22,19 @@ use SwagUserPrice\Models\UserPrice\Repository;
 class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backend_ExtJs
 {
     /**
-     * @var Repository
+     * @var Repository|null
      */
     protected $userPriceRepository;
 
     /**
-     * @var ModelManager
+     * @var ModelManager|null
      */
     protected $entityManager;
 
     /**
      * Disable template engine for most actions
+     *
+     * @return void
      */
     public function preDispatch()
     {
@@ -212,7 +213,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Reads the groups and its total-count.
      * It supports searching- and paging-functions.
      */
-    private function getGroups(?array $params): array
+    private function getGroups(array $params): array
     {
         try {
             $filterValue = '';
@@ -243,23 +244,26 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * Edits a group.
      * This is either creating a new group if no id is set in the parameters.
-     * Otherwise the group with the given id will be edited.
+     * Otherwise, the group with the given id will be edited.
      */
-    private function handleEdit(?array $params): array
+    private function handleEdit(array $params): array
     {
         try {
             $em = $this->getEntityManager();
-            $id = $params['id'];
+            $id = (int) $params['id'];
 
-            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
-            if (empty($id)) {
+            if ($id === 0) {
                 $model = new Group();
-                $msg = $namespace->get('growlMessage/create/message', 'The group was succesfully created');
+                $msg = $namespace->get('growlMessage/create/message', 'The group was successfully created');
             } else {
                 $model = $em->find(Group::class, $id);
-                $msg = $namespace->get('growlMessage/edit/message', 'The group was succesfully edited');
+                $msg = $namespace->get('growlMessage/edit/message', 'The group was successfully edited');
+            }
+
+            if (!$model instanceof Group) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $id)];
             }
 
             $model->fromArray($params);
@@ -281,12 +285,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * This will not only delete the group itself, but also remove all assigned values.
      * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
      */
-    private function handleDeletion(?array $params): array
+    private function handleDeletion(array $params): array
     {
         try {
             $records = $params;
 
-            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
             //The array structure of $params depends on the amount of records being deleted.
@@ -295,8 +298,12 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $records = [$params];
             }
 
+            $modelManager = $this->getEntityManager();
             foreach ($records as $record) {
-                $this->getEntityManager()->remove($this->getRepository()->find($record['id']));
+                $group = $this->getRepository()->find($record['id']);
+                if ($group instanceof Group) {
+                    $modelManager->remove($group);
+                }
 
                 //We also need to delete the attribute-entries
                 $attrModels = $this->getEntityManager()->getRepository(CustomerAttribute::class)->findBy([
@@ -314,11 +321,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 ]);
 
                 foreach ($priceModels as $price) {
-                    $this->getEntityManager()->remove($price);
+                    $modelManager->remove($price);
                 }
             }
 
-            $this->getEntityManager()->flush();
+            $modelManager->flush();
 
             $success = true;
             $msg = $namespace->get('growlMessage/delete/message', 'The groups were succesfully deleted');
@@ -380,10 +387,13 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $customerIds = json_decode($params['customerIds']);
 
             foreach ($customerIds as $customerId) {
-                /** @var Customer $customer */
                 $customer = $this->getEntityManager()->find(Customer::class, $customerId);
+                if (!$customer instanceof Customer) {
+                    continue;
+                }
 
-                if (!$attribute = $customer->getAttribute()) {
+                $attribute = $customer->getAttribute();
+                if (!$attribute instanceof CustomerAttribute) {
                     $attribute = new CustomerAttribute();
                 }
                 $attribute->setCustomer($customer);
@@ -409,7 +419,6 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
         try {
             $customerIds = json_decode($params['customerIds']);
             foreach ($customerIds as $customerId) {
-                /** @var Customer $customer */
                 $customer = $this->getEntityManager()->find(Customer::class, $customerId);
 
                 if (!$customer) {
@@ -460,7 +469,6 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 }
             }
 
-            /** @var Statement $stmt */
             $stmt = $this->getRepository()->getArticlesQuery(
                 $search,
                 $params['start'],
@@ -470,11 +478,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $groupId
             );
 
-            /** @var UserPrice $comp */
             $comp = $this->get('swaguserprice.userprice');
             $articles = $comp->formatArticlePrices($stmt->fetchAll(), $groupId);
 
-            /** @var Statement $countStmt */
             $countStmt = $this->getRepository()->getArticlesCountQuery($search, $main, $groupId);
 
             return ['success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn()];
@@ -490,37 +496,44 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     private function getPrices(): array
     {
         try {
-            /** @var Enlight_Components_Snippet_Namespace $namespace */
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/view/prices');
 
-            $detailId = null;
+            $productVariantId = null;
             $groupId = null;
             foreach ($this->Request()->getParam('filter') as $filter) {
-                if ($filter['property'] == 'detailId') {
-                    $detailId = $filter['value'];
-                } else {
-                    if ($filter['property'] == 'priceGroup') {
-                        $groupId = $filter['value'];
-                    }
+                if ($filter['property'] === 'detailId') {
+                    $productVariantId = (int) $filter['value'];
+                } elseif ($filter['property'] === 'priceGroup') {
+                    $groupId = (int) $filter['value'];
                 }
             }
 
-            if ($groupId === null || $detailId === null) {
+            if ($groupId === null || $productVariantId === null) {
                 throw new ParameterMissingException('Detail or group id missing');
             }
 
-            $article = $this->getEntityManager()->find(Detail::class, $detailId)->getArticle();
+            $productVariant = $this->getEntityManager()->find(ProductVariant::class, $productVariantId);
+            if (!$productVariant instanceof ProductVariant) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $groupId)];
+            }
+            $product = $productVariant->getArticle();
             $group = $this->getRepository()->find($groupId);
+            if (!$group instanceof Group) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $groupId)];
+            }
+            $tax = $product->getTax();
+            if (!$tax instanceof Tax) {
+                return ['success' => false, 'msg' => sprintf('Could not get tax of product with ID "%s"', $product->getId())];
+            }
 
-            $query = $this->getRepository()->getPricesQuery($detailId, $groupId);
-            $data = $query->getArrayResult();
+            $data = $this->getRepository()->getPricesQuery($productVariantId, $groupId)->getArrayResult();
 
             $firstPrice = true;
             foreach ($data as &$item) {
                 $item['percent'] = 0;
 
                 if ($group->getGross() === 1) {
-                    $item['price'] = $item['price'] / 100 * (100 + $article->getTax()->getTax());
+                    $item['price'] = $item['price'] / 100 * (100 + (float) $tax->getTax());
                 }
 
                 $item['percent'] = '0%';
@@ -565,14 +578,14 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $id = $params['id'];
 
             $priceGroupId = $params['priceGroup'];
-            $articleId = $params['articleId'];
+            $productId = $params['articleId'];
             $articleDetailId = $params['articleDetailsId'];
 
             if (!$priceGroupId) {
                 throw new InvalidArgumentException('Price group id is missing!');
             }
 
-            if (!$articleId) {
+            if (!$productId) {
                 throw new InvalidArgumentException('Article id is missing!');
             }
 
@@ -580,10 +593,9 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 throw new InvalidArgumentException('Article detail id is missing!');
             }
 
-            if (!$id) {
+            $model = $this->getEntityManager()->find(Price::class, $id);
+            if (!$model instanceof Price) {
                 $model = new Price();
-            } else {
-                $model = $this->getEntityManager()->find(Price::class, $id);
             }
 
             //This must not be translated!
@@ -593,24 +605,38 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             }
 
             $priceGroup = $this->getEntityManager()->find(Group::class, $priceGroupId);
-            $article = $this->getEntityManager()->find(Article::class, $articleId);
+            if (!$priceGroup instanceof Group) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $id)];
+            }
+            $product = $this->getEntityManager()->find(Product::class, $productId);
+            if (!$product instanceof Product) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Product::class, $id)];
+            }
+            $productVariant = $this->getEntityManager()->find(ProductVariant::class, $articleDetailId);
+            if (!$productVariant instanceof ProductVariant) {
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $id)];
+            }
+            $tax = $product->getTax();
+            if (!$tax instanceof Tax) {
+                return ['success' => false, 'msg' => sprintf('Could not get tax of product with ID "%s"', $product->getId())];
+            }
 
             if ($priceGroup->getGross() === 1 && $params['price']) {
-                $params['price'] = $params['price'] / ((100 + $article->getTax()->getTax()) / 100);
+                $params['price'] = $params['price'] / ((100 + (float) $tax->getTax()) / 100);
             }
 
             $params['price'] = $params['price'] ?: null;
 
             $model->fromArray($params);
             $model->setPriceGroup($priceGroup);
-            $model->setArticle($article);
-            $model->setDetail($this->getEntityManager()->find(Detail::class, $articleDetailId));
+            $model->setArticle($product);
+            $model->setDetail($productVariant);
 
             if ($this->shouldRemovePrice($params)) {
                 $this->getEntityManager()->remove($model);
                 $this->getEntityManager()->flush();
 
-                Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $articleId]);
+                Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $productId]);
 
                 return ['success' => true];
             }
@@ -618,11 +644,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $this->getEntityManager()->persist($model);
             $this->getEntityManager()->flush();
 
-            Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $articleId]);
+            Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $productId]);
 
             return ['success' => true];
         } catch (InvalidArgumentException $e) {
-            return ['success' => true, 'msg' => $e->getMessage()];
+            return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
