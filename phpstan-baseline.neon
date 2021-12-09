@@ -341,11 +341,6 @@ parameters:
 			path: Models/UserPrice/Repository.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Subscriber\\\\CacheKeyExtender\\:\\:onCreateCacheHash\\(\\) has parameter \\$args with no value type specified in iterable type Enlight_Event_EventArgs\\.$#"
-			count: 1
-			path: Subscriber/CacheKeyExtender.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Subscriber\\\\CacheKeyExtender\\:\\:onCreateCacheHash\\(\\) should return string but returns string\\|false\\.$#"
 			count: 1
 			path: Subscriber/CacheKeyExtender.php
@@ -356,19 +351,9 @@ parameters:
 			path: Subscriber/Hooks.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Subscriber\\\\Hooks\\:\\:onUpdatePrice\\(\\) has parameter \\$args with no value type specified in iterable type Enlight_Event_EventArgs\\.$#"
-			count: 1
-			path: Subscriber/Hooks.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Subscriber\\\\Hooks\\:\\:onUpdatePrice\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Subscriber/Hooks.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Subscriber\\\\TemplateRegistration\\:\\:onTemplatesCollected\\(\\) has parameter \\$args with no value type specified in iterable type Enlight_Event_EventArgs\\.$#"
-			count: 1
-			path: Subscriber/TemplateRegistration.php
 
 		-
 			message: "#^Method SwagUserPrice\\\\SwagUserPrice\\:\\:getSetup\\(\\) has no return typehint specified\\.$#"
