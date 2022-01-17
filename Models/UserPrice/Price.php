@@ -186,6 +186,16 @@ class Price extends LazyFetchModelEntity
         return $this;
     }
 
+    public function getPriceGroupId(): string
+    {
+        return $this->priceGroupId;
+    }
+
+    public function setPriceGroupId(string $priceGroupId): void
+    {
+        $this->priceGroupId = $priceGroupId;
+    }
+
     /**
      * @return Product
      */
@@ -206,6 +216,16 @@ class Price extends LazyFetchModelEntity
         return $this;
     }
 
+    public function getProductId(): int
+    {
+        return $this->articleId;
+    }
+
+    public function setProductId(int $productId): void
+    {
+        $this->articleId = $productId;
+    }
+
     /**
      * @return ProductVariant
      */
@@ -224,5 +244,15 @@ class Price extends LazyFetchModelEntity
         $this->detail = $detail;
 
         return $this;
+    }
+
+    public function getProductVariantId(): int
+    {
+        return $this->articleDetailsId;
+    }
+
+    public function setProductVariantId(int $productVariantId): void
+    {
+        $this->articleDetailsId = $productVariantId;
     }
 }

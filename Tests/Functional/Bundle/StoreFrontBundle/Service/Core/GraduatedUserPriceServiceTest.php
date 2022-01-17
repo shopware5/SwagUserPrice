@@ -31,6 +31,7 @@ class GraduatedUserPriceServiceTest extends TestCase
         static::assertInstanceOf(GraduatedUserPricesService::class, $service);
 
         $result = $service->get($listProduct, $context);
+        static::assertIsArray($result);
         $result = array_shift($result);
         static::assertInstanceOf(PriceRule::class, $result);
 
