@@ -11,7 +11,7 @@ parameters:
 			path: Bootstrap/Setup.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:update\\(\\) has parameter \\$oldVersion with no typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:update\\(\\) has parameter \\$oldVersion with no type specified\\.$#"
 			count: 1
 			path: Bootstrap/Setup.php
 
@@ -31,32 +31,22 @@ parameters:
 			path: Bundle/SearchBundleDBAL/PriceHelper.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinAvailableVariant\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinAvailableVariant\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Bundle/SearchBundleDBAL/PriceHelper.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinDefaultPrices\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinDefaultPrices\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Bundle/SearchBundleDBAL/PriceHelper.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinPrices\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinPrices\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Bundle/SearchBundleDBAL/PriceHelper.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestUserPriceService\\:\\:get\\(\\) should return Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\Product\\\\PriceRule but returns Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\Product\\\\PriceRule\\|null\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
 
 		-
 			message: "#^Parameter \\#1 \\$price of method SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:buildRule\\(\\) expects array, array\\|null given\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
-
-		-
-			message: "#^Property SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestUserPriceService\\:\\:\\$service \\(Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\CheapestPriceService\\) does not accept Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\CheapestPriceServiceInterface\\.$#"
 			count: 1
 			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
 
@@ -71,11 +61,6 @@ parameters:
 			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPricesService\\:\\:getList\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
-
-		-
 			message: "#^Parameter \\#1 \\$array_arg of function end expects array\\|object, array\\|null given\\.$#"
 			count: 1
 			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
@@ -86,7 +71,7 @@ parameters:
 			path: Components/AccessValidator.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:validateProduct\\(\\) has parameter \\$number with no typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:validateProduct\\(\\) has parameter \\$number with no type specified\\.$#"
 			count: 1
 			path: Components/AccessValidator.php
 
@@ -261,12 +246,12 @@ parameters:
 			path: Models/UserPrice/Repository.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
 
@@ -356,7 +341,7 @@ parameters:
 			path: Subscriber/Hooks.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\SwagUserPrice\\:\\:getSetup\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\SwagUserPrice\\:\\:getSetup\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: SwagUserPrice.php
 
@@ -371,6 +356,6 @@ parameters:
 			path: Tests/Functional/Components/AccessValidatorTest.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Models\\\\UserPrice\\\\RepositoryTest\\:\\:getRepository\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Models\\\\UserPrice\\\\RepositoryTest\\:\\:getRepository\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Tests/Functional/Models/UserPrice/RepositoryTest.php

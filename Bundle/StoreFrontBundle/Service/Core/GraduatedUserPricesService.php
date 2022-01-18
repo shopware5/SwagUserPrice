@@ -12,6 +12,7 @@ namespace SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 use Shopware\Bundle\StoreFrontBundle\Service\GraduatedPricesServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Bundle\StoreFrontBundle\Struct\Product\Unit;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use SwagUserPrice\Components\AccessValidator;
 use SwagUserPrice\Components\ServiceHelper;
@@ -82,7 +83,9 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
         foreach ($prices as $price) {
             $userPriceRule = $this->helper->buildRule($price);
             $userPriceRule->setCustomerGroup($coreRule->getCustomerGroup());
-            $userPriceRule->setUnit($coreRule->getUnit());
+            if ($coreRule->getUnit() instanceof Unit) {
+                $userPriceRule->setUnit($coreRule->getUnit());
+            }
 
             $customRules[] = $userPriceRule;
         }
@@ -102,7 +105,9 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
         $lastEntry['price'] = null;
         $rule = $this->helper->buildRule($lastEntry);
         $rule->setCustomerGroup($coreRule->getCustomerGroup());
-        $rule->setUnit($coreRule->getUnit());
+        if ($coreRule->getUnit() instanceof Unit) {
+            $rule->setUnit($coreRule->getUnit());
+        }
 
         $customRules[] = $rule;
 

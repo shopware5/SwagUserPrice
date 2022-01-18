@@ -10,9 +10,9 @@
 namespace SwagUserPrice\Bundle\StoreFrontBundle\Service\Core;
 
 use Shopware\Bundle\StoreFrontBundle\Service\CheapestPriceServiceInterface;
-use Shopware\Bundle\StoreFrontBundle\Service\Core\CheapestPriceService;
 use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Bundle\StoreFrontBundle\Struct\Product\Unit;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use SwagUserPrice\Components\AccessValidator;
 use SwagUserPrice\Components\ServiceHelper;
@@ -26,7 +26,7 @@ use SwagUserPrice\Components\ServiceHelper;
 class CheapestUserPriceService implements CheapestPriceServiceInterface
 {
     /**
-     * @var CheapestPriceService
+     * @var CheapestPriceServiceInterface
      */
     private $service;
 
@@ -86,7 +86,9 @@ class CheapestUserPriceService implements CheapestPriceServiceInterface
 
         $customRule = $this->helper->buildRule($price);
         $customRule->setCustomerGroup($rule->getCustomerGroup());
-        $customRule->setUnit($rule->getUnit());
+        if ($rule->getUnit() instanceof Unit) {
+            $customRule->setUnit($rule->getUnit());
+        }
 
         return $customRule;
     }
