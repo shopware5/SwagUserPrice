@@ -241,11 +241,6 @@ parameters:
 			path: Controllers/Backend/UserPrice.php
 
 		-
-			message: "#^Call to an undefined method Doctrine\\\\ORM\\\\EntityManager\\:\\:getDBALQueryBuilder\\(\\)\\.$#"
-			count: 2
-			path: Models/UserPrice/Repository.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
