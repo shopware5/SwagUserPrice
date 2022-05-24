@@ -11,6 +11,8 @@ parameters:
     doctrine:
         repositoryClass: Shopware\Components\Model\ModelRepository
         objectManagerLoader: ../../../tests/phpstan-doctrine-model-manager.php
+    scanDirectories:
+        - ../../../var/cache/production____REVISION___/doctrine
     excludePaths:
         - .githooks
         - vendor
