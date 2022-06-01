@@ -478,12 +478,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $groupId
             );
 
-            $comp = $this->get('swaguserprice.userprice');
-            $articles = $comp->formatArticlePrices($stmt->fetchAll(), $groupId);
+            $products = $this->get('swaguserprice.userprice')->formatArticlePrices($stmt->fetchAll(), $groupId);
 
             $countStmt = $this->getRepository()->getArticlesCountQuery($search, $main, $groupId);
 
-            return ['success' => true, 'data' => $articles, 'total' => $countStmt->fetchColumn()];
+            return ['success' => true, 'data' => $products, 'total' => $countStmt->fetchColumn()];
         } catch (Exception $e) {
             return ['success' => false, 'msg' => $e->getMessage()];
         }

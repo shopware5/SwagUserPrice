@@ -186,7 +186,6 @@ class Setup
      */
     private function importOldData(): void
     {
-        /** @var \Enlight_Components_Db_Adapter_Pdo_Mysql $db */
         $db = $this->databaseAdapter;
         try {
             $sql = "SELECT *, groups.id AS groupId, prices.id AS priceId
@@ -197,7 +196,7 @@ class Setup
 
             $groups = [];
             foreach ($values as $group) {
-                if (!$groups[$group['groupId']]) {
+                if (!isset($groups[$group['groupId']])) {
                     $groups[$group['groupId']] = [
                         'id' => $group['groupId'],
                         'name' => $group['name'],

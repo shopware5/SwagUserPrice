@@ -236,82 +236,12 @@ parameters:
 			path: Controllers/Backend/UserPrice.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) has no return type specified\\.$#"
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getCustomersQuery\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getCustomersQueryBuilder\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getGroupsQuery\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getGroupsQueryBuilder\\(\\) has parameter \\$sort with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#1 \\$detailId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getPricesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#1 \\$filter of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQueryBuilder\\(\\) expects string, string\\|null given\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#1 \\$filter of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects string, string\\|null given\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#1 \\$sort of method Doctrine\\\\ORM\\\\QueryBuilder\\:\\:addOrderBy\\(\\) expects Doctrine\\\\ORM\\\\Query\\\\Expr\\\\OrderBy\\|string, array given\\.$#"
-			count: 2
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#2 \\$groupId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:buildGetArticleQuery\\(\\) expects int, int\\|null given\\.$#"
-			count: 2
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#2 \\$groupId of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getPricesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#2 \\$start of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
-			count: 1
-			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Parameter \\#3 \\$limit of method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQueryBuilder\\(\\) expects int, int\\|null given\\.$#"
+			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
 
