@@ -48,7 +48,7 @@ class Group extends LazyFetchModelEntity
      * @ORM\Column(name="id", type="integer", nullable=false)
      * @ORM\GeneratedValue(strategy="IDENTITY")
      */
-    private $id;
+    protected $id;
 
     /**
      * Contains the customer price group name value.
