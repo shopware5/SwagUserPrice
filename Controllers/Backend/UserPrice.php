@@ -217,7 +217,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     {
         try {
             $filterValue = '';
-            //filter from the search-field
+            // filter from the search-field
             if ($filter = $this->Request()->get('filter')) {
                 $filterValue = $filter[0]['value'];
             } else {
@@ -292,8 +292,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
 
-            //The array structure of $params depends on the amount of records being deleted.
-            //This way we create the same array-structure in every case
+            // The array structure of $params depends on the amount of records being deleted.
+            // This way we create the same array-structure in every case
             if (!$this->isMultiDimensional($params)) {
                 $records = [$params];
             }
@@ -305,7 +305,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                     $modelManager->remove($group);
                 }
 
-                //We also need to delete the attribute-entries
+                // We also need to delete the attribute-entries
                 $attrModels = $this->getEntityManager()->getRepository(CustomerAttribute::class)->findBy([
                     'swagPricegroup' => $record['id'],
                 ]);
@@ -315,7 +315,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                     $this->getEntityManager()->persist($attr);
                 }
 
-                //We also need to delete the assigned prices
+                // We also need to delete the assigned prices
                 $priceModels = $this->getEntityManager()->getRepository(Price::class)->findBy([
                     'priceGroupId' => $record['id'],
                 ]);
@@ -544,12 +544,12 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $lastEntry = end($data);
 
-            //This must not be translated!
-            //Do not translate, this is not shown to the user and only used for the logic!
+            // This must not be translated!
+            // Do not translate, this is not shown to the user and only used for the logic!
             $addEntry = $lastEntry['to'] != 'beliebig';
 
             if ($addEntry) {
-                //No prices defined yet
+                // No prices defined yet
                 if (!$lastEntry) {
                     $from = 1;
                 } else {
@@ -597,8 +597,8 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 $model = new Price();
             }
 
-            //This must not be translated!
-            //Do not translate, this is not shown to the user and only used for the logic!
+            // This must not be translated!
+            // Do not translate, this is not shown to the user and only used for the logic!
             if ((int) $params['to'] === 0) {
                 $params['to'] = 'beliebig';
             }

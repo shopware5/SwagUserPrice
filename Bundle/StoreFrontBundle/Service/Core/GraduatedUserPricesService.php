@@ -92,8 +92,8 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 
         $lastEntry = end($prices);
 
-        //This must not be translated!
-        //Do not translate, this is not shown to the user and only used for the logic!
+        // This must not be translated!
+        // Do not translate, this is not shown to the user and only used for the logic!
         $addEntry = $lastEntry['to'] != 'beliebig';
 
         if (!$addEntry) {
