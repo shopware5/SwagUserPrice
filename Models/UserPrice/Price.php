@@ -42,6 +42,7 @@ class Price extends LazyFetchModelEntity
      * OWNING SIDE
      *
      * @var ProductVariant
+     *
      * @ORM\ManyToOne(targetEntity="Shopware\Models\Article\Detail")
      * @ORM\JoinColumn(name="articledetailsID", referencedColumnName="id", nullable=false)
      */

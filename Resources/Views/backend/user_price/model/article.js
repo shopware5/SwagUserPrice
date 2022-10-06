@@ -55,7 +55,6 @@ Ext.define('Shopware.apps.UserPrice.model.Article', {
         { name: 'current', type: 'float' }
     ],
 
-
     /**
      * Configure the data communication
      * @object

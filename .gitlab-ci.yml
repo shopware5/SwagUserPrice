@@ -48,6 +48,21 @@ PHP analyze:
         - make fix-cs-dry
         - make phpstan
 
+JavaScript analyze:
+    stage: Code Analysis
+    image: node:alpine
+    services: []
+    before_script:
+        - apk add --no-cache make bash zip unzip git
+        - zip -rq plugin.zip .
+        - git clone https://gitlab-ci-token:${CI_JOB_TOKEN}@gitlab.shopware.com/shopware/5/product/shopware.git shopware --depth=1 -b ${CHECKOUT_SHOPWARE_BRANCH}
+        - unzip -q plugin.zip -d shopware/custom/plugins/${PLUGIN_NAME}
+    script:
+        - cd shopware
+        - make .make.install.npm-dependencies
+        - cd custom/plugins/${PLUGIN_NAME}
+        - make check-js-code
+
 Code Coverage:
     stage: PHPUnit
     needs: [ PHP analyze ]
