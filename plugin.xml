@@ -11,6 +11,11 @@
     <author>shopware AG</author>
     <compatibility minVersion="5.6.9" maxVersion="5.99.99"/>
 
+    <changelog version="REPLACE_WITH_NEXT_VERSION(4.0.2)">
+        <changes lang="de">PT-12522 - Product Stream Vorschau wird wieder angezeigt;</changes>
+        <changes lang="en">PT-12522 - Fix Product Stream preview;</changes>
+    </changelog>
+
     <changelog version="4.0.1">
         <changes lang="de">
             PT-12328 - Shopware 5.6.9 Kompatibilität;
