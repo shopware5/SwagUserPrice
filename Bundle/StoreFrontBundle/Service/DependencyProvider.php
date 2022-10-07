@@ -27,7 +27,7 @@ class DependencyProvider implements DependencyProviderInterface
 
     public function has(string $serviceId): bool
     {
-        return $this->container->has($serviceId);
+        return $this->container->initialized($serviceId);
     }
 
     /**
@@ -35,7 +35,7 @@ class DependencyProvider implements DependencyProviderInterface
      */
     public function hasShop(): bool
     {
-        return $this->container->has('shop');
+        return $this->container->initialized('shop');
     }
 
     /**
