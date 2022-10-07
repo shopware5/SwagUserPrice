@@ -203,7 +203,11 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     private function getRepository(): Repository
     {
         if ($this->userPriceRepository === null) {
-            $this->userPriceRepository = $this->getEntityManager()->getRepository(Group::class);
+            $repo = $this->getEntityManager()->getRepository(Group::class);
+            if (!$repo instanceof Repository) {
+                throw new RuntimeException('Unexpected repository instance');
+            }
+            $this->userPriceRepository = $repo;
         }
 
         return $this->userPriceRepository;
