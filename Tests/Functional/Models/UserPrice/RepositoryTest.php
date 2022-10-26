@@ -17,9 +17,18 @@ class RepositoryTest extends TestCase
 {
     public function testGetArticlesQueryBuilderWithNullParams(): void
     {
-        $repository = $this->getRepository();
+        $result = $this->getRepository()->getArticlesQuery('ibiza', 0, 25, null, null, 1)->fetchAll();
 
-        $result = $repository->getArticlesQuery('ibiza', 0, 25, null, null, 1)->fetchAll();
+        static::assertCount(1, $result);
+
+        static::assertSame('407', $result[0]['id']);
+        static::assertSame('178', $result[0]['articleId']);
+        static::assertSame('SW10178', $result[0]['number']);
+    }
+
+    public function testGetArticlesQueryBuilderWithEmptyArrayParams(): void
+    {
+        $result = $this->getRepository()->getArticlesQuery('ibiza', 0, 25, [], false, 1)->fetchAll();
 
         static::assertCount(1, $result);
 
