@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -49,17 +50,13 @@ class Repository extends ModelRepository
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
-        $builder->select(
-            [
-                'priceGroup.id as id',
-                'priceGroup.name as name',
-                'priceGroup.gross as gross',
-                'priceGroup.active as active',
-            ]
-        )->from(
-            $this->getEntityName(),
-            'priceGroup'
-        );
+        $builder->select([
+            'priceGroup.id as id',
+            'priceGroup.name as name',
+            'priceGroup.gross as gross',
+            'priceGroup.active as active',
+        ])
+            ->from($this->getEntityName(), 'priceGroup');
 
         if ($filter !== null) {
             $builder->where('priceGroup.name LIKE :filter')
@@ -109,26 +106,17 @@ class Repository extends ModelRepository
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
-        $builder->select(
-            [
-                'customer.id as id',
-                'customer.number as number',
-                'customer.groupKey as groupKey',
-                'billing.company as company',
-                'billing.firstname as firstName',
-                'billing.lastname as lastName',
-            ]
-        )->from(
-            Customer::class,
-            'customer'
-        )->join(
-            'customer.defaultBillingAddress',
-            'billing'
-        )
-            ->leftJoin(
-                'customer.attribute',
-                'attribute'
-            );
+        $builder->select([
+            'customer.id as id',
+            'customer.number as number',
+            'customer.groupKey as groupKey',
+            'billing.company as company',
+            'billing.firstname as firstName',
+            'billing.lastname as lastName',
+        ])
+            ->from(Customer::class, 'customer')
+            ->join('customer.defaultBillingAddress', 'billing')
+            ->leftJoin('customer.attribute', 'attribute');
 
         if (!empty($filter)) {
             $builder->andWhere('customer.number LIKE ?1')
@@ -139,13 +127,8 @@ class Repository extends ModelRepository
                 ->orWhere('billing.company LIKE ?2')
                 ->orWhere('billing.city LIKE ?2')
                 ->orWhere('billing.zipcode LIKE ?1')
-                ->setParameter(
-                    1,
-                    $filter . '%'
-                )->setParameter(
-                    2,
-                    '%' . $filter . '%'
-                );
+                ->setParameter(1, $filter . '%')
+                ->setParameter(2, '%' . $filter . '%');
         }
         if ($sort !== null) {
             $builder->addOrderBy($sort);
@@ -181,21 +164,26 @@ class Repository extends ModelRepository
      *
      * @param array<array{property: string, direction: string}>|null $sort
      */
-    public function getArticlesQueryBuilder(?string $filter, ?int $start, ?int $limit, ?array $sort, ?bool $main, ?int $groupId): DbalQueryBuilder
-    {
+    public function getArticlesQueryBuilder(
+        ?string $filter,
+        ?int $start,
+        ?int $limit,
+        ?array $sort,
+        ?bool $main,
+        ?int $groupId
+    ): DbalQueryBuilder {
         $builder = $this->getEntityManager()->getDBALQueryBuilder();
 
-        $builder->select(
-            [
-                'detail.id as id',
-                'article.id as articleId',
-                'article.name as name',
-                'detail.ordernumber as number',
-                'aPrices.price as defaultPrice',
-                'prices.price as current',
-                'tax.tax as tax',
-            ]
-        )->groupBy('detail.id');
+        $builder->select([
+            'detail.id as id',
+            'article.id as articleId',
+            'article.name as name',
+            'detail.ordernumber as number',
+            'aPrices.price as defaultPrice',
+            'prices.price as current',
+            'tax.tax as tax',
+        ])
+            ->groupBy('detail.id');
 
         if ($main) {
             $builder->andWhere('detail.kind = 1');
@@ -203,15 +191,11 @@ class Repository extends ModelRepository
 
         if (!empty($filter)) {
             $builder->andWhere('article.name LIKE :filter')
-                ->orWhere(
-                    'detail.ordernumber LIKE :filter'
-                )->setParameter(
-                    'filter',
-                    '%' . $filter . '%'
-                );
+                ->orWhere('detail.ordernumber LIKE :filter')
+                ->setParameter('filter', '%' . $filter . '%');
         }
 
-        if ($sort !== null) {
+        if (!empty($sort)) {
             $builder->orderBy(
                 $sort[0]['property'],
                 $sort[0]['direction']
@@ -241,9 +225,7 @@ class Repository extends ModelRepository
      */
     public function getArticlesCountQuery(?string $filter = '', ?bool $main = false, ?int $groupId = null)
     {
-        $builder = $this->getArticlesCountQueryBuilder($filter, $main, $groupId);
-
-        return $builder->execute();
+        return $this->getArticlesCountQueryBuilder($filter, $main, $groupId)->execute();
     }
 
     /**
@@ -264,10 +246,7 @@ class Repository extends ModelRepository
         if (!empty($filter)) {
             $builder->andWhere('article.name LIKE :filter')
                 ->orWhere('detail.ordernumber LIKE :filter')
-                ->setParameter(
-                    'filter',
-                    '%' . $filter . '%'
-                );
+                ->setParameter('filter', '%' . $filter . '%');
         }
 
         if (!\is_int($groupId)) {
@@ -283,27 +262,31 @@ class Repository extends ModelRepository
      */
     public function buildGetArticleQuery(DbalQueryBuilder $builder, int $groupId): DbalQueryBuilder
     {
-        $builder->from('s_articles', 'article')->join(
-            'article',
-            's_articles_details',
-            'detail',
-            'article.id = detail.articleID'
-        )->join(
-            'detail',
-            's_articles_prices',
-            'aPrices',
-            'detail.id = aPrices.articledetailsID'
-        )->join(
-            'article',
-            's_core_tax',
-            'tax',
-            'tax.id = article.taxID'
-        )->leftJoin(
-            'detail',
-            's_plugin_pricegroups_prices',
-            'prices',
-            'prices.articledetailsID = detail.id AND prices.pricegroup = :group'
-        );
+        $builder->from('s_articles', 'article')
+            ->join(
+                'article',
+                's_articles_details',
+                'detail',
+                'article.id = detail.articleID'
+            )
+            ->join(
+                'detail',
+                's_articles_prices',
+                'aPrices',
+                'detail.id = aPrices.articledetailsID'
+            )
+            ->join(
+                'article',
+                's_core_tax',
+                'tax',
+                'tax.id = article.taxID'
+            )
+            ->leftJoin(
+                'detail',
+                's_plugin_pricegroups_prices',
+                'prices',
+                'prices.articledetailsID = detail.id AND prices.pricegroup = :group'
+            );
 
         $builder->setParameter('group', $groupId);
 
@@ -331,20 +314,17 @@ class Repository extends ModelRepository
     {
         $builder = $this->getEntityManager()->createQueryBuilder();
 
-        $builder->select(
-            [
-                'prices.id',
-                'prices.priceGroupId as priceGroup',
-                'prices.from',
-                'prices.to',
-                'prices.price',
-                'prices.articleId',
-                'prices.articleDetailsId',
-            ]
-        )->from(
-            Price::class,
-            'prices'
-        )->where('prices.priceGroupId = ?1')
+        $builder->select([
+            'prices.id',
+            'prices.priceGroupId as priceGroup',
+            'prices.from',
+            'prices.to',
+            'prices.price',
+            'prices.articleId',
+            'prices.articleDetailsId',
+        ])
+            ->from(Price::class, 'prices')
+            ->where('prices.priceGroupId = ?1')
             ->andWhere('prices.articleDetailsId = ?2')
             ->setParameter(1, $groupId)
             ->setParameter(2, $detailId)
