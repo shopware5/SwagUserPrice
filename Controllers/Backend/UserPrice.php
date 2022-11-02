@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -39,7 +40,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     public function preDispatch()
     {
         if (!\in_array($this->Request()->getActionName(), ['index', 'load'])) {
-            $this->Front()->Plugins()->Json()->setRenderer(true);
+            $this->Front()->Plugins()->Json()->setRenderer();
         }
     }
 
@@ -72,7 +73,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     {
         $this->View()->assign(
             $this->getGroups(
-                $this->Request()->getQuery()
+                $this->Request()->getParams()
             )
         );
     }
@@ -115,7 +116,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     {
         $this->View()->assign(
             $this->getCustomers(
-                $this->Request()->getQuery()
+                $this->Request()->getParams()
             )
         );
     }
@@ -145,30 +146,32 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * This event listener method is needed to load all articles.
-     * Additionally you can filter the articles to only show main-products.
+     * This event listener method is needed to load all products.
+     * Additionally, you can filter the products to only show main-products.
      */
     public function getArticlesAction(): void
     {
         $this->View()->assign(
             $this->getArticles(
-                $this->Request()->getQuery()
+                $this->Request()->getParams()
             )
         );
     }
 
     /**
-     * This event listener method returns all prices being assigned to an article and a group.
+     * This event listener method returns all prices being assigned to a product and a group.
      */
     public function getPricesAction(): void
     {
         $this->View()->assign(
-            $this->getPrices()
+            $this->getPrices(
+                $this->Request()->getParams()
+            )
         );
     }
 
     /**
-     * This event listener method is called to edit the configured prices for an article in a specific group.
+     * This event listener method is called to edit the configured prices for a product in a specific group.
      */
     public function updatePriceAction(): void
     {
@@ -180,7 +183,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * This event listener method is called to delete the last price-row of an article in a specific group.
+     * This event listener method is called to delete the last price-row of a product in a specific group.
      */
     public function deletePriceAction(): void
     {
@@ -216,28 +219,30 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     /**
      * Reads the groups and its total-count.
      * It supports searching- and paging-functions.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, total?: int, data?: array<array<string, mixed>>, msg?: string}
      */
     private function getGroups(array $params): array
     {
-        try {
-            $filterValue = '';
-            // filter from the search-field
-            if ($filter = $this->Request()->get('filter')) {
-                $filterValue = $filter[0]['value'];
-            } else {
-                if ($filter = $params['query']) {
-                    $filterValue = $filter;
-                }
-            }
+        $filterValue = '';
+        // filter from the search-field
+        if ($filter = $params['filter']) {
+            $filterValue = $filter[0]['value'];
+        } elseif ($filter = $params['query']) {
+            $filterValue = $filter;
+        }
 
+        try {
             $query = $this->getRepository()->getGroupsQuery(
                 $filterValue,
-                $params['start'],
-                $params['limit'],
-                (array) $this->Request()->getParam('sort', [])
+                (int) $params['start'],
+                (int) $params['limit'],
+                $params['sort']
             );
 
-            $totalResult = $this->getEntityManager()->getQueryCount($query);
+            $totalResult = (int) $this->getEntityManager()->getQueryCount($query);
 
             return ['success' => true, 'data' => $query->getArrayResult(), 'total' => $totalResult];
         } catch (Exception $e) {
@@ -249,27 +254,31 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Edits a group.
      * This is either creating a new group if no id is set in the parameters.
      * Otherwise, the group with the given id will be edited.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg: string}
      */
     private function handleEdit(array $params): array
     {
+        $em = $this->getEntityManager();
+        $id = (int) $params['id'];
+
+        $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
+
+        if ($id === 0) {
+            $model = new Group();
+            $msg = $namespace->get('growlMessage/create/message', 'The group was successfully created');
+        } else {
+            $model = $em->find(Group::class, $id);
+            $msg = $namespace->get('growlMessage/edit/message', 'The group was successfully edited');
+        }
+
+        if (!$model instanceof Group) {
+            return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $id)];
+        }
+
         try {
-            $em = $this->getEntityManager();
-            $id = (int) $params['id'];
-
-            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
-
-            if ($id === 0) {
-                $model = new Group();
-                $msg = $namespace->get('growlMessage/create/message', 'The group was successfully created');
-            } else {
-                $model = $em->find(Group::class, $id);
-                $msg = $namespace->get('growlMessage/edit/message', 'The group was successfully edited');
-            }
-
-            if (!$model instanceof Group) {
-                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $id)];
-            }
-
             $model->fromArray($params);
 
             $em->persist($model);
@@ -288,21 +297,26 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * Deletes a group.
      * This will not only delete the group itself, but also remove all assigned values.
      * E.g. this will also delete the assigned prices and removes the assigned customers from the group.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg: string}
      */
     private function handleDeletion(array $params): array
     {
+        $records = $params;
+
+        $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
+
+        // The array structure of $params depends on the amount of records being deleted.
+        // This way we create the same array-structure in every case
+        if (!$this->isMultiDimensional($params)) {
+            $records = [$params];
+        }
+
+        $modelManager = $this->getEntityManager();
+
         try {
-            $records = $params;
-
-            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/controller/group');
-
-            // The array structure of $params depends on the amount of records being deleted.
-            // This way we create the same array-structure in every case
-            if (!$this->isMultiDimensional($params)) {
-                $records = [$params];
-            }
-
-            $modelManager = $this->getEntityManager();
             foreach ($records as $record) {
                 $group = $this->getRepository()->find($record['id']);
                 if ($group instanceof Group) {
@@ -332,7 +346,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             $modelManager->flush();
 
             $success = true;
-            $msg = $namespace->get('growlMessage/delete/message', 'The groups were succesfully deleted');
+            $msg = $namespace->get('growlMessage/delete/message', 'The groups were successfully deleted');
         } catch (Exception $e) {
             $success = false;
             $msg = $e->getMessage();
@@ -348,33 +362,35 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      * 2nd - only selected customers, which are currently assigned to the group whose id is in the parameter.
      *
      * It supports searching- and paging-functions.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, total?: int, data?: array<array<string, mixed>>, msg?: string}
      */
     private function getCustomers(array $params): array
     {
-        try {
-            $search = '';
-            $groupId = null;
-            foreach ($this->Request()->getParam('filter') as $filter) {
-                if ($filter['property'] === 'priceGroup') {
-                    $groupId = $filter['value'];
-                } else {
-                    if ($filter['property'] === 'searchValue') {
-                        $search = $filter['value'];
-                    }
-                }
+        $search = '';
+        $groupId = null;
+        foreach ($params['filter'] as $filter) {
+            if ($filter['property'] === 'priceGroup') {
+                $groupId = $filter['value'];
+            } elseif ($filter['property'] === 'searchValue') {
+                $search = $filter['value'];
             }
+        }
 
+        try {
             $query = $this->getRepository()->getCustomersQuery(
                 $search,
-                $params['start'],
-                $params['limit'],
-                (array) $this->Request()->getParam('sort', []),
+                (int) $params['start'],
+                (int) $params['limit'],
+                $params['sort'],
                 $groupId
             );
 
             return [
                 'success' => true,
-                'total' => $this->getEntityManager()->getQueryCount($query),
+                'total' => (int) $this->getEntityManager()->getQueryCount($query),
                 'data' => $query->getArrayResult(),
             ];
         } catch (Exception $e) {
@@ -384,13 +400,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Adds a customer to a group.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg?: string}
      */
     private function addCustomer(array $params): array
     {
         try {
-            $customerIds = json_decode($params['customerIds']);
-
-            foreach ($customerIds as $customerId) {
+            foreach (json_decode($params['customerIds']) as $customerId) {
                 $customer = $this->getEntityManager()->find(Customer::class, $customerId);
                 if (!$customer instanceof Customer) {
                     continue;
@@ -417,12 +435,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
     /**
      * Removes a customer from a given group.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg?: string}
      */
     private function removeCustomer(array $params): array
     {
         try {
-            $customerIds = json_decode($params['customerIds']);
-            foreach ($customerIds as $customerId) {
+            foreach (json_decode($params['customerIds']) as $customerId) {
                 $customer = $this->getEntityManager()->find(Customer::class, $customerId);
 
                 if (!$customer) {
@@ -447,37 +468,37 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Returns all articles.
-     * This can also be configured to only show main-articles.
+     * Returns all products.
+     * This can also be configured to only show main-products.
      *
      * It supports searching- and paging-functions.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, total?: int, data?: array<array<string, mixed>>, msg?: string}
      */
     private function getArticles(array $params): array
     {
-        try {
-            $search = '';
-            $main = null;
-            $groupId = null;
+        $search = '';
+        $main = null;
+        $groupId = null;
 
-            foreach ($this->Request()->getParam('filter') as $filter) {
-                if ($filter['property'] == 'mainOnly') {
-                    $main = $filter['value'];
-                } else {
-                    if ($filter['property'] == 'searchValue') {
-                        $search = $filter['value'];
-                    } else {
-                        if ($filter['property'] == 'priceGroup') {
-                            $groupId = $filter['value'];
-                        }
-                    }
-                }
+        foreach ($params['filter'] as $filter) {
+            if ($filter['property'] === 'mainOnly') {
+                $main = $filter['value'];
+            } elseif ($filter['property'] === 'searchValue') {
+                $search = $filter['value'];
+            } elseif ($filter['property'] === 'priceGroup') {
+                $groupId = $filter['value'];
             }
+        }
 
+        try {
             $stmt = $this->getRepository()->getArticlesQuery(
                 $search,
-                $params['start'],
-                $params['limit'],
-                (array) $this->Request()->getParam('sort', []),
+                (int) $params['start'],
+                (int) $params['limit'],
+                $params['sort'],
                 $main,
                 $groupId
             );
@@ -493,31 +514,35 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Reads all prices being set for a specific article and a specific group.
-     * This way you can configure prices for each group and for each article in the groups then.
+     * Reads all prices being set for a specific product and a specific group.
+     * This way you can configure prices for each group and for each product in the groups then.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, data?: array<array<string, mixed>>, msg?: string}
      */
-    private function getPrices(): array
+    private function getPrices(array $params): array
     {
-        try {
-            $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/view/prices');
+        $namespace = Shopware()->Snippets()->getNamespace('backend/plugins/user_price/view/prices');
 
-            $productVariantId = null;
-            $groupId = null;
-            foreach ($this->Request()->getParam('filter') as $filter) {
-                if ($filter['property'] === 'detailId') {
-                    $productVariantId = (int) $filter['value'];
-                } elseif ($filter['property'] === 'priceGroup') {
-                    $groupId = (int) $filter['value'];
-                }
+        $productVariantId = null;
+        $groupId = null;
+        foreach ($params['filter'] as $filter) {
+            if ($filter['property'] === 'detailId') {
+                $productVariantId = (int) $filter['value'];
+            } elseif ($filter['property'] === 'priceGroup') {
+                $groupId = (int) $filter['value'];
             }
+        }
 
+        try {
             if ($groupId === null || $productVariantId === null) {
                 throw new ParameterMissingException('Detail or group id missing');
             }
 
             $productVariant = $this->getEntityManager()->find(ProductVariant::class, $productVariantId);
             if (!$productVariant instanceof ProductVariant) {
-                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $groupId)];
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $productVariantId)];
             }
             $product = $productVariant->getArticle();
             $group = $this->getRepository()->find($groupId);
@@ -545,12 +570,13 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 }
                 $firstPrice = false;
             }
+            unset($item);
 
             $lastEntry = end($data);
 
             // This must not be translated!
             // Do not translate, this is not shown to the user and only used for the logic!
-            $addEntry = $lastEntry['to'] != 'beliebig';
+            $addEntry = $lastEntry['to'] !== 'beliebig';
 
             if ($addEntry) {
                 // No prices defined yet
@@ -573,32 +599,35 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Updates the price for a specific article in a specific group.
+     * Updates the price for a specific product in a specific group.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg?: string}
      */
     private function updatePrice(array $params): array
     {
+        $id = $params['id'];
+        $priceGroupId = (int) $params['priceGroup'];
+        $productId = (int) $params['articleId'];
+        $productVariantId = (int) $params['articleDetailsId'];
+
         try {
-            $id = $params['id'];
-
-            $priceGroupId = $params['priceGroup'];
-            $productId = $params['articleId'];
-            $articleDetailId = $params['articleDetailsId'];
-
-            if (!$priceGroupId) {
-                throw new InvalidArgumentException('Price group id is missing!');
+            if ($priceGroupId === 0) {
+                throw new InvalidArgumentException('Price group ID is missing!');
             }
 
-            if (!$productId) {
-                throw new InvalidArgumentException('Article id is missing!');
+            if ($productId === 0) {
+                throw new InvalidArgumentException('Product ID is missing!');
             }
 
-            if (!$articleDetailId) {
-                throw new InvalidArgumentException('Article detail id is missing!');
+            if ($productVariantId === 0) {
+                throw new InvalidArgumentException('Product variant ID is missing!');
             }
 
-            $model = $this->getEntityManager()->find(Price::class, $id);
-            if (!$model instanceof Price) {
-                $model = new Price();
+            $priceModel = $this->getEntityManager()->find(Price::class, $id);
+            if (!$priceModel instanceof Price) {
+                $priceModel = new Price();
             }
 
             // This must not be translated!
@@ -609,15 +638,15 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
 
             $priceGroup = $this->getEntityManager()->find(Group::class, $priceGroupId);
             if (!$priceGroup instanceof Group) {
-                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $id)];
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Group::class, $priceGroupId)];
             }
             $product = $this->getEntityManager()->find(Product::class, $productId);
             if (!$product instanceof Product) {
-                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Product::class, $id)];
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', Product::class, $productId)];
             }
-            $productVariant = $this->getEntityManager()->find(ProductVariant::class, $articleDetailId);
+            $productVariant = $this->getEntityManager()->find(ProductVariant::class, $productVariantId);
             if (!$productVariant instanceof ProductVariant) {
-                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $id)];
+                return ['success' => false, 'msg' => sprintf('Could not find %s with ID "%s"', ProductVariant::class, $productVariantId)];
             }
             $tax = $product->getTax();
             if (!$tax instanceof Tax) {
@@ -625,18 +654,18 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
             }
 
             if ($priceGroup->getGross() === 1 && $params['price']) {
-                $params['price'] = $params['price'] / ((100 + (float) $tax->getTax()) / 100);
+                $params['price'] /= ((100 + (float) $tax->getTax()) / 100);
             }
 
             $params['price'] = $params['price'] ?: null;
 
-            $model->fromArray($params);
-            $model->setPriceGroup($priceGroup);
-            $model->setArticle($product);
-            $model->setDetail($productVariant);
+            $priceModel->fromArray($params);
+            $priceModel->setPriceGroup($priceGroup);
+            $priceModel->setArticle($product);
+            $priceModel->setDetail($productVariant);
 
             if ($this->shouldRemovePrice($params)) {
-                $this->getEntityManager()->remove($model);
+                $this->getEntityManager()->remove($priceModel);
                 $this->getEntityManager()->flush();
 
                 Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $productId]);
@@ -644,34 +673,39 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
                 return ['success' => true];
             }
 
-            $this->getEntityManager()->persist($model);
+            $this->getEntityManager()->persist($priceModel);
             $this->getEntityManager()->flush();
 
             Shopware()->Events()->notify('Shopware_Plugins_HttpCache_InvalidateCacheId', ['cacheId' => 'a' . $productId]);
 
             return ['success' => true];
-        } catch (InvalidArgumentException $e) {
+        } catch (Exception $e) {
             return ['success' => false, 'msg' => $e->getMessage()];
         }
     }
 
     /**
      * Deletes a price by a given id.
+     *
+     * @param array<string, mixed> $params
+     *
+     * @return array{success: bool, msg?: string}
      */
     private function deletePrice(array $params): array
     {
+        $id = (int) $params['id'];
+
         try {
-            if (!$id = $params['id']) {
+            if (!$id) {
                 throw new ParameterMissingException('Identifier id missing');
             }
-            $model = $this->getEntityManager()->find(Price::class, $params['id']);
+            $model = $this->getEntityManager()->find(Price::class, $id);
 
-            if (!$model) {
+            if (!$model instanceof Price) {
                 throw new EntityNotFoundException('No entity with id ' . $id . ' found.');
             }
 
             $this->getEntityManager()->remove($model);
-
             $this->getEntityManager()->flush();
 
             return ['success' => true];
@@ -681,18 +715,22 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
     }
 
     /**
-     * Checks if an array is multi-dimensional.
+     * Checks if an array is multidimensional.
+     *
+     * @param array<string, mixed> $array
      */
     private function isMultiDimensional(array $array): bool
     {
-        return \count($array) != \count($array, \COUNT_RECURSIVE);
+        return \count($array) !== \count($array, \COUNT_RECURSIVE);
     }
 
     /**
      * Returns true if the price-stack should be removed.
-     * There may only be a single price defined in order to remove the whole user-price on this article.
-     * Therefore we check for both "from = 1", so it's the first price, as well as "to = beliebig", so it's the last price.
+     * There may only be a single price defined in order to remove the whole user-price on this product.
+     * Therefore, we check for both "from = 1", so it's the first price, and "to = beliebig", so it's the last price.
      * If the price is then set to null, the user might want to remove this price.
+     *
+     * @param array<string, mixed> $params
      */
     private function shouldRemovePrice(array $params): bool
     {
