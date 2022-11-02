@@ -12,9 +12,12 @@ namespace SwagUserPrice\Tests\Functional\Models\UserPrice;
 
 use PHPUnit\Framework\TestCase;
 use SwagUserPrice\Models\UserPrice\Group;
+use SwagUserPrice\Tests\Functional\ContainerTrait;
 
 class RepositoryTest extends TestCase
 {
+    use ContainerTrait;
+
     public function testGetArticlesQueryBuilderWithNullParams(): void
     {
         $result = $this->getRepository()->getArticlesQuery('ibiza', 0, 25, null, null, 1)->fetchAll();
@@ -39,6 +42,6 @@ class RepositoryTest extends TestCase
 
     private function getRepository()
     {
-        return Shopware()->Container()->get('models')->getRepository(Group::class);
+        return $this->getContainer()->get('models')->getRepository(Group::class);
     }
 }
