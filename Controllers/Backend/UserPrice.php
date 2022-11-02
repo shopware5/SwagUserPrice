@@ -607,7 +607,7 @@ class Shopware_Controllers_Backend_UserPrice extends Shopware_Controllers_Backen
      */
     private function updatePrice(array $params): array
     {
-        $id = $params['id'];
+        $id = (int) $params['id'];
         $priceGroupId = (int) $params['priceGroup'];
         $productId = (int) $params['articleId'];
         $productVariantId = (int) $params['articleDetailsId'];
