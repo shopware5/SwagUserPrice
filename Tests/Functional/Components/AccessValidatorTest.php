@@ -13,9 +13,11 @@ namespace SwagUserPrice\Tests\Functional\Components;
 use PHPUnit\Framework\TestCase;
 use Shopware\Tests\Functional\Traits\DatabaseTransactionBehaviour;
 use SwagUserPrice\Components\AccessValidator;
+use SwagUserPrice\Tests\Functional\ContainerTrait;
 
 class AccessValidatorTest extends TestCase
 {
+    use ContainerTrait;
     use DatabaseTransactionBehaviour;
 
     public function testValidateProductNoUserIdShouldReturnFalse(): void
@@ -29,7 +31,7 @@ class AccessValidatorTest extends TestCase
     {
         $validator = $this->getValidator();
 
-        Shopware()->Container()->get('session')->offsetSet('sUserId', 1);
+        $this->getContainer()->get('session')->offsetSet('sUserId', 1);
 
         $result = $validator->validateProduct('SW10178');
 
@@ -41,9 +43,9 @@ class AccessValidatorTest extends TestCase
         $validator = $this->getValidator();
 
         $sql = file_get_contents(__DIR__ . '/_fixtures/prices.sql');
-        Shopware()->Container()->get('dbal_connection')->exec($sql);
+        $this->getContainer()->get('dbal_connection')->exec($sql);
 
-        Shopware()->Container()->get('session')->offsetSet('sUserId', 1);
+        $this->getContainer()->get('session')->offsetSet('sUserId', 1);
 
         $result = $validator->validateProduct('SW10178');
 
@@ -53,8 +55,8 @@ class AccessValidatorTest extends TestCase
     private function getValidator(): AccessValidator
     {
         return new AccessValidator(
-            Shopware()->Container()->get('swaguserprice.dependency_provider'),
-            Shopware()->Container()->get('models')
+            $this->getContainer()->get('swaguserprice.dependency_provider'),
+            $this->getContainer()->get('models')
         );
     }
 }

@@ -15,7 +15,8 @@
                 <directory suffix=".php">./Tests</directory>
                 <directory suffix=".php">./vendor</directory>
 
-                <file>SwagPromotion.php</file>
+                <file>.php-cs-fixer.php</file>
+                <file>SwagUserPrice.php</file>
             </exclude>
         </whitelist>
     </filter>

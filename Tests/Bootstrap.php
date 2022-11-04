@@ -8,47 +8,44 @@ declare(strict_types=1);
  *
  */
 
-/**
- * Initialize the shopware kernel
- */
-require __DIR__ . '/../../../../autoload.php';
-
 use Shopware\Kernel;
 use Shopware\Models\Shop\Shop;
 
+require __DIR__ . '/../../../../autoload.php';
+
 class SwagUserPriceTestKernel extends Kernel
 {
+    /**
+     * @var SwagUserPriceTestKernel
+     */
+    private static $kernel;
+
     public static function start(): void
     {
-        $kernel = new self((string) getenv('SHOPWARE_ENV') ?: 'testing', true);
-        $kernel->boot();
+        self::$kernel = new self(\getenv('SHOPWARE_ENV') ?: 'testing', true);
+        self::$kernel->boot();
 
-        $container = $kernel->getContainer();
+        $container = self::$kernel->getContainer();
         $container->get('plugins')->Core()->ErrorHandler()->registerErrorHandler(\E_ALL | \E_STRICT);
 
         $shop = $container->get('models')->getRepository(Shop::class)->getActiveDefault();
+        $container->get('shopware.components.shop_registration_service')->registerResources($shop);
 
-        $shopRegistrationService = $container->get('shopware.components.shop_registration_service');
-        $shopRegistrationService->registerResources($shop);
-
-        $_SERVER['HTTP_HOST'] = $shop->getHost();
-
-        if (!self::assertPlugin('SwagUserPrice')) {
-            throw new Exception('Plugin SwagUserPrice is not installed or activated.');
+        if (!self::assertPlugin()) {
+            throw new \RuntimeException('Plugin SwagUserPrice must be installed and activated.');
         }
-
-        /*
-         * \sBasket::sInsertPremium expects a request object and is called by sGetBasket
-         * which we use a lot here
-         */
-        Shopware()->Front()->setRequest(new Enlight_Controller_Request_RequestTestCase());
     }
 
-    private static function assertPlugin(string $name): bool
+    public static function getKernel(): SwagUserPriceTestKernel
+    {
+        return self::$kernel;
+    }
+
+    private static function assertPlugin(): bool
     {
         $sql = 'SELECT 1 FROM s_core_plugins WHERE name = ? AND active = 1';
 
-        return (bool) Shopware()->Container()->get('dbal_connection')->fetchColumn($sql, [$name]);
+        return (bool) Shopware()->Container()->get('dbal_connection')->fetchColumn($sql, ['SwagUserPrice']);
     }
 }
 
