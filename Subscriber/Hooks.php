@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -14,7 +15,7 @@ use Enlight\Event\SubscriberInterface;
 use Enlight_Event_EventArgs as EventArgs;
 use Shopware\Components\Model\ModelManager;
 use Shopware\Models\Plugin\Plugin;
-use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
+use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProviderInterface;
 use SwagUserPrice\Components\AccessValidator;
 use SwagUserPrice\Components\ServiceHelper;
 
@@ -23,7 +24,7 @@ class Hooks implements SubscriberInterface
     /**
      * @var Connection
      */
-    private $database;
+    private $connection;
 
     /**
      * @var AccessValidator
@@ -36,7 +37,7 @@ class Hooks implements SubscriberInterface
     private $serviceHelper;
 
     /**
-     * @var DependencyProvider
+     * @var DependencyProviderInterface
      */
     private $dependencyProvider;
 
@@ -46,13 +47,13 @@ class Hooks implements SubscriberInterface
     private $modelManager;
 
     public function __construct(
-        Connection $database,
+        Connection $connection,
         AccessValidator $accessValidator,
         ServiceHelper $serviceHelper,
-        DependencyProvider $dependencyProvider,
+        DependencyProviderInterface $dependencyProvider,
         ModelManager $modelManager
     ) {
-        $this->database = $database;
+        $this->connection = $connection;
         $this->accessValidator = $accessValidator;
         $this->serviceHelper = $serviceHelper;
         $this->dependencyProvider = $dependencyProvider;
@@ -83,7 +84,7 @@ class Hooks implements SubscriberInterface
 
         $sql = 'SELECT ordernumber FROM `s_order_basket` WHERE `id` = ?';
 
-        $orderNumber = $this->database->fetchOne($sql, [$id]);
+        $orderNumber = (string) $this->connection->fetchColumn($sql, [$id]);
 
         if (!$this->accessValidator->validateProduct($orderNumber)) {
             return $return;
@@ -117,9 +118,11 @@ class Hooks implements SubscriberInterface
      */
     private function cachePluginActive(): bool
     {
-        /** @var Plugin $cachePlugin */
-        $cachePlugin = $this->modelManager->getRepository(Plugin::class)
-            ->findOneBy(['name' => 'HttpCache']);
+        $cachePlugin = $this->modelManager->getRepository(Plugin::class)->findOneBy(['name' => 'HttpCache']);
+        if (!$cachePlugin instanceof Plugin) {
+            return false;
+        }
+
         if ($cachePlugin->getActive()) {
             return true;
         }
