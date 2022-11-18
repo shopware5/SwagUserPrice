@@ -9,7 +9,6 @@
 
 namespace SwagUserPrice\Bundle\StoreFrontBundle\Service;
 
-use Enlight_Components_Session_Namespace;
 use Shopware_Plugins_Core_HttpCache_Bootstrap as HttpCache;
 
 interface DependencyProviderInterface
@@ -18,7 +17,7 @@ interface DependencyProviderInterface
 
     public function hasShop(): bool;
 
-    public function getSession(): Enlight_Components_Session_Namespace;
+    public function getSession(): \Enlight_Components_Session_Namespace;
 
     public function getHttpCache(): HttpCache;
 }

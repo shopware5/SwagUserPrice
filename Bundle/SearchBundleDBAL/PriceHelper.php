@@ -16,7 +16,6 @@ use Shopware\Bundle\SearchBundleDBAL\PriceHelperInterface;
 use Shopware\Bundle\SearchBundleDBAL\QueryBuilder;
 use Shopware\Bundle\StoreFrontBundle\Struct\ProductContextInterface;
 use Shopware\Bundle\StoreFrontBundle\Struct\ShopContextInterface;
-use Shopware_Components_Config;
 use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 
 /**
@@ -32,7 +31,7 @@ class PriceHelper implements PriceHelperInterface
     private $coreHelper;
 
     /**
-     * @var Shopware_Components_Config
+     * @var \Shopware_Components_Config
      */
     private $config;
 
@@ -48,7 +47,7 @@ class PriceHelper implements PriceHelperInterface
 
     public function __construct(
         PriceHelperInterface $coreHelper,
-        Shopware_Components_Config $config,
+        \Shopware_Components_Config $config,
         Connection $connection,
         DependencyProvider $dependencyProvider
     ) {

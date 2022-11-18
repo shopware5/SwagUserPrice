@@ -9,7 +9,6 @@
 
 namespace SwagUserPrice\Bundle\StoreFrontBundle\Service;
 
-use Enlight_Components_Session_Namespace;
 use Shopware_Plugins_Core_HttpCache_Bootstrap as HttpCache;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -41,7 +40,7 @@ class DependencyProvider implements DependencyProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function getSession(): Enlight_Components_Session_Namespace
+    public function getSession(): \Enlight_Components_Session_Namespace
     {
         return $this->container->get('session');
     }

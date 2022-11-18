@@ -12,7 +12,6 @@ namespace SwagUserPrice\Tests\Functional\Controller\Backend;
 
 use PHPUnit\Framework\TestCase;
 use Shopware\Tests\Functional\Traits\DatabaseTransactionBehaviour;
-use Shopware_Controllers_Backend_UserPrice;
 use SwagUserPrice\Tests\Functional\ContainerTrait;
 use SwagUserPrice\Tests\Functional\ReflectionHelper;
 
@@ -41,7 +40,7 @@ class UserPriceTest extends TestCase
         ];
 
         $userPriceController = $this->getUserPriceController();
-        $updatePriceResult = ReflectionHelper::getMethod(Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
+        $updatePriceResult = ReflectionHelper::getMethod(\Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
             ->invokeArgs($userPriceController, [$updatePriceParams]);
         static::assertTrue($updatePriceResult['success'], $updatePriceResult['msg'] ?? '');
 
@@ -57,7 +56,7 @@ class UserPriceTest extends TestCase
                 ],
             ],
         ];
-        $getPricesResult = ReflectionHelper::getMethod(Shopware_Controllers_Backend_UserPrice::class, 'getPrices')
+        $getPricesResult = ReflectionHelper::getMethod(\Shopware_Controllers_Backend_UserPrice::class, 'getPrices')
             ->invokeArgs($userPriceController, [$getPricesParams]);
         static::assertTrue($getPricesResult['success'], $getPricesResult['msg'] ?? '');
 
@@ -70,7 +69,7 @@ class UserPriceTest extends TestCase
     public function testUpdatePriceActionWithoutPriceGroupId(): void
     {
         $params = [];
-        $result = ReflectionHelper::getMethod(Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
+        $result = ReflectionHelper::getMethod(\Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
             ->invokeArgs($this->getUserPriceController(), [$params]);
 
         static::assertFalse($result['success']);
@@ -82,7 +81,7 @@ class UserPriceTest extends TestCase
         $params = [
             'priceGroup' => 1,
         ];
-        $result = ReflectionHelper::getMethod(Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
+        $result = ReflectionHelper::getMethod(\Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
             ->invokeArgs($this->getUserPriceController(), [$params]);
 
         static::assertFalse($result['success']);
@@ -95,16 +94,16 @@ class UserPriceTest extends TestCase
             'priceGroup' => 1,
             'articleId' => 1,
         ];
-        $result = ReflectionHelper::getMethod(Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
+        $result = ReflectionHelper::getMethod(\Shopware_Controllers_Backend_UserPrice::class, 'updatePrice')
             ->invokeArgs($this->getUserPriceController(), [$params]);
 
         static::assertFalse($result['success']);
         static::assertSame('Product variant ID is missing!', $result['msg']);
     }
 
-    private function getUserPriceController(): Shopware_Controllers_Backend_UserPrice
+    private function getUserPriceController(): \Shopware_Controllers_Backend_UserPrice
     {
-        $userPriceController = new Shopware_Controllers_Backend_UserPrice();
+        $userPriceController = new \Shopware_Controllers_Backend_UserPrice();
         $userPriceController->setContainer($this->getContainer());
 
         return $userPriceController;
