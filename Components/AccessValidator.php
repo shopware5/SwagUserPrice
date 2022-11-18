@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -9,8 +10,6 @@
 
 namespace SwagUserPrice\Components;
 
-use Doctrine\DBAL\Query\QueryBuilder;
-use Enlight_Components_Session_Namespace as Session;
 use Shopware\Components\Model\ModelManager;
 use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 
@@ -23,7 +22,7 @@ use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
 class AccessValidator
 {
     /**
-     * @var Session
+     * @var DependencyProvider
      */
     private $dependencyProvider;
 
@@ -42,6 +41,8 @@ class AccessValidator
      * This method validates a product.
      * If a product owns custom user-prices, this will return true.
      * In case there is no logged in user or the current article has no custom user-prices, it returns false.
+     *
+     * @param string $number
      *
      * @throws \Exception
      */
@@ -68,10 +69,8 @@ class AccessValidator
             ->setParameter('number', $number)
             ->execute()->fetchColumn();
 
-        /** @var QueryBuilder $builder */
-        $builder = $this->modelManager->getDBALQueryBuilder();
-
-        $stmt = $builder->select('COUNT(prices.id)')
+        $stmt = $this->modelManager->getDBALQueryBuilder()
+            ->select('COUNT(prices.id)')
             ->from('s_plugin_pricegroups_prices', 'prices')
             ->innerJoin(
                 'prices',

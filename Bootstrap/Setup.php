@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -80,6 +81,8 @@ class Setup
 
     /**
      * The update method handles the migration of the old data.
+     *
+     * @param string $oldVersion
      */
     public function update($oldVersion): bool
     {
@@ -271,13 +274,9 @@ class Setup
      */
     private function removeMenuEntry(): void
     {
-        $menuItem = $this->getEntityManager()->getRepository(Menu::class)->findOneBy(
-            [
-                'label' => 'Kundenspezifische Preise',
-            ]
-        );
+        $menuItem = $this->modelManager->getRepository(Menu::class)->findOneBy(['controller' => 'UserPrice']);
 
-        if (!$menuItem) {
+        if (!$menuItem instanceof Menu) {
             return;
         }
 

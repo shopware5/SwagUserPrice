@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -94,7 +95,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 
         // This must not be translated!
         // Do not translate, this is not shown to the user and only used for the logic!
-        $addEntry = $lastEntry['to'] != 'beliebig';
+        $addEntry = $lastEntry['to'] !== 'beliebig';
 
         if (!$addEntry) {
             return $customRules;

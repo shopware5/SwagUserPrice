@@ -12,6 +12,7 @@ namespace SwagUserPrice\Tests\Functional\Models\UserPrice;
 
 use PHPUnit\Framework\TestCase;
 use SwagUserPrice\Models\UserPrice\Group;
+use SwagUserPrice\Models\UserPrice\Repository;
 use SwagUserPrice\Tests\Functional\ContainerTrait;
 
 class RepositoryTest extends TestCase
@@ -40,7 +41,7 @@ class RepositoryTest extends TestCase
         static::assertSame('SW10178', $result[0]['number']);
     }
 
-    private function getRepository()
+    private function getRepository(): Repository
     {
         return $this->getContainer()->get('models')->getRepository(Group::class);
     }

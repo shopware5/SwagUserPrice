@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -48,7 +49,7 @@ class SwagUserPrice extends Plugin
         $deactivateContext->scheduleClearCache(DeactivateContext::CACHE_LIST_ALL);
     }
 
-    private function getSetup()
+    private function getSetup(): Setup
     {
         return new Setup(
             $this->container->get('models'),
