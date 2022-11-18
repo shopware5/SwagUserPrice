@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -14,7 +15,6 @@ use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
 use Shopware\Components\Model\ModelManager;
 use Shopware_Components_Config as Config;
 use SwagUserPrice\Bundle\StoreFrontBundle\Service\DependencyProvider;
-use Symfony\Component\HttpFoundation\Session\Session;
 
 /**
  * Plugin ServiceHelper class.
@@ -34,7 +34,7 @@ class ServiceHelper
     private $config;
 
     /**
-     * @var Session
+     * @var DependencyProvider
      */
     private $dependencyProvider;
 
@@ -51,15 +51,15 @@ class ServiceHelper
     /**
      * Get the prices for a product.
      */
-    public function getPrices(string $number): ?array
+    public function getPrices(string $number): array
     {
         $result = $this->getPricesQueryBuilder($number)
             ->orderBy('prices.from', 'ASC')
             ->execute()
             ->fetchAll();
 
-        if ($result === false) {
-            return null;
+        if (empty($result)) {
+            return [];
         }
 
         return $result;
@@ -68,7 +68,7 @@ class ServiceHelper
     /**
      * Get a single price for a product.
      */
-    public function getPrice(string $number): ?array
+    public function getPrice(string $number): array
     {
         $builder = $this->getPricesQueryBuilder($number);
         if ($this->config->get('useLastGraduationForCheapestPrice')) {
@@ -79,8 +79,8 @@ class ServiceHelper
             ->execute()
             ->fetch();
 
-        if ($result === false) {
-            return null;
+        if (!\is_array($result)) {
+            return [];
         }
 
         return $result;
@@ -101,7 +101,7 @@ class ServiceHelper
             ->execute()
             ->fetch();
 
-        if ($result === false) {
+        if (!\is_array($result)) {
             return null;
         }
 
@@ -114,7 +114,7 @@ class ServiceHelper
         $priceRuleStruct->setPrice((float) $price['price']);
         $priceRuleStruct->setFrom((int) $price['from']);
         $priceRuleStruct->setTo((int) $price['to'] > 0 ? (int) $price['to'] : null);
-        $priceRuleStruct->setPseudoPrice((float) 0);
+        $priceRuleStruct->setPseudoPrice(0.0);
 
         return $priceRuleStruct;
     }
@@ -158,17 +158,15 @@ class ServiceHelper
 
     private function getDetailIdByNumber(string $number): ?int
     {
-        $result = $this->modelManager->getDBALQueryBuilder()
+        $result = (int) $this->modelManager->getDBALQueryBuilder()
             ->select('detail.id')
-            ->from(
-                's_articles_details',
-                'detail'
-            )->where('detail.ordernumber = :number')
+            ->from('s_articles_details', 'detail')
+            ->where('detail.ordernumber = :number')
             ->setParameter('number', $number)
             ->execute()
             ->fetchColumn();
 
-        if ($result === false) {
+        if ($result === 0) {
             return null;
         }
 

@@ -23,3 +23,8 @@ parameters:
         # Needs some improvements in the doctrine PHPStan extensions: see https://github.com/phpstan/phpstan-doctrine/pull/167
         - '#Cannot call method fetch.*\(\) on Doctrine\\DBAL\\.*\|int#'
         - '#should return Doctrine\\DBAL\\.* but returns Doctrine\\DBAL\\.*\|int\|string#'
+
+        - # Needs annotation fixes in the core
+            message: '#Parameter .* of method Shopware_Components_Acl::createResource\(\) expects null#'
+            count: 2
+            path: Bootstrap/Setup.php

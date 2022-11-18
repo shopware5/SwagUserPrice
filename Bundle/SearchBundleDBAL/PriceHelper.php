@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -70,6 +71,8 @@ class PriceHelper implements PriceHelperInterface
      * joins the user-prices from the plugin now.
      *
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function joinPrices(QueryBuilder $query, ShopContextInterface $context)
     {
@@ -104,6 +107,8 @@ class PriceHelper implements PriceHelperInterface
      * Additionally the user-prices from this plugin are joined.
      *
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function joinDefaultPrices(QueryBuilder $query, ShopContextInterface $context)
     {
@@ -124,16 +129,20 @@ class PriceHelper implements PriceHelperInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @return void
      */
     public function joinAvailableVariant(QueryBuilder $query)
     {
-        return $this->coreHelper->joinAvailableVariant($query);
+        $this->coreHelper->joinAvailableVariant($query);
     }
 
     /**
      * Builds the query to join all the needed prices.
      * Default-price for the default customer-group, customer-price for the current customer-group and
      * the own user-prices from this plugin.
+     *
+     * @param array{0: string, 1: string} $group
      */
     public function buildQuery(QueryBuilder $query, string $name, array $group): QueryBuilder
     {

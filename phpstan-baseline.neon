@@ -1,84 +1,9 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Call to an undefined method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:getEntityManager\\(\\)\\.$#"
-			count: 1
-			path: Bootstrap/Setup.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bootstrap\\\\Setup\\:\\:update\\(\\) has parameter \\$oldVersion with no type specified\\.$#"
-			count: 1
-			path: Bootstrap/Setup.php
-
-		-
-			message: "#^Parameter \\#3 \\$menuItemName of method Shopware_Components_Acl\\:\\:createResource\\(\\) expects null, string given\\.$#"
-			count: 1
-			path: Bootstrap/Setup.php
-
-		-
-			message: "#^Parameter \\#4 \\$pluginID of method Shopware_Components_Acl\\:\\:createResource\\(\\) expects null, int given\\.$#"
-			count: 1
-			path: Bootstrap/Setup.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:buildQuery\\(\\) has parameter \\$group with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Bundle/SearchBundleDBAL/PriceHelper.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinAvailableVariant\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Bundle/SearchBundleDBAL/PriceHelper.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinDefaultPrices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Bundle/SearchBundleDBAL/PriceHelper.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\SearchBundleDBAL\\\\PriceHelper\\:\\:joinPrices\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Bundle/SearchBundleDBAL/PriceHelper.php
-
-		-
-			message: "#^Parameter \\#1 \\$price of method SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:buildRule\\(\\) expects array, array\\|null given\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/CheapestUserPriceService.php
-
-		-
-			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPricesService\\:\\:getCustomRules\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
-
-		-
-			message: "#^Parameter \\#1 \\$array_arg of function end expects array\\|object, array\\|null given\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
-
-		-
-			message: "#^Call to an undefined method Enlight_Components_Session_Namespace\\:\\:getSession\\(\\)\\.$#"
-			count: 1
-			path: Components/AccessValidator.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:validateProduct\\(\\) has parameter \\$number with no type specified\\.$#"
-			count: 1
-			path: Components/AccessValidator.php
-
-		-
-			message: "#^Property SwagUserPrice\\\\Components\\\\AccessValidator\\:\\:\\$dependencyProvider \\(Enlight_Components_Session_Namespace\\) does not accept SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider\\.$#"
-			count: 1
-			path: Components/AccessValidator.php
-
-		-
-			message: "#^Call to an undefined method Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\Session\\:\\:getSession\\(\\)\\.$#"
-			count: 1
-			path: Components/ServiceHelper.php
 
 		-
 			message: "#^Method SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:buildRule\\(\\) has parameter \\$price with no value type specified in iterable type array\\.$#"
@@ -101,36 +26,6 @@ parameters:
 			path: Components/ServiceHelper.php
 
 		-
-			message: "#^Property SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:\\$dependencyProvider \\(Symfony\\\\Component\\\\HttpFoundation\\\\Session\\\\Session\\) does not accept SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\DependencyProvider\\.$#"
-			count: 1
-			path: Components/ServiceHelper.php
-
-		-
-			message: "#^Strict comparison using \\=\\=\\= between array and false will always evaluate to false\\.$#"
-			count: 1
-			path: Components/ServiceHelper.php
-
-		-
-			message: "#^Argument of an invalid type array\\|null supplied for foreach, only iterables are supported\\.$#"
-			count: 1
-			path: Components/UserPrice.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Components\\\\UserPrice\\:\\:formatArticlePrices\\(\\) has parameter \\$articles with no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Components/UserPrice.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Components\\\\UserPrice\\:\\:formatArticlePrices\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Components/UserPrice.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Components\\\\UserPrice\\:\\:getRepository\\(\\) return type with generic class Doctrine\\\\ORM\\\\EntityRepository does not specify its types\\: TEntityClass$#"
-			count: 1
-			path: Components/UserPrice.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesCountQuery\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
@@ -139,11 +34,6 @@ parameters:
 			message: "#^Method SwagUserPrice\\\\Models\\\\UserPrice\\\\Repository\\:\\:getArticlesQuery\\(\\) return type has no value type specified in iterable type Doctrine\\\\DBAL\\\\Driver\\\\Statement\\.$#"
 			count: 1
 			path: Models/UserPrice/Repository.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Subscriber\\\\CacheKeyExtender\\:\\:onCreateCacheHash\\(\\) should return string but returns string\\|false\\.$#"
-			count: 1
-			path: Subscriber/CacheKeyExtender.php
 
 		-
 			message: "#^Method SwagUserPrice\\\\Subscriber\\\\Hooks\\:\\:getSubscribedEvents\\(\\) return type has no value type specified in iterable type array\\.$#"
@@ -156,21 +46,6 @@ parameters:
 			path: Subscriber/Hooks.php
 
 		-
-			message: "#^Method SwagUserPrice\\\\SwagUserPrice\\:\\:getSetup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: SwagUserPrice.php
-
-		-
 			message: "#^Parameter \\#2 \\$context of method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPricesService\\:\\:get\\(\\) expects Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\ProductContextInterface, Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\ShopContextInterface given\\.$#"
 			count: 1
 			path: Tests/Functional/Bundle/StoreFrontBundle/Service/Core/GraduatedUserPriceServiceTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$sql of method Doctrine\\\\DBAL\\\\Connection\\:\\:exec\\(\\) expects string, string\\|false given\\.$#"
-			count: 1
-			path: Tests/Functional/Components/AccessValidatorTest.php
-
-		-
-			message: "#^Method SwagUserPrice\\\\Tests\\\\Functional\\\\Models\\\\UserPrice\\\\RepositoryTest\\:\\:getRepository\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: Tests/Functional/Models/UserPrice/RepositoryTest.php

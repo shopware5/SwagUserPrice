@@ -43,6 +43,7 @@ class AccessValidatorTest extends TestCase
         $validator = $this->getValidator();
 
         $sql = file_get_contents(__DIR__ . '/_fixtures/prices.sql');
+        static::assertIsString($sql);
         $this->getContainer()->get('dbal_connection')->exec($sql);
 
         $this->getContainer()->get('session')->offsetSet('sUserId', 1);

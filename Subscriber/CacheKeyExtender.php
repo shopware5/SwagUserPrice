@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -57,7 +58,7 @@ class CacheKeyExtender implements SubscriberInterface
             return $originalHash;
         }
 
-        return json_encode(['original_hash' => $originalHash, 'swag_user_price_group' => $priceGroup]);
+        return (string) json_encode(['original_hash' => $originalHash, 'swag_user_price_group' => $priceGroup]);
     }
 
     private function getCustomerPriceGroupId(int $userId): int

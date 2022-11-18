@@ -1,4 +1,5 @@
 <?php
+declare(strict_types=1);
 /**
  * (c) shopware AG <info@shopware.com>
  *
@@ -9,7 +10,6 @@
 
 namespace SwagUserPrice\Components;
 
-use Doctrine\ORM\EntityRepository;
 use Shopware\Components\Model\ModelManager;
 use SwagUserPrice\Models\UserPrice\Group;
 
@@ -27,26 +27,24 @@ class UserPrice
 
     /**
      * Formats the prices for an article in the backend.
+     *
+     * @param array<array<string, mixed>> $articles
+     *
+     * @return array<array<string, mixed>>
      */
-    public function formatArticlePrices(?array $articles, int $groupId): ?array
+    public function formatArticlePrices(array $articles, int $groupId): array
     {
-        /** @var Group $model */
-        $model = $this->getRepository()->find($groupId);
+        $priceGroup = $this->modelManager->getRepository(Group::class)->find($groupId);
 
-        if (!$model->getGross()) {
+        if (!$priceGroup instanceof Group || !$priceGroup->getGross()) {
             return $articles;
         }
 
-        foreach ($articles as &$article) {
-            $article['defaultPrice'] = round($article['defaultPrice'] / 100 * (100 + $article['tax']), 3);
-            $article['current'] = round($article['current'] / 100 * (100 + $article['tax']), 3);
+        foreach ($articles as &$product) {
+            $product['defaultPrice'] = round($product['defaultPrice'] / 100 * (100 + $product['tax']), 3);
+            $product['current'] = round($product['current'] / 100 * (100 + $product['tax']), 3);
         }
 
         return $articles;
-    }
-
-    private function getRepository(): EntityRepository
-    {
-        return $this->modelManager->getRepository(Group::class);
     }
 }
