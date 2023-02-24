@@ -22,4 +22,15 @@ class ReflectionHelper
 
         return $method;
     }
+
+    /**
+     * @param class-string $class
+     */
+    public static function getProperty(string $class, string $propertyName): \ReflectionProperty
+    {
+        $property = (new \ReflectionClass($class))->getProperty($propertyName);
+        $property->setAccessible(true);
+
+        return $property;
+    }
 }

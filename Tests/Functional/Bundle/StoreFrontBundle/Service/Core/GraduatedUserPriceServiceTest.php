@@ -11,12 +11,14 @@ declare(strict_types=1);
 namespace SwagUserPrice\Tests\Functional\Bundle\StoreFrontBundle\Service\Core;
 
 use PHPUnit\Framework\TestCase;
-use Shopware\Bundle\StoreFrontBundle\Service\GraduatedPricesServiceInterface;
 use Shopware\Bundle\StoreFrontBundle\Struct\ListProduct;
 use Shopware\Bundle\StoreFrontBundle\Struct\Product\PriceRule;
+use Shopware\Bundle\StoreFrontBundle\Struct\ShopContext;
 use Shopware\Tests\Functional\Traits\DatabaseTransactionBehaviour;
 use SwagUserPrice\Bundle\StoreFrontBundle\Service\Core\GraduatedUserPricesService;
+use SwagUserPrice\Components\AccessValidator;
 use SwagUserPrice\Tests\Functional\ContainerTrait;
+use SwagUserPrice\Tests\Functional\ReflectionHelper;
 
 class GraduatedUserPriceServiceTest extends TestCase
 {
@@ -25,23 +27,59 @@ class GraduatedUserPriceServiceTest extends TestCase
 
     public function testGet(): void
     {
-        $contextService = $this->getContainer()->get('shopware_storefront.context_service');
-        $context = $contextService->createProductContext(1, 1, 'EK');
-        $listProduct = new ListProduct(178, 407, 'SW10178');
+        $result = $this->getService()->get(new ListProduct(178, 407, 'SW10178'), $this->getContext());
 
-        $service = $this->getService();
-        static::assertInstanceOf(GraduatedUserPricesService::class, $service);
-
-        $result = $service->get($listProduct, $context);
         static::assertIsArray($result);
         $result = array_shift($result);
         static::assertInstanceOf(PriceRule::class, $result);
-
-        static::assertEqualsWithDelta(16.764705882353, $result->getPrice(), 0.01);
+        static::assertSame(0.0, $result->getPrice());
     }
 
-    private function getService(): GraduatedPricesServiceInterface
+    public function testGetListWithNumericProductNumbers(): void
     {
-        return $this->getContainer()->get('shopware_storefront.graduated_prices_service');
+        $this->prepareCustomerPrice();
+
+        $result = $this->getService()->getList([
+            10178 => new ListProduct(178, 407, '10178'),
+        ], $this->getContext());
+
+        $priceRulesOfProduct = array_shift($result);
+        static::assertIsArray($priceRulesOfProduct);
+        $firstPriceRule = array_shift($priceRulesOfProduct);
+        static::assertInstanceOf(PriceRule::class, $firstPriceRule);
+        static::assertSame(0.0, $firstPriceRule->getPrice());
+    }
+
+    private function getService(): GraduatedUserPricesService
+    {
+        $service = $this->getContainer()->get('shopware_storefront.graduated_prices_service');
+        static::assertInstanceOf(GraduatedUserPricesService::class, $service);
+
+        $validatorMock = $this->createMock(AccessValidator::class);
+        $validatorMock->expects(static::once())->method('validateProduct')->willReturn(true);
+
+        $validatorProperty = ReflectionHelper::getProperty(GraduatedUserPricesService::class, 'validator');
+        $validatorProperty->setValue($service, $validatorMock);
+
+        return $service;
+    }
+
+    private function getContext(): ShopContext
+    {
+        $contextService = $this->getContainer()->get('shopware_storefront.context_service');
+
+        $context = $contextService->createShopContext(1, 1, 'EK');
+        static::assertInstanceOf(ShopContext::class, $context);
+
+        return $context;
+    }
+
+    private function prepareCustomerPrice(): void
+    {
+        $this->getContainer()->get('dbal_connection')->update(
+            's_articles_details',
+            ['ordernumber' => 10178],
+            ['ordernumber' => 'SW10178']
+        );
     }
 }

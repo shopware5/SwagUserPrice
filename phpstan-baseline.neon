@@ -1,11 +1,6 @@
 parameters:
 	ignoreErrors:
 		-
-			message: "#^Method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPricesService\\:\\:getCustomRules\\(\\) return type has no value type specified in iterable type array\\.$#"
-			count: 1
-			path: Bundle/StoreFrontBundle/Service/Core/GraduatedUserPricesService.php
-
-		-
 			message: "#^Method SwagUserPrice\\\\Components\\\\ServiceHelper\\:\\:buildRule\\(\\) has parameter \\$price with no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Components/ServiceHelper.php
@@ -44,8 +39,3 @@ parameters:
 			message: "#^Method SwagUserPrice\\\\Subscriber\\\\Hooks\\:\\:onUpdatePrice\\(\\) return type has no value type specified in iterable type array\\.$#"
 			count: 1
 			path: Subscriber/Hooks.php
-
-		-
-			message: "#^Parameter \\#2 \\$context of method SwagUserPrice\\\\Bundle\\\\StoreFrontBundle\\\\Service\\\\Core\\\\GraduatedUserPricesService\\:\\:get\\(\\) expects Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\ProductContextInterface, Shopware\\\\Bundle\\\\StoreFrontBundle\\\\Struct\\\\ShopContextInterface given\\.$#"
-			count: 1
-			path: Tests/Functional/Bundle/StoreFrontBundle/Service/Core/GraduatedUserPriceServiceTest.php
