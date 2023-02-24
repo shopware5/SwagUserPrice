@@ -63,6 +63,7 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
         $products = $this->service->getList($products, $context);
 
         foreach ($products as $number => &$rules) {
+            $number = (string) $number;
             if (!$this->validator->validateProduct($number)) {
                 continue;
             }
@@ -75,6 +76,8 @@ class GraduatedUserPricesService implements GraduatedPricesServiceInterface
 
     /**
      * Builds a custom price-rule to implement the plugins prices.
+     *
+     * @return list<PriceRule>
      */
     private function getCustomRules(PriceRule $coreRule, string $number): array
     {
