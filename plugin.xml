@@ -4,12 +4,17 @@
 
     <label lang="de">Kundenspezifische Preise</label>
     <label lang="en">Customer-specific prices</label>
-    <version>4.0.6</version>
+    <version>4.0.7</version>
     <copyright>(c) by shopware AG</copyright>
     <license>MIT</license>
     <link>http://store.shopware.com</link>
     <author>shopware AG</author>
     <compatibility minVersion="5.6.9" maxVersion="5.99.99"/>
+
+    <changelog version="4.0.7">
+        <changes lang="de">PT-13058 - Problem mit nummerischen Produktnummern behoben;</changes>
+        <changes lang="en">PT-13058 - Fixed problem with numeric product numbers;</changes>
+    </changelog>
 
     <changelog version="4.0.6">
         <changes lang="de">PT-13052 - Problem mit nummerischen Produktnummern behoben;</changes>

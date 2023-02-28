@@ -66,16 +66,17 @@ class CheapestUserPriceService implements CheapestPriceServiceInterface
      */
     public function getList($products, ProductContextInterface $context)
     {
-        $products = $this->service->getList($products, $context);
+        $priceRules = $this->service->getList($products, $context);
 
-        foreach ($products as $number => &$rule) {
+        foreach ($priceRules as $number => &$rule) {
+            $number = (string) $number;
             if (!$this->validator->validateProduct($number)) {
                 continue;
             }
             $rule = $this->getCustomRule($rule, $number);
         }
 
-        return $products;
+        return $priceRules;
     }
 
     /**
