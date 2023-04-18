@@ -66,7 +66,7 @@ class CheapestUserPriceServiceTest extends TestCase
     {
         $this->getContainer()->get('dbal_connection')->update(
             's_articles_details',
-            ['ordernumber' => 10178],
+            ['ordernumber' => '10178'],
             ['ordernumber' => 'SW10178']
         );
     }
