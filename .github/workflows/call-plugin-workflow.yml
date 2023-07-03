@@ -35,3 +35,8 @@ jobs:
         uses: shopware5/docker-images-testing/.github/workflows/php-code-analysis.yml@main
         with:
             plugin-name: SwagUserPrice
+
+    call-javascript-workflow:
+        uses: shopware5/docker-images-testing/.github/workflows/php-code-analysis.yml@main
+        with:
+            plugin-name: SwagUserPrice
